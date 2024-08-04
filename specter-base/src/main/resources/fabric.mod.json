@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-base",
+	"version": "${version}",
+	"name": "Specter Base",
+	"description": "Library for Spirit Studios mods (Base module)",
+	"authors": [],
+	"contact": {
+		"repo": "https://github.com/SpiritGameStudios/Specter",
+		"issues": "https://github.com/SpiritGameStudios/Specter/issues"
+	},
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+	},
+	"mixins": [
+		"specter-base.mixins.json",
+		{
+			"config": "specter-base.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"fabric-api": "*",
+		"java": ">=21"
+	},
+	"custom": {
+		"modmenu": {
+			"parent": "specter",
+			"badges": [ "library" ]
+		}
+	}
+}

@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-config-testmod",
+	"version": "${version}",
+	"name": "Specter",
+	"description": "Library for Spirit Studios mods (Config module tests)",
+	"authors": [],
+	"contact": {
+		"repo": "https://github.com/SpiritGameStudios/Specter",
+		"issues": "https://github.com/SpiritGameStudios/Specter/issues"
+	},
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.spiritstudios.testmod.SpecterConfigTestmod"
+		],
+		"client": [
+			"dev.spiritstudios.testmod.SpecterConfigTestmodClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"fabric-api": "*",
+		"java": ">=21"
+	}
+}

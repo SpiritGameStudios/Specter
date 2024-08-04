@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.specter.mixin.item",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ItemMixin",
+		"ItemSettingsMixin",
+		"RegistryMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
