@@ -51,7 +51,7 @@ allprojects {
 		mappings("net.fabricmc:yarn:${deps.yarn}:v2")
 		modApi("net.fabricmc:fabric-loader:${deps.loader}")
 
-		modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
+		modApi("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
 	}
 
 
