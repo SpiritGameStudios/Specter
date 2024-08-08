@@ -61,10 +61,10 @@ public class ConfigScreen extends Screen {
 		Object value = ReflectionHelper.getFieldValue(config, option);
 		options.add(switch (value) {
 			case String ignored ->
-				new TextBoxWidget(getTranslationKey(option), () -> (String) value, newValue -> ReflectionHelper.setFieldValue(config, option, newValue));
+				new TextBoxWidget(getTranslationKey(option), () -> ReflectionHelper.getFieldValue(config, option), newValue -> ReflectionHelper.setFieldValue(config, option, newValue));
 
 			case Boolean ignored ->
-				new BooleanButtonWidget(getTranslationKey(option), () -> (Boolean) value, newValue -> ReflectionHelper.setFieldValue(config, option, newValue));
+				new BooleanButtonWidget(getTranslationKey(option), () -> ReflectionHelper.getFieldValue(config, option), newValue -> ReflectionHelper.setFieldValue(config, option, newValue));
 
 			case Float ignored -> {
 				float min = 0;
@@ -121,7 +121,7 @@ public class ConfigScreen extends Screen {
 			}
 
 			case Enum<?> ignored ->
-				new EnumButtonWidget(option.getName(), () -> (Enum<?>) value, newValue -> ReflectionHelper.setFieldValue(config, option, newValue), (Enum<?>) value);
+				new EnumButtonWidget(option.getName(), () -> ReflectionHelper.getFieldValue(config, option), newValue -> ReflectionHelper.setFieldValue(config, option, newValue), (Enum<?>) value);
 
 			case NestedConfig nestedValue -> {
 				getNestedClass(options, nestedValue);

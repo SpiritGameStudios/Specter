@@ -33,6 +33,7 @@ public class OptionsScrollableWidget extends ElementListWidget<OptionsScrollable
 	public void addOptions(ClickableWidget[] options) {
 		for (int i = 0; i < options.length; i += 2) {
 			ClickableWidget widget = options[i];
+			if (widget == null) continue;
 			ClickableWidget widget2 = i + 1 < options.length ? options[i + 1] : null;
 			this.addEntry(new OptionEntry(widget, widget2, this.width));
 		}

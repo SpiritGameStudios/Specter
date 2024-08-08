@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.specter.mixin.biome",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

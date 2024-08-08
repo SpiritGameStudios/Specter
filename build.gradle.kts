@@ -49,9 +49,9 @@ allprojects {
 	dependencies {
 		minecraft("com.mojang:minecraft:${deps.minecraft}")
 		mappings("net.fabricmc:yarn:${deps.yarn}:v2")
-		modApi("net.fabricmc:fabric-loader:${deps.loader}")
+		modImplementation("net.fabricmc:fabric-loader:${deps.loader}")
 
-		modApi("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
+		modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
 	}
 
 

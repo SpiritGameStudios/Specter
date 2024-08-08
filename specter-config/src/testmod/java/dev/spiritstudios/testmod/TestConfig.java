@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 public class TestConfig implements Config {
 	@Override
 	public Identifier getId() {
-		return Identifier.of("testmod", "testconfig");
+		return Identifier.of("specter-config-testmod", "testconfig");
 	}
 
 	@Comment("This is a test string")
