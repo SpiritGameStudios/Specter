@@ -44,6 +44,7 @@ allprojects {
 
 	loom {
 		splitEnvironmentSourceSets()
+		accessWidenerPath = rootDir.absoluteFile.resolve("src/main/resources/specter.accesswidener")
 	}
 
 	dependencies {

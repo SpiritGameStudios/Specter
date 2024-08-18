@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 public class SpecterBlockTestmod implements ModInitializer {
 	public static final SpecterItemGroup TEST_GROUP = new SpecterItemGroup(Identifier.of("specter_block_testmod", "test_group"), () -> new ItemStack(Blocks.ACACIA_LOG));
 
-	public static final Block TEST_BLOCK = new Block(AbstractBlock.Settings.create().strippedBlock(Blocks.ACACIA_LOG).group(TEST_GROUP).spread(10).burn(10).flammable());
+	public static final Block TEST_BLOCK = new Block(AbstractBlock.Settings.create().group(TEST_GROUP));
 
 	@Override
 	public void onInitialize() {

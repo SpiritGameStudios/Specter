@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.registry;
+package dev.spiritstudios.specter.api.registry.registration;
 
 import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
 import org.jetbrains.annotations.ApiStatus;

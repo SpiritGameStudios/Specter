@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.mixin.block;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import dev.spiritstudios.specter.api.block.BlockAttachments;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.AxeItem;
@@ -17,10 +18,13 @@ import java.util.Optional;
 public class AxeItemMixin {
 	@Shadow
 	@Final
-	protected static Map<Block, Block> STRIPPED_BLOCKS;
+	public static Map<Block, Block> STRIPPED_BLOCKS;
 
 	@WrapOperation(method = "tryStrip", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/AxeItem;getStrippedState(Lnet/minecraft/block/BlockState;)Ljava/util/Optional;"))
 	private Optional<BlockState> getStrippedState(AxeItem instance, BlockState state, Operation<Optional<BlockState>> original) {
-		return Optional.ofNullable(STRIPPED_BLOCKS.get(state.getBlock())).map(block -> block.getStateWithProperties(state));
+		Optional<Block> strippedBlock = BlockAttachments.STRIPPABLE.get(state.getBlock());
+		if (strippedBlock.isEmpty()) strippedBlock = Optional.ofNullable(STRIPPED_BLOCKS.get(state.getBlock()));
+
+		return strippedBlock.map(block -> block.getStateWithProperties(state));
 	}
 }

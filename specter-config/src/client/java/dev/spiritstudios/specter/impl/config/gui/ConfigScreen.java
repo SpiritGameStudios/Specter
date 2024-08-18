@@ -20,7 +20,6 @@ import java.util.List;
 public class ConfigScreen extends Screen {
 	private final Config config;
 	private final Screen parent;
-	private OptionsScrollableWidget scrollableWidget;
 
 	public ConfigScreen(Config config, Screen parent) {
 		super(Text.translatable("config." + config.getId() + ".title"));
@@ -32,12 +31,12 @@ public class ConfigScreen extends Screen {
 	protected void init() {
 		super.init();
 
-		this.scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
+		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
 		List<ClickableWidget> options = new ArrayList<>();
 		for (Field field : config.getClass().getDeclaredFields()) addOptionWidget(field, options);
 
-		this.scrollableWidget.addOptions(Arrays.copyOf(options.toArray(), options.size(), ClickableWidget[].class));
-		this.addDrawableChild(this.scrollableWidget);
+		scrollableWidget.addOptions(Arrays.copyOf(options.toArray(), options.size(), ClickableWidget[].class));
+		this.addDrawableChild(scrollableWidget);
 		this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("gui.done"), button -> close()).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build());
 	}
 

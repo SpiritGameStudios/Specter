@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.registry;
+package dev.spiritstudios.specter.api.registry.registration;
 
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
