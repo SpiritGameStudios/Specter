@@ -8,6 +8,7 @@
 		"AbstractBlockSettingsMixin",
 		"AxeItemMixin",
 		"FireBlockMixin",
+		"HoneycombItemMixin",
 		"RegistryMixin",
 		"ShovelItemMixin"
 	],

@@ -25,6 +25,13 @@ public final class BlockAttachments {
 		PacketCodecs.entryOf(Block.STATE_IDS).cast()
 	).build();
 
+	public static final Attachment<Block, Block> WAXABLE = Attachment.builder(
+		Registries.BLOCK,
+		Identifier.of(MODID, "waxable"),
+		Registries.BLOCK.getCodec(),
+		PacketCodecs.registryValue(RegistryKeys.BLOCK)
+	).build();
+
 	public static final Attachment<Block, FlammableBlockData> FLAMMABLE = Attachment.builder(
 		Registries.BLOCK,
 		Identifier.of(MODID, "flammable"),
