@@ -9,7 +9,7 @@
 		"AxeItemMixin",
 		"FireBlockMixin",
 		"RegistryMixin",
-		"StrippableBlockRegistryMixin"
+		"ShovelItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

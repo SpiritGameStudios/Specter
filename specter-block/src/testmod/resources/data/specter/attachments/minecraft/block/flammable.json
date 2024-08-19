@@ -1,0 +1,9 @@
+{
+	"replace": false,
+	"values": {
+		"minecraft:quartz_pillar": {
+			"burn": 5,
+			"spread": 5
+		}
+	}
+}

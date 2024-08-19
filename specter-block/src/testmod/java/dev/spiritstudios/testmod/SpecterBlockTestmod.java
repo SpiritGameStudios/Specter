@@ -2,7 +2,6 @@ package dev.spiritstudios.testmod;
 
 import dev.spiritstudios.specter.api.item.SpecterItemGroup;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -26,8 +25,5 @@ public class SpecterBlockTestmod implements ModInitializer {
 		Registry.register(Registries.ITEM, Identifier.of("specter_block_testmod", "test_block"), item);
 
 		TEST_GROUP.init();
-
-		// Stripped state test
-		StrippableBlockRegistry.register(Blocks.SANDSTONE_STAIRS, Blocks.SMOOTH_QUARTZ_STAIRS);
 	}
 }

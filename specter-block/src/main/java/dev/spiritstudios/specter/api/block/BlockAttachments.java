@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.block;
 
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
@@ -15,6 +16,13 @@ public final class BlockAttachments {
 		Identifier.of(MODID, "strippable"),
 		Registries.BLOCK.getCodec(),
 		PacketCodecs.registryValue(RegistryKeys.BLOCK)
+	).build();
+
+	public static final Attachment<Block, BlockState> FLATTENABLE = Attachment.builder(
+		Registries.BLOCK,
+		Identifier.of(MODID, "flattenable"),
+		BlockState.CODEC,
+		PacketCodecs.entryOf(Block.STATE_IDS).cast()
 	).build();
 
 	public static final Attachment<Block, FlammableBlockData> FLAMMABLE = Attachment.builder(
