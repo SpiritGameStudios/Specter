@@ -32,6 +32,13 @@ public final class BlockAttachments {
 		PacketCodecs.registryValue(RegistryKeys.BLOCK)
 	).build();
 
+	public static final Attachment<Block, Block> OXIDIZABLE = Attachment.builder(
+		Registries.BLOCK,
+		Identifier.of(MODID, "oxidizable"),
+		Registries.BLOCK.getCodec(),
+		PacketCodecs.registryValue(RegistryKeys.BLOCK)
+	).build();
+
 	public static final Attachment<Block, FlammableBlockData> FLAMMABLE = Attachment.builder(
 		Registries.BLOCK,
 		Identifier.of(MODID, "flammable"),

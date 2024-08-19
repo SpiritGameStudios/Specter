@@ -9,6 +9,7 @@
 		"AxeItemMixin",
 		"FireBlockMixin",
 		"HoneycombItemMixin",
+		"OxidizableMixin",
 		"RegistryMixin",
 		"ShovelItemMixin"
 	],
