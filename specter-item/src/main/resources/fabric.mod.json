@@ -12,6 +12,9 @@
 	"license": "MPL-2.0",
 	"environment": "*",
 	"entrypoints": {
+		"main": [
+			"dev.spiritstudios.specter.impl.item.SpecterItem"
+		]
 	},
 	"mixins": [
 		"specter-item.mixins.json"

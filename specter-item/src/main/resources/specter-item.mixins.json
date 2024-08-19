@@ -4,6 +4,9 @@
 	"package": "dev.spiritstudios.specter.mixin.item",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"AbstractFurnaceBlockEntityMixin",
+		"ComposterBlock$ComposterInventoryMixin",
+		"ComposterBlockMixin",
 		"ItemMixin",
 		"ItemSettingsMixin",
 		"RegistryMixin"
