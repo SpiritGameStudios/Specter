@@ -7,7 +7,7 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
-import static dev.spiritstudios.specter.impl.base.Specter.MODID;
+import static dev.spiritstudios.specter.impl.core.Specter.MODID;
 
 public final class ItemAttachments {
 	public static final Attachment<Item, Float> COMPOSTING_CHANCE = Attachment.builder(

@@ -1,9 +1,9 @@
 package dev.spiritstudios.specter.impl.config;
 
-import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigManager;
 import dev.spiritstudios.specter.api.config.annotations.Sync;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;

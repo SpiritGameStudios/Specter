@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.api.render.shake;
 
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.impl.core.Specter;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;

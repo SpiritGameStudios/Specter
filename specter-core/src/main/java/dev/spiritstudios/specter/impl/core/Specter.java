@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.base;
+package dev.spiritstudios.specter.impl.core;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;

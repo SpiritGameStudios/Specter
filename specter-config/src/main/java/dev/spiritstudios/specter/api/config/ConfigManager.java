@@ -2,9 +2,9 @@ package dev.spiritstudios.specter.api.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NonSyncExclusionStrategy;
+import dev.spiritstudios.specter.impl.core.Specter;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 

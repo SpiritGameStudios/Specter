@@ -1,13 +1,13 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "dev.spiritstudios.specter.mixin.base.client",
+	"package": "dev.spiritstudios.specter.mixin.core.client",
 	"compatibilityLevel": "JAVA_21",
 	"injectors": {
 		"defaultRequire": 1
 	},
 	"client": [
-		"RunArgsNetworkMixin",
-		"NarratorMixin"
+		"NarratorMixin",
+		"RunArgsNetworkMixin"
 	]
 }

@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.impl.registry.attachment;
 
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.SpecterRegistry;
 import dev.spiritstudios.specter.impl.registry.attachment.network.AttachmentSyncS2CPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import static dev.spiritstudios.specter.impl.base.Specter.MODID;
+import static dev.spiritstudios.specter.impl.core.Specter.MODID;
 
 public class AttachmentReloader implements SimpleResourceReloadListener<HashMap<Attachment<?, ?>, AttachmentMap<?, ?>>> {
 	private void processAttachment(Map<Identifier, List<Resource>> resources, Registry<?> registry, HashMap<Attachment<?, ?>, AttachmentMap<?, ?>> attachmentMaps) {

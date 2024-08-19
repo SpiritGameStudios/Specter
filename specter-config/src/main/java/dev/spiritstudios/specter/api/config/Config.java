@@ -1,9 +1,9 @@
 package dev.spiritstudios.specter.api.config;
 
-import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
 import dev.spiritstudios.specter.api.config.annotations.Comment;
 import dev.spiritstudios.specter.api.config.annotations.Range;
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.impl.core.Specter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;

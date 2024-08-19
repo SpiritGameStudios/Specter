@@ -1,1 +1,1 @@
-moduleDependencies(project, "specter-base", "specter-registry")
+moduleDependencies(project, "specter-core", "specter-registry")

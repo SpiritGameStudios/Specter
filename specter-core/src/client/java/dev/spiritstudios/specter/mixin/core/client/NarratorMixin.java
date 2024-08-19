@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.mixin.base.client;
+package dev.spiritstudios.specter.mixin.core.client;
 
 import com.mojang.text2speech.Narrator;
 import com.mojang.text2speech.OperatingSystem;
@@ -15,16 +15,21 @@ public interface NarratorMixin {
 			cir.setReturnValue(
 				new Narrator() {
 					@Override
-					public void say(String msg, boolean interrupt) { }
+					public void say(String msg, boolean interrupt) {
+					}
 
 					@Override
-					public void clear() { }
+					public void clear() {
+					}
 
 					@Override
-					public void destroy() { }
+					public void destroy() {
+					}
 
 					@Override
-					public boolean active() { return false; }
+					public boolean active() {
+						return false;
+					}
 				}
 			);
 		}

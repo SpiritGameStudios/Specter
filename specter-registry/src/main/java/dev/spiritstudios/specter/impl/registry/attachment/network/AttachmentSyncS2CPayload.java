@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.impl.registry.attachment.network;
 
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.network.RegistryByteBuf;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static dev.spiritstudios.specter.impl.base.Specter.MODID;
+import static dev.spiritstudios.specter.impl.core.Specter.MODID;
 
 @ApiStatus.Internal
 public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) implements CustomPayload {

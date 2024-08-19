@@ -1,11 +1,11 @@
 package dev.spiritstudios.specter.impl.config.gui;
 
-import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.annotations.Range;
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.gui.widget.*;
+import dev.spiritstudios.specter.impl.core.Specter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;

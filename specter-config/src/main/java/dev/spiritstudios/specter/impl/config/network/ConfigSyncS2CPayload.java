@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.impl.config.network;
 
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.impl.core.Specter;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.network.codec.PacketCodec;

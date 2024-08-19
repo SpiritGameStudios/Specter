@@ -1,8 +1,8 @@
-package dev.spiritstudios.specter.mixin.base.client;
+package dev.spiritstudios.specter.mixin.core.client;
 
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.util.UndashedUuid;
-import dev.spiritstudios.specter.impl.base.Specter;
+import dev.spiritstudios.specter.impl.core.Specter;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.session.Session;
 import org.spongepowered.asm.mixin.Final;

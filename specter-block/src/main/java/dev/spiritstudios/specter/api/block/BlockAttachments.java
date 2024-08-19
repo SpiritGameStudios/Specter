@@ -8,7 +8,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
-import static dev.spiritstudios.specter.impl.base.Specter.MODID;
+import static dev.spiritstudios.specter.impl.core.Specter.MODID;
 
 public final class BlockAttachments {
 	public static final Attachment<Block, Block> STRIPPABLE = Attachment.builder(

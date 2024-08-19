@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.api.biome;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;

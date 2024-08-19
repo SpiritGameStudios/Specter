@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.api.registry.registration;
 
-import dev.spiritstudios.specter.api.base.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.ElementType;
