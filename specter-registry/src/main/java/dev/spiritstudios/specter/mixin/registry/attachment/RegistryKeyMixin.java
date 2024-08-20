@@ -4,6 +4,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.registry.RegistryKey;
@@ -15,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +29,7 @@ public class RegistryKeyMixin<R> implements AttachmentHolder<R> {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void init(Identifier registry, Identifier value, CallbackInfo ci) {
-		attachments = new HashMap<>();
+		attachments = new Object2ObjectOpenHashMap<>();
 	}
 
 	@Override

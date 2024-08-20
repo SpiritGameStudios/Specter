@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.impl.registry;
 
-import dev.spiritstudios.specter.impl.registry.attachment.AttachmentReloader;
+import dev.spiritstudios.specter.impl.registry.attachment.data.AttachmentReloader;
 import dev.spiritstudios.specter.impl.registry.attachment.network.AttachmentSyncS2CPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -29,9 +29,9 @@ public class SpecterRegistry implements ModInitializer {
 			AttachmentSyncS2CPayload.createPayloads()
 				.forEach(sender::sendPacket));
 
-		ServerLifecycleEvents.SERVER_STARTING.register(server1 -> server = server1);
-		ServerLifecycleEvents.SERVER_STOPPING.register(server1 -> {
-			if (server == server1) server = null;
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> SpecterRegistry.server = server);
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			if (SpecterRegistry.server == server) SpecterRegistry.server = null;
 		});
 	}
 }

@@ -26,9 +26,9 @@ import static dev.spiritstudios.specter.impl.core.Specter.MODID;
 @ApiStatus.Internal
 public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) implements CustomPayload {
 	public static final Id<AttachmentSyncS2CPayload<Object>> ID = new Id<>(Identifier.of(MODID, "attachment_sync"));
+
 	private static final Map<Identifier, CacheEntry<?>> CACHE = new Object2ReferenceOpenHashMap<>();
 
-	// This is the most cursed Codec of all time
 	@SuppressWarnings("unchecked")
 	public static PacketCodec<RegistryByteBuf, AttachmentSyncS2CPayload<Object>> CODEC =
 		PacketCodec.tuple(
@@ -55,7 +55,7 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 	private static void fillCache() {
 		if (!CACHE.isEmpty()) return;
 
-		for (Map.Entry<RegistryKey<MutableRegistry<?>>, MutableRegistry<?>> entry : Registries.ROOT.getEntrySet()) {
+		for (Map.Entry<RegistryKey<MutableRegistry<?>>, MutableRegistry<?>> entry : Registries.ROOT.getEntrySet()) { // For each registry
 			Registry<Object> registry = (Registry<Object>) entry.getValue();
 			AttachmentHolder<Object> attachmentHolder = AttachmentHolder.of(registry);
 
