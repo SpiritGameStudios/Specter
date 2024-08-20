@@ -19,6 +19,7 @@ public class SpecterBlock implements ModInitializer {
 	public void onInitialize() {
 		BlockAttachments.init();
 
+		reloadBiMaps();
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> reloadBiMaps());
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> reloadBiMaps());
 	}
