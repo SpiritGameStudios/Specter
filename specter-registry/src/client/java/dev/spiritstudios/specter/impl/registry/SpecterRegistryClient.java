@@ -12,11 +12,11 @@ import net.minecraft.util.Identifier;
 public class SpecterRegistryClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		ClientPlayNetworking.registerGlobalReceiver(AttachmentSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyAttachmentSync(context, payload)));
+		ClientPlayNetworking.registerGlobalReceiver(AttachmentSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyAttachmentSync(payload)));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <V> void applyAttachmentSync(ClientPlayNetworking.Context context, AttachmentSyncS2CPayload<V> payload) {
+	private static <V> void applyAttachmentSync(AttachmentSyncS2CPayload<V> payload) {
 		if (MinecraftClient.getInstance().isIntegratedServerRunning())
 			return;
 
