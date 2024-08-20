@@ -10,3 +10,10 @@
 
 ## 📔 About
 
+Specter is a library for Spirit Studios mods, providing a variety of utilities and features to make modding easier.
+
+TODO: Add usage instructions here
+
+## Special Thanks
+
+To the QSL Team, for creating their REA system, which the Attachment API is heavily inspired by.
