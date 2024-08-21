@@ -3,9 +3,9 @@ package dev.spiritstudios.specter.impl.config.gui;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.annotations.Range;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.gui.widget.*;
-import dev.spiritstudios.specter.impl.core.Specter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -128,8 +128,8 @@ public class ConfigScreen extends Screen {
 			}
 
 			case null, default -> {
-				if (Specter.DEBUG)
-					Specter.LOGGER.warn("Unsupported config type: {}", option.getType().getName());
+				if (SpecterGlobals.DEBUG)
+					SpecterGlobals.LOGGER.warn("Unsupported config type: {}", option.getType().getName());
 
 				yield null;
 			}

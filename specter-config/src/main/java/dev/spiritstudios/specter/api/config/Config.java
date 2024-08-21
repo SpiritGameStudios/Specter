@@ -2,8 +2,8 @@ package dev.spiritstudios.specter.api.config;
 
 import dev.spiritstudios.specter.api.config.annotations.Comment;
 import dev.spiritstudios.specter.api.config.annotations.Range;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
-import dev.spiritstudios.specter.impl.core.Specter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -79,7 +79,7 @@ public interface Config {
 		try {
 			Files.write(path, newLines);
 		} catch (IOException e) {
-			Specter.LOGGER.error("Failed to save config file: {}", path, e);
+			SpecterGlobals.LOGGER.error("Failed to save config file: {}", path, e);
 		}
 	}
 

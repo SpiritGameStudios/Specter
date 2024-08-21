@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.mixin.core.client;
 
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.util.UndashedUuid;
-import dev.spiritstudios.specter.impl.core.Specter;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.session.Session;
 import org.spongepowered.asm.mixin.Final;
@@ -25,17 +25,17 @@ public class RunArgsNetworkMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void init(Session session, PropertyMap userProperties, PropertyMap profileProperties, Proxy proxy, CallbackInfo ci) {
-		if (!Specter.DEBUG) return;
+		if (!SpecterGlobals.DEBUG) return;
 
 		if (!System.getProperties().containsKey("specter.development.username") || !System.getProperties().containsKey("specter.development.uuid")) {
-			Specter.LOGGER.info("Development account not set, skipping...");
+			SpecterGlobals.LOGGER.info("Development account not set, skipping...");
 			return;
 		}
 
 		String username = System.getProperty("specter.development.username");
 		UUID uuid = UndashedUuid.fromString(System.getProperty("specter.development.uuid").replace("-", ""));
 
-		Specter.LOGGER.info(String.format("Using development account %s (%s)", username, uuid));
+		SpecterGlobals.LOGGER.info(String.format("Using development account %s (%s)", username, uuid));
 		this.session = new Session(
 			username,
 			uuid,

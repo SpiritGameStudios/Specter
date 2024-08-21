@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.impl.registry.attachment.network;
 
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.network.RegistryByteBuf;
@@ -21,11 +21,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static dev.spiritstudios.specter.impl.core.Specter.MODID;
-
 @ApiStatus.Internal
 public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) implements CustomPayload {
-	public static final Id<AttachmentSyncS2CPayload<Object>> ID = new Id<>(Identifier.of(MODID, "attachment_sync"));
+	public static final Id<AttachmentSyncS2CPayload<Object>> ID = new Id<>(Identifier.of(SpecterGlobals.MODID, "attachment_sync"));
 
 	private static final Map<Identifier, CacheEntry<?>> CACHE = new Object2ReferenceOpenHashMap<>();
 
@@ -60,7 +58,7 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 			AttachmentHolder<Object> attachmentHolder = AttachmentHolder.of(registry);
 
 			for (Map.Entry<Identifier, Attachment<Object, ?>> attachment : attachmentHolder.specter$getAttachments()) {
-				Specter.LOGGER.debug("Caching attachment {}", attachment.getKey());
+				SpecterGlobals.LOGGER.debug("Caching attachment {}", attachment.getKey());
 				cacheAttachment(attachment.getValue(), registry);
 			}
 		}

@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.impl.registry.attachment.data;
 
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import dev.spiritstudios.specter.impl.registry.SpecterRegistry;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
@@ -22,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-
-import static dev.spiritstudios.specter.impl.core.Specter.MODID;
 
 public class AttachmentReloader implements SimpleResourceReloadListener<Map<Attachment<?, ?>, AttachmentMap<?, ?>>> {
 	private <R, V> AttachmentMap<R, V> createMap(Attachment<R, V> attachment) {
@@ -113,6 +112,6 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 
 	@Override
 	public Identifier getFabricId() {
-		return Identifier.of(MODID, "attachments");
+		return Identifier.of(SpecterGlobals.MODID, "attachments");
 	}
 }

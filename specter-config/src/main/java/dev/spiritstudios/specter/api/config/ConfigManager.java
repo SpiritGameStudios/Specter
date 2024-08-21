@@ -2,9 +2,9 @@ package dev.spiritstudios.specter.api.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NonSyncExclusionStrategy;
-import dev.spiritstudios.specter.impl.core.Specter;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -44,7 +44,7 @@ public final class ConfigManager {
 		try {
 			lines = Files.readAllLines(config.getPath());
 		} catch (IOException e) {
-			Specter.LOGGER.error("Failed to load config file {}. Default values will be used instead.", config.getPath().toString());
+			SpecterGlobals.LOGGER.error("Failed to load config file {}. Default values will be used instead.", config.getPath().toString());
 			configs.add(config);
 			return config;
 		}
