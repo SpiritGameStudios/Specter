@@ -3,6 +3,7 @@ package dev.spiritstudios.specter.impl.registry.attachment.network;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -15,7 +16,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -68,7 +68,7 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 	private static <R, V> void cacheAttachment(Attachment<R, V> attachment, Registry<R> registry) {
 		AttachmentHolder<R> attachmentHolder = AttachmentHolder.of(registry);
 
-		Map<String, Set<AttachmentSyncEntry<V>>> encodedEntries = new HashMap<>();
+		Map<String, Set<AttachmentSyncEntry<V>>> encodedEntries = new Object2ObjectOpenHashMap<>();
 		Map<R, Object> values = attachmentHolder.specter$getValues().rowMap().get(attachment);
 
 		if (values == null) return;

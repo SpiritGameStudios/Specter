@@ -19,6 +19,7 @@ public class TestConfig implements Config {
 	@Comment("This is a test int")
 	@Range(min = 2, max = 10)
 	public int testInt = 1;
+	@Comment("This is a test bool")
 	public boolean testBool = true;
 	@Comment("This is a test double")
 	public double testDouble = 1.0;

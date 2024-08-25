@@ -1,16 +1,18 @@
 package dev.spiritstudios.specter.api;
 
 import dev.spiritstudios.specter.api.config.Config;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper class for ModMenu integration without having to depend on ModMenu directly.
  */
 public class ModMenuHelper {
-	private static final HashMap<String, Class<? extends Config>> screens = new HashMap<>();
+	private static final Map<String, Class<? extends Config>> screens = new Object2ObjectOpenHashMap<>();
+	private static final boolean modMenuLoaded = FabricLoader.getInstance().isModLoaded("modmenu");
 
 	/**
 	 * Adds a config screen to ModMenu.
@@ -19,12 +21,12 @@ public class ModMenuHelper {
 	 * @param configClass The class of the config screen.
 	 */
 	public static void addConfig(String modid, Class<? extends Config> configClass) {
-		if (!FabricLoader.getInstance().isModLoaded("modmenu")) return;
+		if (!modMenuLoaded) return;
 		screens.put(modid, configClass);
 	}
 
 	@ApiStatus.Internal
-	public static HashMap<String, Class<? extends Config>> getConfigScreens() {
+	public static Map<String, Class<? extends Config>> getConfigScreens() {
 		return screens;
 	}
 }

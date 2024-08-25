@@ -1,19 +1,19 @@
 package dev.spiritstudios.specter.api.biome;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.biome.Biome;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-// TODO: Create the specter-data module to reintroduce the datadriven part of this system
+// TODO: Create the specter-data module to reintroduce the data-driven part of this system
 public final class BiomeEffectsModificationManager {
-	private static final Map<RegistryKey<Biome>, BiomeEffectsModification> modifications = new HashMap<>();
+	private static final Map<RegistryKey<Biome>, BiomeEffectsModification> modifications = new Object2ObjectOpenHashMap<>();
 
 	public static void register(RegistryKey<Biome> biome, BiomeEffectsModification modifier) {
 		modifications.put(biome, modifier);

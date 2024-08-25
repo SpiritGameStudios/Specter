@@ -54,9 +54,7 @@ allprojects {
 
 		modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
 	}
-
-
-
+	
 	for (modProject in allprojects) {
 		loom.mods.register(modProject.name) {
 			sourceSet(modProject.sourceSets.getByName("main"))

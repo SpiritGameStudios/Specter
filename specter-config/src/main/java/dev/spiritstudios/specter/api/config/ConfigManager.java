@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NonSyncExclusionStrategy;
@@ -56,8 +57,14 @@ public final class ConfigManager {
 		lines.removeIf(line -> line.trim().startsWith("//"));
 		StringBuilder stringBuilder = new StringBuilder();
 		lines.forEach(stringBuilder::append);
+		T loadedConfig;
 
-		T loadedConfig = GSON.fromJson(stringBuilder.toString(), clazz);
+		try {
+			loadedConfig = GSON.fromJson(stringBuilder.toString(), clazz);
+		} catch (JsonSyntaxException e) {
+			SpecterGlobals.LOGGER.error("Failed to parse config file {}. Resetting to default values.", config.getPath().toString());
+			loadedConfig = config;
+		}
 
 		// Save to make sure any new fields are added
 		loadedConfig.save();
