@@ -38,7 +38,7 @@ public class SpecterConfigClient implements ClientModInitializer {
 					);
 				}
 
-				ConfigManager.getConfigs().set(ConfigManager.getConfigs().indexOf(config), config);
+				ConfigManager.getConfigs().put(id, config);
 			}));
 		});
 	}

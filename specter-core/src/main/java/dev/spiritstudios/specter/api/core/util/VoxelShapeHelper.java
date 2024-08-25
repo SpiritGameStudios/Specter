@@ -17,7 +17,7 @@ public final class VoxelShapeHelper {
 	 * @param shape The VoxelShape to rotate
 	 * @return The rotated VoxelShape
 	 */
-	public static VoxelShape rotate(Direction to, Direction from, VoxelShape shape) {
+	public static VoxelShape rotateHorizontal(Direction to, Direction from, VoxelShape shape) {
 		VoxelShape[] buffer = new VoxelShape[]{shape, VoxelShapes.empty()};
 		int times = (to.getHorizontal() - from.getHorizontal() + 4) % 4;
 
