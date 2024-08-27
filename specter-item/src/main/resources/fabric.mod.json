@@ -24,11 +24,6 @@
 		}
 	],
 	"custom": {
-		"loom:injected_interfaces": {
-			"net/minecraft/class_1792\u0024class_1793": [
-				"dev/spiritstudios/specter/api/item/SpecterItem\u0024Settings"
-			]
-		},
 		"modmenu": {
 			"parent": "specter",
 			"badges": [
