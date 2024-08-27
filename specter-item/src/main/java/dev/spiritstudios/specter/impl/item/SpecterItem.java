@@ -21,6 +21,6 @@ public class SpecterItem implements ModInitializer {
 	private void reloadMaps() {
 		ITEM_TO_LEVEL_INCREASE_CHANCE.clear();
 
-		ItemAttachments.COMPOSTING_CHANCE.forEach((entry) -> ITEM_TO_LEVEL_INCREASE_CHANCE.put(entry.entry(), entry.value().floatValue()));
+		ItemAttachments.COMPOSTING_CHANCE.forEach((entry) -> ITEM_TO_LEVEL_INCREASE_CHANCE.put(entry.key(), entry.value().floatValue()));
 	}
 }

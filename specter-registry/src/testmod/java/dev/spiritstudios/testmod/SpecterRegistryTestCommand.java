@@ -69,7 +69,7 @@ public class SpecterRegistryTestCommand {
 		var codec = AttachmentResource.resourceCodecOf(attachment);
 		var resource = new AttachmentResource<V>(false,
 			Streams.stream(attachment.iterator())
-				.map(e -> Pair.of(attachment.getRegistry().getId(e.entry()), e.value()))
+				.map(e -> Pair.of(attachment.getRegistry().getId(e.key()), e.value()))
 				.toList()
 		);
 		return codec.encodeStart(JsonOps.INSTANCE, resource).getOrThrow().toString();

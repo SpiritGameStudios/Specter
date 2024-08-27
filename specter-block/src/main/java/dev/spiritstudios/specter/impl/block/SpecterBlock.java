@@ -32,16 +32,16 @@ public class SpecterBlock implements ModInitializer {
 		WAXED_TO_UNWAXED_BLOCKS.clear();
 
 		BlockAttachments.WAXABLE.forEach((entry) -> {
-			UNWAXED_TO_WAXED_BLOCKS.put(entry.entry(), entry.value());
-			WAXED_TO_UNWAXED_BLOCKS.put(entry.value(), entry.entry());
+			UNWAXED_TO_WAXED_BLOCKS.put(entry.key(), entry.value());
+			WAXED_TO_UNWAXED_BLOCKS.put(entry.value(), entry.key());
 		});
 
 		OXIDATION_LEVEL_INCREASES.clear();
 		OXIDATION_LEVEL_DECREASES.clear();
 
 		BlockAttachments.OXIDIZABLE.forEach((entry) -> {
-			OXIDATION_LEVEL_INCREASES.put(entry.entry(), entry.value());
-			OXIDATION_LEVEL_DECREASES.put(entry.value(), entry.entry());
+			OXIDATION_LEVEL_INCREASES.put(entry.key(), entry.value());
+			OXIDATION_LEVEL_DECREASES.put(entry.value(), entry.key());
 		});
 	}
 }

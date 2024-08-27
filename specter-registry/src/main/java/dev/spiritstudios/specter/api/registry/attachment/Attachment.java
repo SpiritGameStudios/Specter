@@ -42,7 +42,7 @@ public interface Attachment<R, V> extends Iterable<Attachment.Entry<R, V>> {
 
 	void put(R entry, V value);
 
-	record Entry<R, V>(R entry, V value) {
+	record Entry<R, V>(R key, V value) {
 	}
 
 	final class Builder<R, V> {
