@@ -98,15 +98,14 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 		}, executor);
 	}
 
-	@SuppressWarnings("unchecked")
 	private <R, V> void loadAttachment(Attachment<R, V> attachment, AttachmentMap<R, V> map) {
 		Registry<R> registry = attachment.getRegistry();
 
-		for (Map.Entry<Identifier, Object> entry : map.getValues().entrySet()) {
+		for (Map.Entry<Identifier, V> entry : map.getValues().entrySet()) {
 			Identifier id = entry.getKey();
-			Object value = entry.getValue();
+			V value = entry.getValue();
 
-			attachment.put(registry.get(id), (V) value);
+			attachment.put(registry.get(id), value);
 		}
 	}
 
