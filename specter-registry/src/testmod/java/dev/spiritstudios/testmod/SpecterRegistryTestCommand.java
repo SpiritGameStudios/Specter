@@ -3,79 +3,60 @@ package dev.spiritstudios.testmod;
 import com.google.common.collect.Streams;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
 import dev.spiritstudios.specter.impl.registry.attachment.data.AttachmentResource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
+import java.util.function.Function;
 
 public class SpecterRegistryTestCommand {
-	public static class RegistryArgumentType implements ArgumentType<Registry<?>> {
-		@Override
-		public Registry<?> parse(StringReader reader) throws CommandSyntaxException {
-			return Registries.ROOT.get(Identifier.fromCommandInput(reader));
-		}
 
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-			return context.getSource() instanceof CommandSource
-				? CommandSource.suggestIdentifiers(Registries.ROOT.stream().map(r -> r.getKey().getValue()), builder)
-				: Suggestions.empty();
-		}
+	private static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->
+			CommandSource.suggestIdentifiers(Registries.ROOT.stream()
+				.filter(registry -> AttachmentHolder.of(registry).specter$getAttachments().size() > 0)
+				.map(registry -> registry.getKey().getValue()), builder);
+
+
+	private static final Function<String, SuggestionProvider<ServerCommandSource>> ATTACHMENT_SUGGESTIONS = (registryArg) -> (context, builder) -> {
+		Registry<?> registry = getRegistryFromContext(context, registryArg);
+		return CommandSource.suggestIdentifiers(AttachmentHolder.of(registry).specter$getAttachments().stream().map(Map.Entry::getKey), builder);
+	};
+
+	private static Registry<?> getRegistryFromContext(CommandContext<ServerCommandSource> context, String registryArg) {
+		return Registries.ROOT.get(context.getArgument(registryArg, Identifier.class));
 	}
 
-	public static class AttachmentArgumentType implements ArgumentType<Identifier> {
-
-		protected final String registryArg;
-		public AttachmentArgumentType(String registryArg) {
-			this.registryArg = registryArg;
-		}
-
-		@Override
-		public Identifier parse(StringReader reader) throws CommandSyntaxException {
-			return Identifier.fromCommandInput(reader);
-		}
-
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-			Registry<?> registry = context.getArgument(registryArg, Registry.class);
-			CommandSource.suggestIdentifiers(registry.getKeys().stream().map(RegistryKey::getValue), builder);
-			return CommandSource.suggestIdentifiers(registry.getKeys().stream().map(RegistryKey::getValue), builder);
-		}
-
-	}
-
-	private static Attachment<?, ?> getAttachmentFromContext(CommandContext<ServerCommandSource> ctx) {
-		Registry<?> registry = ctx.getArgument("registry", Registry.class);
-		Identifier attachmentId = ctx.getArgument("attachment", Identifier.class);
+	private static Attachment<?, ?> getAttachmentFromContext(CommandContext<ServerCommandSource> context, String registryArg, String attachmentArg) {
+		Registry<?> registry = getRegistryFromContext(context, registryArg);
+		Identifier attachmentId = context.getArgument(attachmentArg, Identifier.class);
 		return AttachmentHolder.of(registry).specter$getAttachment(attachmentId);
 	}
 
-	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
+	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		dispatcher.register(CommandManager.literal("specter-test-registry")
 			.then(CommandManager.literal("dump")
-				.then(CommandManager.argument("registry", new RegistryArgumentType())
-					.then(CommandManager.argument("attachment", new AttachmentArgumentType("registry"))
-						.executes(ctx -> {
-							ctx.getSource().sendFeedback(() -> Text.literal("result printed to terminal: registry"), true);
-							System.out.println(dump(getAttachmentFromContext(ctx)));
+				.then(CommandManager.argument("registry", IdentifierArgumentType.identifier())
+					.suggests(REGISTRY_SUGGESTIONS)
+					.then(CommandManager.argument("attachment", IdentifierArgumentType.identifier())
+						.suggests(ATTACHMENT_SUGGESTIONS.apply("registry"))
+						.executes(context -> {
+							context.getSource().sendFeedback(() -> Text.literal("attachment data printed to terminal"), true);
+							SpecterGlobals.LOGGER.info(dump(getAttachmentFromContext(context, "registry", "attachment")));
 							return Command.SINGLE_SUCCESS;
 						})
 					)
