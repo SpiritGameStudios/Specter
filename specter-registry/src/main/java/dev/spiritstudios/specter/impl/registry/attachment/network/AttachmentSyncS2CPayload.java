@@ -27,7 +27,6 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 
 	private static final Map<Identifier, CacheEntry<?>> CACHE = new Object2ReferenceOpenHashMap<>();
 
-	@SuppressWarnings("unchecked")
 	public static PacketCodec<RegistryByteBuf, AttachmentSyncS2CPayload<Object>> CODEC =
 		PacketCodec.tuple(
 			Identifier.PACKET_CODEC.xmap(
@@ -49,36 +48,28 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 			AttachmentSyncS2CPayload::new
 		);
 
-	@SuppressWarnings("unchecked")
 	private static void fillCache() {
 		if (!CACHE.isEmpty()) return;
 
-		for (Map.Entry<RegistryKey<MutableRegistry<?>>, MutableRegistry<?>> entry : Registries.ROOT.getEntrySet()) { // For each registry
-			Registry<Object> registry = (Registry<Object>) entry.getValue();
-			AttachmentHolder<Object> attachmentHolder = AttachmentHolder.of(registry);
-
-			for (Map.Entry<Identifier, Attachment<Object, ?>> attachment : attachmentHolder.specter$getAttachments()) {
-				SpecterGlobals.LOGGER.debug("Caching attachment {}", attachment.getKey());
-				cacheAttachment(attachment.getValue(), registry);
+		for (Registry<?> registry : Registries.ROOT) {
+			AttachmentHolder<?> attachmentHolder = AttachmentHolder.of(registry);
+			for (var entry : attachmentHolder.specter$getAttachments()) {
+				SpecterGlobals.LOGGER.debug("Caching attachment {}", entry.getKey());
+				cacheAttachment(entry.getValue());
 			}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <R, V> void cacheAttachment(Attachment<R, V> attachment, Registry<R> registry) {
-		AttachmentHolder<R> attachmentHolder = AttachmentHolder.of(registry);
-
+	private static <R, V> void cacheAttachment(Attachment<R, V> attachment) {
 		Map<String, Set<AttachmentSyncEntry<V>>> encodedEntries = new Object2ObjectOpenHashMap<>();
-		Map<R, Object> values = attachmentHolder.specter$getValues().rowMap().get(attachment);
 
-		if (values == null) return;
-		for (Map.Entry<R, Object> entry : values.entrySet()) {
-			Identifier id = registry.getId(entry.getKey());
+		for (Attachment.Entry<R, V> entry : attachment) {
+			Identifier id = attachment.getRegistry().getId(entry.key());
 			if (id == null)
-				throw new IllegalStateException("Registry entry " + entry.getKey() + " has no identifier");
+				throw new IllegalStateException("Registry entry " + entry.key() + " has no identifier");
 
 			encodedEntries.computeIfAbsent(id.getNamespace(), identifier -> new HashSet<>()).add(
-				new AttachmentSyncEntry<>(id.getPath(), (V) entry.getValue())
+					new AttachmentSyncEntry<>(id.getPath(), entry.value())
 			);
 		}
 
