@@ -1,14 +1,16 @@
-package dev.spiritstudios.specter.impl.item;
+package dev.spiritstudios.specter.api.item;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,6 +56,11 @@ public class DataItemGroup extends ItemGroup implements FabricItemGroupImpl {
 		this.displayStacks = items.stream().map(entry -> entry.map(ItemStack::new, itemStack -> itemStack)).toList();
 	}
 
+	public DataItemGroup(String translationKey, ItemConvertible icon, List<ItemStack> items) {
+		this(translationKey, new ItemStack(icon), items.stream().map(Either::<Item, ItemStack>right).toList());
+	}
+
+	@ApiStatus.Internal
 	public void setup(List<ItemGroup> filtered, int offset) {
 		int count = filtered.size() + offset;
 		this.page = count / TABS_PER_PAGE;

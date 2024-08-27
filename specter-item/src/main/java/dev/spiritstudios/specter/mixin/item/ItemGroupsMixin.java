@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.mixin.item;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import dev.spiritstudios.specter.impl.item.DataItemGroup;
+import dev.spiritstudios.specter.api.item.DataItemGroup;
 import dev.spiritstudios.specter.impl.item.ItemGroupReloader;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;

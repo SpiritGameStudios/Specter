@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.impl.item;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import dev.spiritstudios.specter.api.item.DataItemGroup;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;

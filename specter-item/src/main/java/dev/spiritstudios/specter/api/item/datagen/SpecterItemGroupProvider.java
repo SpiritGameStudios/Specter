@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.api.item.datagen;
 
-import dev.spiritstudios.specter.impl.item.DataItemGroup;
+import dev.spiritstudios.specter.api.item.DataItemGroup;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 import net.minecraft.data.DataOutput;
