@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.item;
+package dev.spiritstudios.specter.impl.item;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
