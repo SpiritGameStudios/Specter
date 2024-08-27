@@ -17,7 +17,11 @@
 		]
 	},
 	"mixins": [
-		"specter-item.mixins.json"
+		"specter-item.mixins.json",
+		{
+			"config": "specter-item.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"custom": {
 		"loom:injected_interfaces": {

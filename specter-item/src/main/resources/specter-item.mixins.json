@@ -7,9 +7,7 @@
 		"AbstractFurnaceBlockEntityMixin",
 		"ComposterBlock$ComposterInventoryMixin",
 		"ComposterBlockMixin",
-		"ItemMixin",
-		"ItemSettingsMixin",
-		"RegistryMixin"
+		"ItemGroupsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

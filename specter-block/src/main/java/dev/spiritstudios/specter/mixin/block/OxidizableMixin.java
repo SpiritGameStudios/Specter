@@ -28,7 +28,7 @@ public interface OxidizableMixin {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@WrapOperation(method = "getUnaffectedOxidationBlock", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/BiMap;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	@WrapOperation(method = "getUnaffectedOxidationBlock", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/BiMap;get(Ljava/lang/Object;)Ljava/lang/Object;", remap = false))
 	private static Object getUnaffectedOxidationBlock(BiMap instance, Object o, Operation<Object> original) {
 		Block block = (Block) o;
 		Optional<Block> unaffectedOxidationBlock = Optional.ofNullable(SpecterBlock.OXIDATION_LEVEL_DECREASES.get(block));

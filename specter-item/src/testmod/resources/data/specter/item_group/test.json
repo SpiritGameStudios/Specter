@@ -1,0 +1,12 @@
+{
+	"translate": "specter.test",
+	"icon": {
+		"id": "minecraft:potato"
+	},
+	"items": [
+		{
+			"id": "minecraft:potato"
+		},
+		"minecraft:carrot"
+	]
+}

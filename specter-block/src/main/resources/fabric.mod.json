@@ -20,11 +20,6 @@
 		"specter-block.mixins.json"
 	],
 	"custom": {
-		"loom:injected_interfaces": {
-			"net/minecraft/class_4970\u0024class_2251": [
-				"dev/spiritstudios/specter/api/block/SpecterBlock\u0024Settings"
-			]
-		},
 		"modmenu": {
 			"parent": "specter",
 			"badges": [

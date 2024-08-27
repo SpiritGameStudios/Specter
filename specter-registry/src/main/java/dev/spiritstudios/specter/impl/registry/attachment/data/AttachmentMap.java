@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public class AttachmentMap<R, V> {
-
 	private final Registry<R> registry;
 	private final Attachment<R, V> attachment;
 	private final Object2ObjectOpenHashMap<Identifier, V> values;
@@ -35,7 +34,9 @@ public class AttachmentMap<R, V> {
 		values.put(id, value);
 	}
 
-	public Registry<R> getRegistry() { return registry; }
+	public Registry<R> getRegistry() {
+		return registry;
+	}
 
 	public Attachment<R, V> getAttachment() {
 		return attachment;
@@ -65,5 +66,4 @@ public class AttachmentMap<R, V> {
 			throw new JsonSyntaxException("Failed to read attachment " + id + " from resource.");
 		}
 	}
-
 }
