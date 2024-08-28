@@ -54,7 +54,7 @@ allprojects {
 
 		modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
 	}
-	
+
 	for (modProject in allprojects) {
 		loom.mods.register(modProject.name) {
 			sourceSet(modProject.sourceSets.getByName("main"))
@@ -114,6 +114,8 @@ tasks.assemble.configure {
 }
 
 subprojects {
+	val deps = Dependencies()
+
 	sourceSets.create("testmod") {
 		compileClasspath += sourceSets.main.get().compileClasspath
 		runtimeClasspath += sourceSets.main.get().runtimeClasspath
@@ -135,6 +137,8 @@ subprojects {
 
 		"testmodClientImplementation"(sourceSets.getByName("client").output)
 		"testmodClientImplementation"(sourceSets.getByName("testmod").output)
+
+		"testImplementation"("net.fabricmc:fabric-loader-junit:${deps.loader}")
 	}
 
 	extensions.configure(PublishingExtension::class.java) {
@@ -239,6 +243,17 @@ loom {
 		ideConfigGenerated(project.rootProject == project)
 		name = "Testmod Server"
 		source(sourceSets.getByName("testmod"))
+	}
+
+	runs.create("gametest") {
+		server()
+		ideConfigGenerated(project.rootProject == project)
+		name = "Gametest"
+		source(sourceSets.getByName("testmod"))
+
+		vmArg("-Dfabric-api.gametest")
+		vmArg("-Dfabric-api.gametest.report-file=${project.layout.buildDirectory}/junit.xml")
+		runDir = "build/gametest"
 	}
 }
 
