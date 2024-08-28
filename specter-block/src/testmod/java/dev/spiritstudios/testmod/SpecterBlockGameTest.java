@@ -52,4 +52,27 @@ public final class SpecterBlockGameTest {
 		context.complete();
 	}
 
+	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	public void testOxidizableAttachment(TestContext context) {
+		BlockPos pos = new BlockPos(0, 1, 0);
+		context.setBlockState(pos, Blocks.DIAMOND_ORE);
+
+		PlayerEntity player = context.createMockPlayer(GameMode.SURVIVAL);
+		player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.DIAMOND_AXE));
+
+		context.useBlock(pos, player);
+		context.expectBlock(Blocks.IRON_ORE, pos);
+
+		context.useBlock(pos, player);
+		context.expectBlock(Blocks.GOLD_ORE, pos);
+
+		context.useBlock(pos, player);
+		context.expectBlock(Blocks.COPPER_ORE, pos);
+
+		context.useBlock(pos, player);
+		context.expectBlock(Blocks.COPPER_ORE, pos);
+
+		context.complete();
+	}
+
 }

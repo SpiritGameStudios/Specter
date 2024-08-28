@@ -1,0 +1,8 @@
+{
+	"replace": false,
+	"values": {
+		"minecraft:copper_ore": "minecraft:gold_ore",
+		"minecraft:gold_ore": "minecraft:iron_ore",
+		"minecraft:iron_ore": "minecraft:diamond_ore"
+	}
+}
