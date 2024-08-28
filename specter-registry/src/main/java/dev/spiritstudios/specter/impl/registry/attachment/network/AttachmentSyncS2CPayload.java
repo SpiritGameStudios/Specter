@@ -9,10 +9,8 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.MutableRegistry;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -27,6 +25,7 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 
 	private static final Map<Identifier, CacheEntry<?>> CACHE = new Object2ReferenceOpenHashMap<>();
 
+	@SuppressWarnings("unchecked")
 	public static PacketCodec<RegistryByteBuf, AttachmentSyncS2CPayload<Object>> CODEC =
 		PacketCodec.tuple(
 			Identifier.PACKET_CODEC.xmap(
@@ -69,7 +68,7 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 				throw new IllegalStateException("Registry entry " + entry.key() + " has no identifier");
 
 			encodedEntries.computeIfAbsent(id.getNamespace(), identifier -> new HashSet<>()).add(
-					new AttachmentSyncEntry<>(id.getPath(), entry.value())
+				new AttachmentSyncEntry<>(id.getPath(), entry.value())
 			);
 		}
 

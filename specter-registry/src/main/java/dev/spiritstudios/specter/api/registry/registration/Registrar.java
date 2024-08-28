@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
  * Objects are defined as static fields in the implementing class.
  *
  * @param <T> Type of object to register
+ * @see MinecraftRegistrar
  */
 public interface Registrar<T> {
 	static <T> void process(Class<? extends Registrar<T>> clazz, String namespace) {

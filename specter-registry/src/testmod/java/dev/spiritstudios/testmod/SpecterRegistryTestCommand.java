@@ -11,7 +11,6 @@ import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
 import dev.spiritstudios.specter.impl.registry.attachment.data.AttachmentResource;
-import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.registry.Registries;
@@ -27,9 +26,9 @@ import java.util.function.Function;
 public class SpecterRegistryTestCommand {
 
 	private static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->
-			CommandSource.suggestIdentifiers(Registries.ROOT.stream()
-				.filter(registry -> AttachmentHolder.of(registry).specter$getAttachments().size() > 0)
-				.map(registry -> registry.getKey().getValue()), builder);
+		CommandSource.suggestIdentifiers(Registries.ROOT.stream()
+			.filter(registry -> !AttachmentHolder.of(registry).specter$getAttachments().isEmpty())
+			.map(registry -> registry.getKey().getValue()), builder);
 
 
 	private static final Function<String, SuggestionProvider<ServerCommandSource>> ATTACHMENT_SUGGESTIONS = (registryArg) -> (context, builder) -> {
