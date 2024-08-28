@@ -7,15 +7,15 @@ import dev.spiritstudios.specter.api.config.annotations.Range;
 import dev.spiritstudios.specter.api.config.annotations.Sync;
 import net.minecraft.util.Identifier;
 
-public class TestConfig implements Config {
+public class CreateTestConfig implements Config {
 	@Override
 	public Identifier getId() {
-		return Identifier.of("specter-config-testmod", "testconfig");
+		return Identifier.of("specter-config-testmod", "createtestconfig");
 	}
 
 	@Comment("This is a test string")
 	@Sync
-	public String testString = "test4";
+	public String testString = "test";
 	@Comment("This is a test int")
 	@Range(min = 2, max = 10)
 	public int testInt = 1;

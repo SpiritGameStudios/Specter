@@ -114,8 +114,6 @@ tasks.assemble.configure {
 }
 
 subprojects {
-	val deps = Dependencies()
-
 	sourceSets.create("testmod") {
 		compileClasspath += sourceSets.main.get().compileClasspath
 		runtimeClasspath += sourceSets.main.get().runtimeClasspath
@@ -137,8 +135,6 @@ subprojects {
 
 		"testmodClientImplementation"(sourceSets.getByName("client").output)
 		"testmodClientImplementation"(sourceSets.getByName("testmod").output)
-
-		"testImplementation"("net.fabricmc:fabric-loader-junit:${deps.loader}")
 	}
 
 	extensions.configure(PublishingExtension::class.java) {
@@ -210,9 +206,8 @@ extensions.configure(PublishingExtension::class.java) {
 			credentials(PasswordCredentials::class)
 		}
 	}
-
-
 }
+
 
 sourceSets.create("testmod") {
 	compileClasspath += sourceSets.main.get().compileClasspath
@@ -248,11 +243,11 @@ loom {
 	runs.create("gametest") {
 		server()
 		ideConfigGenerated(project.rootProject == project)
-		name = "Gametest"
+		name = "Game Test"
 		source(sourceSets.getByName("testmod"))
 
 		vmArg("-Dfabric-api.gametest")
-		vmArg("-Dfabric-api.gametest.report-file=${project.layout.buildDirectory}/junit.xml")
+		vmArg("-Dfabric-api.gametest.report-file=${project.layout.buildDirectory.get()}/junit.xml")
 		runDir = "build/gametest"
 	}
 }
@@ -270,8 +265,4 @@ dependencies {
 	}
 }
 
-for (subproject in subprojects) {
-	tasks.getByName("remapJar") {
-		dependsOn(":${subproject.name}:remapJar")
-	}
-}
+for (subproject in subprojects) tasks.remapJar.configure { dependsOn(":${subproject.name}:remapJar") }

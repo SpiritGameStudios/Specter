@@ -17,6 +17,9 @@
 		],
 		"client": [
 			"dev.spiritstudios.testmod.SpecterConfigTestmodClient"
+		],
+		"fabric-gametest": [
+			"dev.spiritstudios.testmod.SpecterConfigGameTest"
 		]
 	},
 	"depends": {
