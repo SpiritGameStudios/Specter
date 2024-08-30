@@ -7,7 +7,8 @@
 		"AbstractFurnaceBlockEntityMixin",
 		"ComposterBlock$ComposterInventoryMixin",
 		"ComposterBlockMixin",
-		"ItemGroupsMixin"
+		"ItemGroupsMixin",
+		"ShapedRecipeJsonBuilderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -55,8 +55,7 @@ public interface Config {
 				continue;
 			}
 
-			String key = line.split("\"")[1];
-			String comment = comments.get(key);
+			String comment = comments.get(line.split("\"")[1]);
 			if (comment == null) {
 				newLines.add(line);
 				continue;
@@ -88,25 +87,26 @@ public interface Config {
 	}
 
 	private void checkAnnotations(Map<String, String> comments, Field field) {
-		if (field.isAnnotationPresent(Range.class)) {
-			Range annotation = field.getAnnotation(Range.class);
-			if (annotation.clamp()) {
-				Number value = ReflectionHelper.getFieldValue(this, field);
-				if (value != null)
-					ReflectionHelper.setFieldValue(
-						this,
-						field,
-						MathHelper.clamp(
-							value.doubleValue(),
-							annotation.min(),
-							annotation.max()
-						)
-					);
-			}
+		Range rangeAnnotation = field.getAnnotation(Range.class);
+		if (rangeAnnotation == null) return;
+
+		if (rangeAnnotation.clamp()) {
+			Number value = ReflectionHelper.getFieldValue(this, field);
+			if (value != null)
+				ReflectionHelper.setFieldValue(
+					this,
+					field,
+					MathHelper.clamp(
+						value.doubleValue(),
+						rangeAnnotation.min(),
+						rangeAnnotation.max()
+					)
+				);
 		}
 
-		if (!field.isAnnotationPresent(Comment.class)) return;
-		Comment annotation = field.getAnnotation(Comment.class);
-		comments.put(field.getName(), annotation.value());
+		Comment commentAnnotation = field.getAnnotation(Comment.class);
+		if (commentAnnotation == null) return;
+
+		comments.put(field.getName(), commentAnnotation.value());
 	}
 }
