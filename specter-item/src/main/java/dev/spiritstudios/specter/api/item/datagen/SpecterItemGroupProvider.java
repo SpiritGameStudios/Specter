@@ -42,6 +42,9 @@ public abstract class SpecterItemGroupProvider extends FabricCodecDataProvider<D
 		return "Specter Item Groups";
 	}
 
-	protected record ItemGroupData(Identifier id, ItemConvertible icon, List<ItemConvertible> items) {
+	public record ItemGroupData(Identifier id, ItemConvertible icon, List<ItemConvertible> items) {
+		public static ItemGroupData of(Identifier id, ItemConvertible icon, List<ItemConvertible> items) {
+			return new ItemGroupData(id, icon, items);
+		}
 	}
 }
