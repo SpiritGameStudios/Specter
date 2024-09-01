@@ -208,7 +208,6 @@ extensions.configure(PublishingExtension::class.java) {
 	}
 }
 
-
 sourceSets.create("testmod") {
 	compileClasspath += sourceSets.main.get().compileClasspath
 	runtimeClasspath += sourceSets.main.get().runtimeClasspath

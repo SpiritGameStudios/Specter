@@ -18,6 +18,15 @@ import java.lang.reflect.Modifier;
  * @see MinecraftRegistrar
  */
 public interface Registrar<T> {
+	/**
+	 * Obsolete. Please use the <code>specter:registrars</code> metadata tag instead.
+	 * <p>
+	 * Process a registrar class and register all objects.
+	 *
+	 * @param clazz     Registrar class to process
+	 * @param namespace Namespace to register objects in
+	 */
+	@ApiStatus.Obsolete
 	static <T> void process(Class<? extends Registrar<T>> clazz, String namespace) {
 		Registrar<T> registrar = ReflectionHelper.instantiate(clazz);
 		registrar.init(namespace);
@@ -41,7 +50,7 @@ public interface Registrar<T> {
 	 */
 	@ApiStatus.Internal
 	default void init(String namespace) {
-		for (var field : this.getClass().getDeclaredFields()) {
+		for (Field field : this.getClass().getDeclaredFields()) {
 			if (!Modifier.isStatic(field.getModifiers())) continue;
 			if (field.isAnnotationPresent(Ignore.class)) continue;
 

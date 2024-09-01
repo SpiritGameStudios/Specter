@@ -2,7 +2,6 @@ package dev.spiritstudios.testmod;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import dev.spiritstudios.specter.api.registry.registration.Registrar;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.block.Block;
@@ -27,7 +26,7 @@ public class SpecterRegistryTestMod implements ModInitializer {
 			SpecterRegistryTestCommand.register(dispatcher);
 		});
 
-		Registrar.process(SpecterRegistryTestBlockRegistrar.class, "specter-registry-testmod");
+//		Registrar.process(SpecterRegistryTestBlockRegistrar.class, "specter-registry-testmod");
 	}
 
 }
