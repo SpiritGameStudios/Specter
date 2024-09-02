@@ -1,11 +1,15 @@
 package dev.spiritstudios.specter.api.registry.attachment;
 
 import com.mojang.serialization.Codec;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
 import dev.spiritstudios.specter.impl.registry.attachment.AttachmentImpl;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +39,8 @@ public interface Attachment<R, V> extends Iterable<Attachment.Entry<R, V>> {
 
 	PacketCodec<RegistryByteBuf, V> getPacketCodec();
 
+	ResourceType getSide();
+
 	Optional<V> get(R entry);
 
 	@NotNull
@@ -50,6 +56,7 @@ public interface Attachment<R, V> extends Iterable<Attachment.Entry<R, V>> {
 		private final Identifier id;
 		private final Codec<V> codec;
 		private final PacketCodec<RegistryByteBuf, V> packetCodec;
+		private ResourceType side = ResourceType.SERVER_DATA;
 
 		private Builder(Registry<R> registry, Identifier id, Codec<V> codec, PacketCodec<RegistryByteBuf, V> packetCodec) {
 			this.registry = registry;
@@ -58,8 +65,33 @@ public interface Attachment<R, V> extends Iterable<Attachment.Entry<R, V>> {
 			this.packetCodec = packetCodec;
 		}
 
+		/**
+		 * Sets the side that this attachment is intended for. Defaults to {@link EnvType#SERVER}.
+		 * <p>
+		 * Server-side attachments are stored in data packs and are sent to clients when they connect. <br>
+		 * Client-side attachments are stored in resource packs and as such are only available on the client.
+		 * </p>
+		 *
+		 * @param side The side that this attachment is intended for.
+		 * @return This builder.
+		 */
+		public Builder<R, V> side(ResourceType side) {
+			this.side = side;
+			return this;
+		}
+
 		public Attachment<R, V> build() {
-			Attachment<R, V> attachment = new AttachmentImpl<>(registry, id, codec, packetCodec);
+			Attachment<R, V> attachment = new AttachmentImpl<>(registry, id, codec, packetCodec, side);
+
+			if (side == ResourceType.CLIENT_RESOURCES && FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
+				SpecterGlobals.LOGGER.warn(
+					"Client-side attachment {} is being registered on the server. This should only be done on the client.",
+					id
+				);
+
+				SpecterGlobals.LOGGER.warn("This warning may be changed to an exception in the future.");
+			}
+
 			AttachmentHolder.of(registry).specter$registerAttachment(attachment);
 			return attachment;
 		}

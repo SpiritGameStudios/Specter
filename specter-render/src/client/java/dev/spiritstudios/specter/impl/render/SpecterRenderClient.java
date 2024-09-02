@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.impl.render;
 
+import dev.spiritstudios.specter.api.render.RenderAttachments;
 import dev.spiritstudios.specter.api.render.shake.Screenshake;
 import dev.spiritstudios.specter.api.render.shake.ScreenshakeManager;
 import dev.spiritstudios.specter.api.render.shake.ScreenshakeS2CPayload;
@@ -13,5 +14,7 @@ public class SpecterRenderClient implements ClientModInitializer {
 			Screenshake screenshake = new Screenshake(payload.duration(), payload.posIntensity(), payload.rotationIntensity());
 			context.client().execute(() -> ScreenshakeManager.addScreenshake(screenshake));
 		});
+
+		RenderAttachments.init();
 	}
 }

@@ -48,7 +48,6 @@ public class AttachmentMap<R, V> {
 
 	public void parseResource(Identifier id, Resource resource) {
 		try (InputStreamReader resourceReader = new InputStreamReader(resource.getInputStream())) {
-
 			JsonObject resourceJson = JsonHelper.deserialize(resourceReader);
 
 			AttachmentResource<V> parsed = resourceCodec.parse(JsonOps.INSTANCE, resourceJson).getOrThrow();

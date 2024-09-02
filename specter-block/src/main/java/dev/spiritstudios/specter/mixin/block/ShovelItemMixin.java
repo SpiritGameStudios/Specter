@@ -21,6 +21,5 @@ public class ShovelItemMixin {
 
 		Optional<BlockState> flattenedBlock = BlockAttachments.FLATTENABLE.get(block);
 		return flattenedBlock.map(blockState -> (V) blockState).orElseGet(() -> original.call(instance, o));
-
 	}
 }

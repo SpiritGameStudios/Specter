@@ -11,6 +11,7 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -52,10 +53,13 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 
 		for (Registry<?> registry : Registries.ROOT) {
 			AttachmentHolder<?> attachmentHolder = AttachmentHolder.of(registry);
-			for (var entry : attachmentHolder.specter$getAttachments()) {
+			attachmentHolder.specter$getAttachments().forEach(entry -> {
+				if (entry.getValue().getSide() == ResourceType.CLIENT_RESOURCES)
+					return;
+
 				SpecterGlobals.LOGGER.debug("Caching attachment {}", entry.getKey());
 				cacheAttachment(entry.getValue());
-			}
+			});
 		}
 	}
 

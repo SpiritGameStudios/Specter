@@ -14,6 +14,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -25,6 +26,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class AttachmentReloader implements SimpleResourceReloadListener<Map<Attachment<?, ?>, AttachmentMap<?, ?>>> {
+	private final ResourceType side;
+
+	public AttachmentReloader(ResourceType side) {
+		this.side = side;
+	}
+
 	private <R, V> AttachmentMap<R, V> createMap(Attachment<R, V> attachment) {
 		return new AttachmentMap<>(attachment.getRegistry(), attachment);
 	}
@@ -67,6 +74,7 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 			List<Resource> attachmentResources = resource.getValue();
 			Attachment<?, ?> attachment = AttachmentHolder.of(registry).specter$getAttachment(attachmentId);
 			if (attachment == null) continue;
+			if (attachment.getSide() != this.side) continue;
 
 			AttachmentMap<?, ?> map = attachmentMaps.computeIfAbsent(attachment, this::createMap);
 			for (Resource attachmentResource : attachmentResources)
@@ -80,7 +88,7 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 		return CompletableFuture.runAsync(() -> {
 			for (RegistryEntry<MutableRegistry<?>> entry : Registries.ROOT.getIndexedEntries()) { // For each registry
 				AttachmentHolder<?> holder = AttachmentHolder.of(entry.value());
-				holder.specter$getValues().clear();
+				holder.specter$getValues().rowKeySet().removeIf(attachment -> attachment.getSide() == this.side);
 			}
 
 			for (Map.Entry<Attachment<?, ?>, AttachmentMap<?, ?>> entry : data.entrySet()) {
@@ -91,6 +99,8 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 			}
 
 			AttachmentSyncS2CPayload.clearCache();
+
+			if (this.side != ResourceType.SERVER_DATA) return;
 			MinecraftServer server = SpecterRegistry.getServer();
 			if (server == null) return;
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList())
@@ -111,6 +121,6 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 
 	@Override
 	public Identifier getFabricId() {
-		return Identifier.of(SpecterGlobals.MODID, "attachments");
+		return Identifier.of(SpecterGlobals.MODID, this.side == ResourceType.SERVER_DATA ? "attachments_data" : "attachments_resources");
 	}
 }

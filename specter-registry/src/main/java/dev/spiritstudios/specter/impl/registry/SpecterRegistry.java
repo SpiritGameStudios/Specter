@@ -30,7 +30,7 @@ public class SpecterRegistry implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AttachmentReloader());
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AttachmentReloader(ResourceType.SERVER_DATA));
 
 		PayloadTypeRegistry.playS2C().register(AttachmentSyncS2CPayload.ID, AttachmentSyncS2CPayload.CODEC);
 
