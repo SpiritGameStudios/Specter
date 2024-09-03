@@ -264,4 +264,8 @@ dependencies {
 	}
 }
 
+tasks.test {
+	dependsOn(":runGametest")
+}
+
 for (subproject in subprojects) tasks.remapJar.configure { dependsOn(":${subproject.name}:remapJar") }
