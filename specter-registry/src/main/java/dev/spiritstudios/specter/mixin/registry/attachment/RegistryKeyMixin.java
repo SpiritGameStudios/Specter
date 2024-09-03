@@ -10,7 +10,9 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,6 +23,9 @@ import java.util.Set;
 
 @Mixin(RegistryKey.class)
 public class RegistryKeyMixin<R> implements AttachmentHolder<R> {
+	@Shadow
+	@Final
+	private Identifier value;
 	@Unique
 	private Map<Identifier, Attachment<R, ?>> attachments;
 
@@ -54,8 +59,8 @@ public class RegistryKeyMixin<R> implements AttachmentHolder<R> {
 	}
 
 	@Override
-	public Table<Attachment<R, ?>, R, Object> specter$getValues() {
-		return values;
+	public void specter$clearAttachment(Attachment<R, ?> attachment) {
+		values.row(attachment).clear();
 	}
 
 	@Override

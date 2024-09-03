@@ -1,6 +1,5 @@
 package dev.spiritstudios.specter.impl.registry.attachment;
 
-import com.google.common.collect.Table;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -23,8 +22,8 @@ public interface AttachmentHolder<R> {
 	<V> V specter$getAttachmentValue(Attachment<R, V> attachment, R entry);
 
 	Set<Map.Entry<Identifier, Attachment<R, ?>>> specter$getAttachments();
-
-	Table<Attachment<R, ?>, R, Object> specter$getValues();
+	
+	void specter$clearAttachment(Attachment<R, ?> attachment);
 
 	<T> void specter$putAttachmentValue(Attachment<R, T> attachment, R entry, T value);
 }

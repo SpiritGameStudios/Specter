@@ -86,11 +86,6 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 	@Override
 	public CompletableFuture<Void> apply(Map<Attachment<?, ?>, AttachmentMap<?, ?>> data, ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
-			for (RegistryEntry<MutableRegistry<?>> entry : Registries.ROOT.getIndexedEntries()) { // For each registry
-				AttachmentHolder<?> holder = AttachmentHolder.of(entry.value());
-				holder.specter$getValues().rowKeySet().removeIf(attachment -> attachment.getSide() == this.side);
-			}
-
 			for (Map.Entry<Attachment<?, ?>, AttachmentMap<?, ?>> entry : data.entrySet()) {
 				Attachment<?, ?> attachment = entry.getKey();
 				AttachmentMap<?, ?> map = entry.getValue();
@@ -110,6 +105,10 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 
 	private <R, V> void loadAttachment(Attachment<R, V> attachment, AttachmentMap<R, V> map) {
 		Registry<R> registry = attachment.getRegistry();
+
+		AttachmentHolder<R> holder = AttachmentHolder.of(registry);
+		if (attachment.getSide() == this.side)
+			holder.specter$clearAttachment(attachment);
 
 		for (Map.Entry<Identifier, V> entry : map.getValues().entrySet()) {
 			Identifier id = entry.getKey();

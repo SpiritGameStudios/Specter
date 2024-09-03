@@ -29,7 +29,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 		Registry<Object> registry = attachment.getRegistry();
 		AttachmentHolder<Object> attachmentHolder = AttachmentHolder.of(registry);
 
-		attachmentHolder.specter$getValues().row(attachment).clear();
+		attachmentHolder.specter$clearAttachment(attachment);
 
 		for (AttachmentSyncS2CPayload.AttachmentSyncEntry<V> entry : payload.attachmentPair().entries()) {
 			Identifier id = Identifier.of(payload.attachmentPair().namespace(), entry.id());
