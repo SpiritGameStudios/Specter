@@ -2,7 +2,6 @@ package dev.spiritstudios.specter.impl.registry.attachment.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
@@ -56,11 +55,9 @@ public class AttachmentMap<R, V> {
 				this.values.trim(parsed.entries().size());
 			}
 
-			for (Pair<Identifier, V> entry : parsed.entries()) {
-				if (!this.registry.containsId(entry.getFirst())) continue;
-				this.put(entry.getFirst(), entry.getSecond());
-			}
-
+			parsed.entries().stream()
+				.filter(pair -> this.registry.containsId(pair.getFirst()))
+				.forEach(pair -> this.put(pair.getFirst(), pair.getSecond()));
 		} catch (IOException e) {
 			throw new JsonSyntaxException("Failed to read attachment " + id + " from resource.");
 		}

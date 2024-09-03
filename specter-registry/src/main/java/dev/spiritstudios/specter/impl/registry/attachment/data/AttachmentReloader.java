@@ -77,8 +77,7 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 			if (attachment.getSide() != this.side) continue;
 
 			AttachmentMap<?, ?> map = attachmentMaps.computeIfAbsent(attachment, this::createMap);
-			for (Resource attachmentResource : attachmentResources)
-				map.parseResource(attachmentId, attachmentResource);
+			attachmentResources.forEach(attachmentResource -> map.parseResource(attachmentId, attachmentResource));
 		}
 	}
 
@@ -86,18 +85,14 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 	@Override
 	public CompletableFuture<Void> apply(Map<Attachment<?, ?>, AttachmentMap<?, ?>> data, ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
-			for (Map.Entry<Attachment<?, ?>, AttachmentMap<?, ?>> entry : data.entrySet()) {
-				Attachment<?, ?> attachment = entry.getKey();
-				AttachmentMap<?, ?> map = entry.getValue();
-
-				loadAttachment((Attachment<Object, Object>) attachment, (AttachmentMap<Object, Object>) map);
-			}
-
-			AttachmentSyncS2CPayload.clearCache();
+			data.forEach((attachment, map) -> loadAttachment((Attachment<Object, Object>) attachment, (AttachmentMap<Object, Object>) map));
 
 			if (this.side != ResourceType.SERVER_DATA) return;
+			AttachmentSyncS2CPayload.clearCache();
+
 			MinecraftServer server = SpecterRegistry.getServer();
 			if (server == null) return;
+
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList())
 				AttachmentSyncS2CPayload.createPayloads().forEach(payload -> ServerPlayNetworking.send(player, payload));
 		}, executor);
@@ -110,12 +105,7 @@ public class AttachmentReloader implements SimpleResourceReloadListener<Map<Atta
 		if (attachment.getSide() == this.side)
 			holder.specter$clearAttachment(attachment);
 
-		for (Map.Entry<Identifier, V> entry : map.getValues().entrySet()) {
-			Identifier id = entry.getKey();
-			V value = entry.getValue();
-
-			attachment.put(registry.get(id), value);
-		}
+		map.getValues().forEach((id, value) -> attachment.put(registry.get(id), value));
 	}
 
 	@Override

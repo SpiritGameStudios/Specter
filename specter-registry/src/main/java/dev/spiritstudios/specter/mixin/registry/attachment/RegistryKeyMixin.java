@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.mixin.registry.attachment;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
@@ -55,7 +56,7 @@ public class RegistryKeyMixin<R> implements AttachmentHolder<R> {
 
 	@Override
 	public Set<Map.Entry<Identifier, Attachment<R, ?>>> specter$getAttachments() {
-		return attachments.entrySet();
+		return ImmutableSet.copyOf(attachments.entrySet());
 	}
 
 	@Override

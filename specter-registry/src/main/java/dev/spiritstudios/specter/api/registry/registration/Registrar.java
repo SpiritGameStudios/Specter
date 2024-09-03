@@ -51,20 +51,18 @@ public interface Registrar<T> {
 	@ApiStatus.Internal
 	default void init(String namespace) {
 		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Modifier.isStatic(field.getModifiers())) continue;
-			if (field.isAnnotationPresent(Ignore.class)) continue;
+			if (!Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(Ignore.class)) continue;
 
 			T value = ReflectionHelper.getFieldValue(field);
-
-			if (value != null && field.getType().isAssignableFrom(value.getClass())) {
-				String name = field.getName().toLowerCase();
-				if (field.isAnnotationPresent(Name.class)) {
-					Name nameAnnotation = field.getAnnotation(Name.class);
-					name = nameAnnotation.value();
-				}
-
-				register(name, namespace, value, field);
+			if (value == null || !field.getType().isAssignableFrom(value.getClass())) continue;
+			
+			String name = field.getName().toLowerCase();
+			if (field.isAnnotationPresent(Name.class)) {
+				Name nameAnnotation = field.getAnnotation(Name.class);
+				name = nameAnnotation.value();
 			}
+
+			register(name, namespace, value, field);
 		}
 	}
 

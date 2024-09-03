@@ -31,14 +31,15 @@ public class SpecterRegistryClient implements ClientModInitializer {
 
 		attachmentHolder.specter$clearAttachment(attachment);
 
-		for (AttachmentSyncS2CPayload.AttachmentSyncEntry<V> entry : payload.attachmentPair().entries()) {
+		payload.attachmentPair().entries().forEach(entry -> {
 			Identifier id = Identifier.of(payload.attachmentPair().namespace(), entry.id());
 			Object object = registry.get(id);
+
 			if (object == null)
 				throw new IllegalStateException("Entry " + id + " is not in the registry");
 
 			V value = entry.value();
 			attachmentHolder.specter$putAttachmentValue(attachment, object, value);
-		}
+		});
 	}
 }

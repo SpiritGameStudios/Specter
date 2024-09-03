@@ -46,6 +46,16 @@ public interface Attachment<R, V> extends Iterable<Attachment.Entry<R, V>> {
 	@NotNull
 	Iterator<Entry<R, V>> iterator();
 
+	/**
+	 * Puts a value into this attachment for the given registry object.
+	 * <p>
+	 * Do not use this unless the data you are adding is generated at runtime.
+	 * Attachments should always be defined in data packs when possible.
+	 * </p>
+	 *
+	 * @param entry The registry object to put the value for.
+	 * @param value The value to put.
+	 */
 	void put(R entry, V value);
 
 	record Entry<R, V>(R key, V value) {

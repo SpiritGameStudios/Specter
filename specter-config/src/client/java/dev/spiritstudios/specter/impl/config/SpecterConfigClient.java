@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.Identifier;
 
-import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Map;
 
 public class SpecterConfigClient implements ClientModInitializer {
@@ -28,15 +28,13 @@ public class SpecterConfigClient implements ClientModInitializer {
 				config.save();
 				Config serverConfig = ConfigManager.GSON.fromJson(data, config.getClass());
 
-				for (Field field : serverConfig.getClass().getDeclaredFields()) {
-					if (!field.isAnnotationPresent(Sync.class)) continue;
-
-					ReflectionHelper.setFieldValue(
+				Arrays.stream(serverConfig.getClass().getDeclaredFields())
+					.filter(field -> field.isAnnotationPresent(Sync.class))
+					.forEach(field -> ReflectionHelper.setFieldValue(
 						config,
 						field,
 						ReflectionHelper.getFieldValue(serverConfig, field)
-					);
-				}
+					));
 
 				ConfigManager.getConfigs().put(id, config);
 			}));

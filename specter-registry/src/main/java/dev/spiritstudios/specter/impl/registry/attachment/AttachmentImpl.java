@@ -1,9 +1,8 @@
 package dev.spiritstudios.specter.impl.registry.attachment;
 
 import com.mojang.serialization.Codec;
+import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
@@ -45,15 +44,15 @@ public record AttachmentImpl<R, V>(Registry<R> registry, Identifier id, Codec<V>
 
 	@Override
 	public Optional<V> get(R entry) {
-		clientGuard();
+		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		return Optional.ofNullable(AttachmentHolder.of(registry).specter$getAttachmentValue(this, entry));
 	}
 
 	@Override
 	public @NotNull Iterator<Entry<R, V>> iterator() {
-		clientGuard();
-		
+		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
+
 		return this.registry.stream().map(entry -> {
 			V value = (AttachmentHolder.of(registry).specter$getAttachmentValue(this, entry));
 			return value == null ? null : new Entry<>(entry, value);
@@ -62,15 +61,9 @@ public record AttachmentImpl<R, V>(Registry<R> registry, Identifier id, Codec<V>
 
 	@Override
 	public void put(R entry, V value) {
-		clientGuard();
+		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		if (this.registry.getId(entry) == null) throw new IllegalArgumentException("Entry is not in the registry");
 		AttachmentHolder.of(registry).specter$putAttachmentValue(this, entry, value);
-	}
-
-	private void clientGuard() {
-		EnvType current = FabricLoader.getInstance().getEnvironmentType();
-		if (side == ResourceType.CLIENT_RESOURCES && current == EnvType.SERVER)
-			throw new IllegalStateException("Attachment is not available on the current side");
 	}
 }

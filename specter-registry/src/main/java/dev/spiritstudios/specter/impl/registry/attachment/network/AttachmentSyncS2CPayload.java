@@ -71,9 +71,7 @@ public record AttachmentSyncS2CPayload<V>(AttachmentPair<V> attachmentPair) impl
 			if (id == null)
 				throw new IllegalStateException("Registry entry " + entry.key() + " has no identifier");
 
-			encodedEntries.computeIfAbsent(id.getNamespace(), identifier -> new HashSet<>()).add(
-				new AttachmentSyncEntry<>(id.getPath(), entry.value())
-			);
+			encodedEntries.computeIfAbsent(id.getNamespace(), identifier -> new HashSet<>()).add(new AttachmentSyncEntry<>(id.getPath(), entry.value()));
 		}
 
 		Set<AttachmentPair<V>> attachmentPairs = new HashSet<>();
