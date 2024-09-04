@@ -29,12 +29,6 @@ allprojects {
 		options.release = 21
 	}
 
-	val mod = ModInfo()
-	val deps = Dependencies()
-
-	group = mod.group
-	version = mod.version
-
 	java {
 		withSourcesJar()
 
@@ -42,10 +36,11 @@ allprojects {
 		targetCompatibility = JavaVersion.VERSION_21
 	}
 
-	loom {
-		splitEnvironmentSourceSets()
-		accessWidenerPath = rootDir.absoluteFile.resolve("src/main/resources/specter.accesswidener")
-	}
+	val mod = ModInfo()
+	val deps = Dependencies()
+
+	group = mod.group
+	version = mod.version
 
 	dependencies {
 		minecraft("com.mojang:minecraft:${deps.minecraft}")
@@ -53,18 +48,6 @@ allprojects {
 		modImplementation("net.fabricmc:fabric-loader:${deps.loader}")
 
 		modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
-	}
-
-	for (modProject in allprojects) {
-		loom.mods.register(modProject.name) {
-			sourceSet(modProject.sourceSets.getByName("main"))
-			sourceSet(modProject.sourceSets.getByName("client"))
-		}
-
-		loom.mods.register(modProject.name + "-testmod") {
-			sourceSet(modProject.sourceSets.getByName("testmod"))
-			sourceSet(modProject.sourceSets.getByName("testmodClient"))
-		}
 	}
 
 	tasks.withType<ProcessResources> {
@@ -83,6 +66,23 @@ allprojects {
 		filesMatching("fabric.mod.json") { expand(map) }
 	}
 
+	loom {
+		splitEnvironmentSourceSets()
+		accessWidenerPath = rootDir.absoluteFile.resolve("src/main/resources/specter.accesswidener")
+	}
+
+	for (modProject in allprojects) {
+		loom.mods.register(modProject.name) {
+			sourceSet(modProject.sourceSets.getByName("main"))
+			sourceSet(modProject.sourceSets.getByName("client"))
+		}
+
+		loom.mods.register(modProject.name + "-testmod") {
+			sourceSet(modProject.sourceSets.getByName("testmod"))
+			sourceSet(modProject.sourceSets.getByName("testmodClient"))
+		}
+	}
+
 	tasks.withType<GenerateModuleMetadata>().configureEach {
 		enabled = false
 	}
@@ -90,13 +90,14 @@ allprojects {
 
 tasks.javadoc {
 	with(options as StandardJavadocDocletOptions) {
+		source = "21"
 		encoding = "UTF-8"
 		charset("UTF-8")
 		memberLevel = JavadocMemberLevel.PACKAGE
 		addStringOption("Xdoclint:none", "-quiet")
 	}
 
-	allprojects.forEach { p -> source(p.sourceSets.main.map { it.allJava.srcDirs }) }
+	allprojects.forEach { proj -> source(proj.sourceSets.main.map { it.allJava.srcDirs }) }
 
 	classpath = project.files(sourceSets.main.map { it.compileClasspath })
 	include("**/api/**")
@@ -106,14 +107,21 @@ tasks.javadoc {
 val javadocJar by tasks.registering(Jar::class) {
 	dependsOn(tasks.javadoc)
 	from(tasks.javadoc.map { it.destinationDir!! })
-	archiveClassifier.set("javadoc")
+
+	archiveClassifier.set("fatjavadoc")
 }
 
 tasks.assemble.configure {
 	dependsOn(javadocJar)
 }
 
+tasks.test.configure {
+	dependsOn(tasks.named("runGametest"))
+}
+
 subprojects {
+	version = rootProject.version
+
 	sourceSets.create("testmod") {
 		compileClasspath += sourceSets.main.get().compileClasspath
 		runtimeClasspath += sourceSets.main.get().runtimeClasspath
@@ -262,10 +270,6 @@ dependencies {
 			"testmodClientImplementation"(project(":${it.name}").sourceSets["testmodClient"].output)
 		}
 	}
-}
-
-tasks.test {
-	dependsOn(":runGametest")
 }
 
 for (subproject in subprojects) tasks.remapJar.configure { dependsOn(":${subproject.name}:remapJar") }

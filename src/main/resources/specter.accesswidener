@@ -4,3 +4,4 @@ accessible field net/minecraft/registry/Registries ROOT Lnet/minecraft/registry/
 accessible class net/minecraft/block/ComposterBlock$ComposterInventory
 accessible method net/minecraft/item/ItemGroup <init> (Lnet/minecraft/item/ItemGroup$Row;ILnet/minecraft/item/ItemGroup$Type;Lnet/minecraft/text/Text;Ljava/util/function/Supplier;Lnet/minecraft/item/ItemGroup$EntryCollector;)V
 accessible method net/minecraft/data/server/recipe/ShapedRecipeJsonBuilder validate (Lnet/minecraft/util/Identifier;)Lnet/minecraft/recipe/RawShapedRecipe;
+accessible field net/minecraft/entity/attribute/DefaultAttributeContainer instances Ljava/util/Map;

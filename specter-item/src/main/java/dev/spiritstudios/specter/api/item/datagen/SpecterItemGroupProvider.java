@@ -4,8 +4,8 @@ import dev.spiritstudios.specter.impl.item.DataItemGroup;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 import net.minecraft.data.DataOutput;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -28,7 +28,7 @@ public abstract class SpecterItemGroupProvider extends FabricCodecDataProvider<D
 				new DataItemGroup(
 					id.toTranslationKey("item_group"),
 					data.icon(),
-					data.items().stream().map(ItemConvertible::asItem).map(Item::getDefaultStack).toList()
+					data.items()
 				)
 			),
 			lookup
@@ -42,8 +42,8 @@ public abstract class SpecterItemGroupProvider extends FabricCodecDataProvider<D
 		return "Specter Item Groups";
 	}
 
-	public record ItemGroupData(Identifier id, ItemConvertible icon, List<ItemConvertible> items) {
-		public static ItemGroupData of(Identifier id, ItemConvertible icon, List<ItemConvertible> items) {
+	public record ItemGroupData(Identifier id, ItemConvertible icon, List<ItemStack> items) {
+		public static ItemGroupData of(Identifier id, ItemConvertible icon, List<ItemStack> items) {
 			return new ItemGroupData(id, icon, items);
 		}
 	}
