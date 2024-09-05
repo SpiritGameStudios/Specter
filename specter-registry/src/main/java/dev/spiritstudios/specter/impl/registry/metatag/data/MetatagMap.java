@@ -1,10 +1,10 @@
-package dev.spiritstudios.specter.impl.registry.attachment.data;
+package dev.spiritstudios.specter.impl.registry.metatag.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import dev.spiritstudios.specter.api.registry.attachment.Attachment;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.Resource;
@@ -16,17 +16,17 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
-public class AttachmentMap<R, V> {
+public class MetatagMap<R, V> {
 	private final Registry<R> registry;
-	private final Attachment<R, V> attachment;
+	private final Metatag<R, V> metatag;
 	private final Object2ObjectOpenHashMap<Identifier, V> values;
-	private final Codec<AttachmentResource<V>> resourceCodec;
+	private final Codec<MetatagResource<V>> resourceCodec;
 
-	public AttachmentMap(Registry<R> registry, Attachment<R, V> attachment) {
+	public MetatagMap(Registry<R> registry, Metatag<R, V> metatag) {
 		this.registry = registry;
-		this.attachment = attachment;
+		this.metatag = metatag;
 		this.values = new Object2ObjectOpenHashMap<>();
-		this.resourceCodec = AttachmentResource.resourceCodecOf(this.attachment);
+		this.resourceCodec = MetatagResource.resourceCodecOf(this.metatag);
 	}
 
 	public void put(Identifier id, V value) {
@@ -37,8 +37,8 @@ public class AttachmentMap<R, V> {
 		return registry;
 	}
 
-	public Attachment<R, V> getAttachment() {
-		return attachment;
+	public Metatag<R, V> getMetatag() {
+		return metatag;
 	}
 
 	public Map<Identifier, V> getValues() {
@@ -49,7 +49,7 @@ public class AttachmentMap<R, V> {
 		try (InputStreamReader resourceReader = new InputStreamReader(resource.getInputStream())) {
 			JsonObject resourceJson = JsonHelper.deserialize(resourceReader);
 
-			AttachmentResource<V> parsed = resourceCodec.parse(JsonOps.INSTANCE, resourceJson).getOrThrow();
+			MetatagResource<V> parsed = resourceCodec.parse(JsonOps.INSTANCE, resourceJson).getOrThrow();
 			if (parsed.replace()) {
 				this.values.clear();
 				this.values.trim(parsed.entries().size());
@@ -59,7 +59,7 @@ public class AttachmentMap<R, V> {
 				.filter(pair -> this.registry.containsId(pair.getFirst()))
 				.forEach(pair -> this.put(pair.getFirst(), pair.getSecond()));
 		} catch (IOException e) {
-			throw new JsonSyntaxException("Failed to read attachment " + id + " from resource.");
+			throw new JsonSyntaxException("Failed to read metatag %s from resource.".formatted(id));
 		}
 	}
 }

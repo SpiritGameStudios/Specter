@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.impl.block;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import dev.spiritstudios.specter.api.block.BlockAttachments;
+import dev.spiritstudios.specter.api.block.BlockMetatags;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.block.Block;
@@ -17,7 +17,7 @@ public class SpecterBlock implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		BlockAttachments.init();
+		BlockMetatags.init();
 
 		reloadBiMaps();
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> reloadBiMaps());
@@ -31,7 +31,7 @@ public class SpecterBlock implements ModInitializer {
 		UNWAXED_TO_WAXED_BLOCKS.clear();
 		WAXED_TO_UNWAXED_BLOCKS.clear();
 
-		BlockAttachments.WAXABLE.forEach((entry) -> {
+		BlockMetatags.WAXABLE.forEach((entry) -> {
 			UNWAXED_TO_WAXED_BLOCKS.put(entry.key(), entry.value());
 			WAXED_TO_UNWAXED_BLOCKS.put(entry.value(), entry.key());
 		});
@@ -39,7 +39,7 @@ public class SpecterBlock implements ModInitializer {
 		OXIDATION_LEVEL_INCREASES.clear();
 		OXIDATION_LEVEL_DECREASES.clear();
 
-		BlockAttachments.OXIDIZABLE.forEach((entry) -> {
+		BlockMetatags.OXIDIZABLE.forEach((entry) -> {
 			OXIDATION_LEVEL_INCREASES.put(entry.key(), entry.value());
 			OXIDATION_LEVEL_DECREASES.put(entry.value(), entry.key());
 		});

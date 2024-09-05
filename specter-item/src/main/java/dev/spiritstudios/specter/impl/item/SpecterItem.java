@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.impl.item;
 
-import dev.spiritstudios.specter.api.item.ItemAttachments;
+import dev.spiritstudios.specter.api.item.ItemMetatags;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.fabricmc.api.ModInitializer;
@@ -15,7 +15,7 @@ public class SpecterItem implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ItemAttachments.init();
+		ItemMetatags.init();
 
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new ItemGroupReloader());
 
@@ -25,6 +25,6 @@ public class SpecterItem implements ModInitializer {
 
 	private void reload(DynamicRegistryManager registryManager) {
 		ITEM_TO_LEVEL_INCREASE_CHANCE.clear();
-		ItemAttachments.COMPOSTING_CHANCE.forEach((entry) -> ITEM_TO_LEVEL_INCREASE_CHANCE.put(entry.key(), entry.value().floatValue()));
+		ItemMetatags.COMPOSTING_CHANCE.forEach((entry) -> ITEM_TO_LEVEL_INCREASE_CHANCE.put(entry.key(), entry.value().floatValue()));
 	}
 }

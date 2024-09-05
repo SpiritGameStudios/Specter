@@ -19,7 +19,7 @@ import net.minecraft.world.GameMode;
 @SuppressWarnings("unused")
 public class SpecterItemGameTest {
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testCompostingChanceAttachment(TestContext context) {
+	public void testCompostingChanceMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.COMPOSTER);
 
@@ -32,7 +32,7 @@ public class SpecterItemGameTest {
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE, tickLimit = 110)
-	public void testFuelAttachment(TestContext context) {
+	public void testFuelMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.BLAST_FURNACE);
 		if (!(context.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity furnace))

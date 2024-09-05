@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.mixin.item;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.api.item.ItemAttachments;
+import dev.spiritstudios.specter.api.item.ItemMetatags;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +18,7 @@ public class AbstractFurnaceBlockEntityMixin {
 	private void getFuelTime(ItemStack fuel, CallbackInfoReturnable<Integer> cir) {
 		if (fuel.isEmpty()) return;
 
-		Optional<Integer> fuelTime = ItemAttachments.FUEL.get(fuel.getItem());
+		Optional<Integer> fuelTime = ItemMetatags.FUEL.get(fuel.getItem());
 		fuelTime.ifPresent(cir::setReturnValue);
 	}
 
@@ -26,7 +26,7 @@ public class AbstractFurnaceBlockEntityMixin {
 	private static boolean canUseAsFuel(boolean original, @Local(argsOnly = true) ItemStack stack) {
 		if (stack.isEmpty()) return original;
 
-		boolean hasFuelAttachment = ItemAttachments.FUEL.get(stack.getItem()).isPresent();
-		return original || hasFuelAttachment;
+		boolean hasFuelMetatag = ItemMetatags.FUEL.get(stack.getItem()).isPresent();
+		return original || hasFuelMetatag;
 	}
 }

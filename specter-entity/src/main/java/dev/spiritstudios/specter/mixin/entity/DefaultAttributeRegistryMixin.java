@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.mixin.entity;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.spiritstudios.specter.api.entity.EntityAttachments;
+import dev.spiritstudios.specter.api.entity.EntityMetatags;
 import dev.spiritstudios.specter.impl.entity.DataDefaultAttributeBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -21,7 +21,7 @@ public class DefaultAttributeRegistryMixin {
 	private static <K, V> V get(Map<K, V> instance, Object o, Operation<V> original) {
 		if (!(o instanceof EntityType<?> entityType)) return original.call(instance, o);
 
-		Optional<DataDefaultAttributeBuilder> attributeBuilder = EntityAttachments.DEFAULT_ATTRIBUTES.get(entityType);
+		Optional<DataDefaultAttributeBuilder> attributeBuilder = EntityMetatags.DEFAULT_ATTRIBUTES.get(entityType);
 		if (attributeBuilder.isEmpty()) return original.call(instance, o);
 
 		DefaultAttributeContainer originalAttributes = (DefaultAttributeContainer) original.call(instance, o);
@@ -34,7 +34,7 @@ public class DefaultAttributeRegistryMixin {
 	private static <K, V> boolean containsKey(Map<K, V> instance, Object o, Operation<Boolean> original) {
 		if (!(o instanceof EntityType<?> entityType)) return original.call(instance, o);
 
-		boolean hasDefinition = Objects.nonNull(EntityAttachments.DEFAULT_ATTRIBUTES.get(entityType));
+		boolean hasDefinition = Objects.nonNull(EntityMetatags.DEFAULT_ATTRIBUTES.get(entityType));
 		return hasDefinition || original.call(instance, o);
 	}
 }

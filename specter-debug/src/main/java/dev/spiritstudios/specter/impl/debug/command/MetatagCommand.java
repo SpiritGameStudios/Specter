@@ -8,9 +8,9 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
-import dev.spiritstudios.specter.impl.registry.attachment.data.AttachmentResource;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagResource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.registry.Registries;
@@ -23,18 +23,18 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 import java.util.function.Function;
 
-public final class AttachmentCommand {
+public final class MetatagCommand {
 	public static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->
 		CommandSource.suggestIdentifiers(Registries.ROOT.stream()
-			.filter(registry -> !AttachmentHolder.of(registry).specter$getAttachments().isEmpty())
+			.filter(registry -> !MetatagHolder.of(registry).specter$getMetatags().isEmpty())
 			.map(registry -> registry.getKey().getValue()), builder);
 
-	public static final Function<String, SuggestionProvider<ServerCommandSource>> ATTACHMENT_SUGGESTIONS = (registryArg) -> (context, builder) -> {
+	public static final Function<String, SuggestionProvider<ServerCommandSource>> METATAG_SUGGESTIONS = (registryArg) -> (context, builder) -> {
 		Registry<?> registry = getRegistryFromContext(context, registryArg);
 		if (registry == null) return null;
 		return CommandSource.suggestIdentifiers(
-			AttachmentHolder.of(registry)
-				.specter$getAttachments()
+			MetatagHolder.of(registry)
+				.specter$getMetatags()
 				.stream()
 				.map(Map.Entry::getKey),
 			builder
@@ -43,15 +43,15 @@ public final class AttachmentCommand {
 
 
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		dispatcher.register(CommandManager.literal("attachment")
+		dispatcher.register(CommandManager.literal("metatag")
 			.then(CommandManager.literal("dump")
 				.then(CommandManager.argument("registry", IdentifierArgumentType.identifier())
 					.suggests(REGISTRY_SUGGESTIONS)
-					.then(CommandManager.argument("attachment", IdentifierArgumentType.identifier())
-						.suggests(ATTACHMENT_SUGGESTIONS.apply("registry"))
+					.then(CommandManager.argument("metatag", IdentifierArgumentType.identifier())
+						.suggests(METATAG_SUGGESTIONS.apply("registry"))
 						.executes(context -> dump(
 							context,
-							getAttachmentFromContext(context)
+							getMetatagFromContext(context)
 						))
 					)
 				)
@@ -62,18 +62,18 @@ public final class AttachmentCommand {
 		return Registries.ROOT.get(context.getArgument(registryArg, Identifier.class));
 	}
 
-	private static Attachment<?, ?> getAttachmentFromContext(CommandContext<ServerCommandSource> context) {
+	private static Metatag<?, ?> getMetatagFromContext(CommandContext<ServerCommandSource> context) {
 		Registry<?> registry = getRegistryFromContext(context, "registry");
-		Identifier attachmentId = context.getArgument("attachment", Identifier.class);
-		return AttachmentHolder.of(registry).specter$getAttachment(attachmentId);
+		Identifier metatagId = context.getArgument("metatag", Identifier.class);
+		return MetatagHolder.of(registry).specter$getMetatag(metatagId);
 	}
 
-	private static <R, V> int dump(CommandContext<ServerCommandSource> context, Attachment<R, V> attachment) {
-		Codec<AttachmentResource<V>> codec = AttachmentResource.resourceCodecOf(attachment);
-		AttachmentResource<V> resource = new AttachmentResource<>(
+	private static <R, V> int dump(CommandContext<ServerCommandSource> context, Metatag<R, V> metatag) {
+		Codec<MetatagResource<V>> codec = MetatagResource.resourceCodecOf(metatag);
+		MetatagResource<V> resource = new MetatagResource<>(
 			false,
-			Streams.stream(attachment.iterator())
-				.map(entry -> Pair.of(attachment.getRegistry().getId(entry.key()), entry.value()))
+			Streams.stream(metatag.iterator())
+				.map(entry -> Pair.of(metatag.getRegistry().getId(entry.key()), entry.value()))
 				.toList()
 		);
 

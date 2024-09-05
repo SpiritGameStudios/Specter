@@ -14,7 +14,7 @@ import net.minecraft.world.GameMode;
 @SuppressWarnings("unused")
 public final class SpecterBlockGameTest {
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testStrippableAttachment(TestContext context) {
+	public void testStrippableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.QUARTZ_PILLAR);
 
@@ -27,7 +27,7 @@ public final class SpecterBlockGameTest {
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testFlattenableAttachment(TestContext context) {
+	public void testFlattenableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.QUARTZ_PILLAR);
 
@@ -40,7 +40,7 @@ public final class SpecterBlockGameTest {
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testWaxableAttachment(TestContext context) {
+	public void testWaxableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.QUARTZ_PILLAR);
 
@@ -53,7 +53,7 @@ public final class SpecterBlockGameTest {
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testOxidizableAttachment(TestContext context) {
+	public void testOxidizableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.DIAMOND_ORE);
 

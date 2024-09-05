@@ -1,8 +1,8 @@
-package dev.spiritstudios.specter.impl.registry.attachment;
+package dev.spiritstudios.specter.impl.registry.metatag;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
-import dev.spiritstudios.specter.api.registry.attachment.Attachment;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
@@ -14,9 +14,9 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 
-public record AttachmentImpl<R, V>(Registry<R> registry, Identifier id, Codec<V> codec,
-								   PacketCodec<RegistryByteBuf, V> packetCodec,
-								   ResourceType side) implements Attachment<R, V> {
+public record MetatagImpl<R, V>(Registry<R> registry, Identifier id, Codec<V> codec,
+								PacketCodec<RegistryByteBuf, V> packetCodec,
+								ResourceType side) implements Metatag<R, V> {
 	@Override
 	public Registry<R> getRegistry() {
 		return registry;
@@ -46,7 +46,7 @@ public record AttachmentImpl<R, V>(Registry<R> registry, Identifier id, Codec<V>
 	public Optional<V> get(R entry) {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
-		return Optional.ofNullable(AttachmentHolder.of(registry).specter$getAttachmentValue(this, entry));
+		return Optional.ofNullable(MetatagHolder.of(registry).specter$getMetatagValue(this, entry));
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public record AttachmentImpl<R, V>(Registry<R> registry, Identifier id, Codec<V>
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		return this.registry.stream().map(entry -> {
-			V value = (AttachmentHolder.of(registry).specter$getAttachmentValue(this, entry));
+			V value = (MetatagHolder.of(registry).specter$getMetatagValue(this, entry));
 			return value == null ? null : new Entry<>(entry, value);
 		}).filter(Objects::nonNull).iterator();
 	}
@@ -64,6 +64,6 @@ public record AttachmentImpl<R, V>(Registry<R> registry, Identifier id, Codec<V>
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		if (this.registry.getId(entry) == null) throw new IllegalArgumentException("Entry is not in the registry");
-		AttachmentHolder.of(registry).specter$putAttachmentValue(this, entry, value);
+		MetatagHolder.of(registry).specter$putMetatagValue(this, entry, value);
 	}
 }

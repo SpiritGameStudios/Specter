@@ -18,34 +18,34 @@ public class SpecterRegistryGameTest {
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testAttachmentGet(TestContext context) {
+	public void testMetatagGet(TestContext context) {
 		context.assertEquals(
-			SpecterRegistryTestMod.TEST_ATTACHMENT.get(Blocks.DIORITE).orElse(null),
+			SpecterRegistryTestMod.TEST_METATAG.get(Blocks.DIORITE).orElse(null),
 			6969,
-			"Attachment value"
+			"Metatag value"
 		);
 
 		context.complete();
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testAttachmentPut(TestContext context) {
-		SpecterRegistryTestMod.TEST_ATTACHMENT.put(Blocks.GRANITE, 420);
+	public void testMetatagPut(TestContext context) {
+		SpecterRegistryTestMod.TEST_METATAG.put(Blocks.GRANITE, 420);
 		context.assertEquals(
-			SpecterRegistryTestMod.TEST_ATTACHMENT.get(Blocks.GRANITE).orElse(null),
+			SpecterRegistryTestMod.TEST_METATAG.get(Blocks.GRANITE).orElse(null),
 			420,
-			"Attachment value"
+			"Metatag value"
 		);
 
 		context.complete();
 	}
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testClientAttachmentIsolation(TestContext context) {
+	public void testClientMetatagIsolation(TestContext context) {
 		SpecterAssertions.assertThrows(
 			AssertionError.class,
-			() -> SpecterRegistryTestMod.TEST_CLIENT_ATTACHMENT.get(Blocks.DIORITE),
-			"Client attachment was not properly isolated from server"
+			() -> SpecterRegistryTestMod.TEST_CLIENT_METATAG.get(Blocks.DIORITE),
+			"Client Metatag was not properly isolated from server"
 		);
 		context.complete();
 	}

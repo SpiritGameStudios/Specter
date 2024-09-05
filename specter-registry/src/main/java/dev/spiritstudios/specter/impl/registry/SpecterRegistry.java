@@ -2,8 +2,8 @@ package dev.spiritstudios.specter.impl.registry;
 
 import com.mojang.datafixers.util.Pair;
 import dev.spiritstudios.specter.api.registry.registration.Registrar;
-import dev.spiritstudios.specter.impl.registry.attachment.data.AttachmentReloader;
-import dev.spiritstudios.specter.impl.registry.attachment.network.AttachmentSyncS2CPayload;
+import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
+import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -30,12 +30,12 @@ public class SpecterRegistry implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AttachmentReloader(ResourceType.SERVER_DATA));
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new MetatagReloader(ResourceType.SERVER_DATA));
 
-		PayloadTypeRegistry.playS2C().register(AttachmentSyncS2CPayload.ID, AttachmentSyncS2CPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(MetatagSyncS2CPayload.ID, MetatagSyncS2CPayload.CODEC);
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-			AttachmentSyncS2CPayload.createPayloads()
+			MetatagSyncS2CPayload.createPayloads()
 				.forEach(sender::sendPacket));
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> SpecterRegistry.server = server);

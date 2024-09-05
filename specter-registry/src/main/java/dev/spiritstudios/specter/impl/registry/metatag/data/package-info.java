@@ -3,6 +3,6 @@
  * Do not use these classes directly.
  */
 @ApiStatus.Internal
-package dev.spiritstudios.specter.impl.registry.attachment.data;
+package dev.spiritstudios.specter.impl.registry.metatag.data;
 
 import org.jetbrains.annotations.ApiStatus;

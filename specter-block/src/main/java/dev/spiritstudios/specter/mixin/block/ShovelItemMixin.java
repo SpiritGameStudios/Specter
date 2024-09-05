@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.mixin.block;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.spiritstudios.specter.api.block.BlockAttachments;
+import dev.spiritstudios.specter.api.block.BlockMetatags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ShovelItem;
@@ -19,7 +19,7 @@ public class ShovelItemMixin {
 	private <K, V> V get(Map<K, V> instance, Object o, Operation<V> original) {
 		if (!(o instanceof Block block)) return original.call(instance, o);
 
-		Optional<BlockState> flattenedBlock = BlockAttachments.FLATTENABLE.get(block);
+		Optional<BlockState> flattenedBlock = BlockMetatags.FLATTENABLE.get(block);
 		return flattenedBlock.map(blockState -> (V) blockState).orElseGet(() -> original.call(instance, o));
 	}
 }

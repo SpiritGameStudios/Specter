@@ -1,9 +1,9 @@
 package dev.spiritstudios.specter.impl.registry;
 
-import dev.spiritstudios.specter.api.registry.attachment.Attachment;
-import dev.spiritstudios.specter.impl.registry.attachment.AttachmentHolder;
-import dev.spiritstudios.specter.impl.registry.attachment.data.AttachmentReloader;
-import dev.spiritstudios.specter.impl.registry.attachment.network.AttachmentSyncS2CPayload;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
+import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -15,31 +15,31 @@ import net.minecraft.util.Identifier;
 public class SpecterRegistryClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new AttachmentReloader(ResourceType.CLIENT_RESOURCES));
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new MetatagReloader(ResourceType.CLIENT_RESOURCES));
 
-		ClientPlayNetworking.registerGlobalReceiver(AttachmentSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyAttachmentSync(payload)));
+		ClientPlayNetworking.registerGlobalReceiver(MetatagSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyMetatagSync(payload)));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <V> void applyAttachmentSync(AttachmentSyncS2CPayload<V> payload) {
+	private static <V> void applyMetatagSync(MetatagSyncS2CPayload<V> payload) {
 		if (MinecraftClient.getInstance().isIntegratedServerRunning())
 			return;
 
-		Attachment<Object, V> attachment = (Attachment<Object, V>) payload.attachmentPair().attachment();
-		Registry<Object> registry = attachment.getRegistry();
-		AttachmentHolder<Object> attachmentHolder = AttachmentHolder.of(registry);
+		Metatag<Object, V> metatag = (Metatag<Object, V>) payload.metatagPair().metatag();
+		Registry<Object> registry = metatag.getRegistry();
+		MetatagHolder<Object> metatagHolder = MetatagHolder.of(registry);
 
-		attachmentHolder.specter$clearAttachment(attachment);
+		metatagHolder.specter$clearMetatag(metatag);
 
-		payload.attachmentPair().entries().forEach(entry -> {
-			Identifier id = Identifier.of(payload.attachmentPair().namespace(), entry.id());
+		payload.metatagPair().entries().forEach(entry -> {
+			Identifier id = Identifier.of(payload.metatagPair().namespace(), entry.id());
 			Object object = registry.get(id);
 
 			if (object == null)
 				throw new IllegalStateException("Entry " + id + " is not in the registry");
 
 			V value = entry.value();
-			attachmentHolder.specter$putAttachmentValue(attachment, object, value);
+			metatagHolder.specter$putMetatagValue(metatag, object, value);
 		});
 	}
 }

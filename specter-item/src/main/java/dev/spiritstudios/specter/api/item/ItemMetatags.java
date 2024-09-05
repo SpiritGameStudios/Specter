@@ -2,21 +2,21 @@ package dev.spiritstudios.specter.api.item;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.registry.attachment.Attachment;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import net.minecraft.item.Item;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
-public final class ItemAttachments {
-	public static final Attachment<Item, Float> COMPOSTING_CHANCE = Attachment.builder(
+public final class ItemMetatags {
+	public static final Metatag<Item, Float> COMPOSTING_CHANCE = Metatag.builder(
 		Registries.ITEM,
 		Identifier.of(SpecterGlobals.MODID, "composting_chance"),
 		Codec.floatRange(0.0F, 1.0F),
 		PacketCodecs.FLOAT.cast()
 	).build();
 
-	public static final Attachment<Item, Integer> FUEL = Attachment.builder(
+	public static final Metatag<Item, Integer> FUEL = Metatag.builder(
 		Registries.ITEM,
 		Identifier.of(SpecterGlobals.MODID, "fuel"),
 		Codec.intRange(0, 32767),
