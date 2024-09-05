@@ -19,6 +19,7 @@
 	"mixins": [
 		"specter-debug.mixins.json"
 	],
+	"accessWidener": "specter-debug.accesswidener",
 	"custom": {
 		"modmenu": {
 			"parent": "specter",

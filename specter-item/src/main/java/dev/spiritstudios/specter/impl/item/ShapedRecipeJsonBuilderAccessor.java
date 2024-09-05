@@ -1,7 +1,9 @@
 package dev.spiritstudios.specter.impl.item;
 
 import net.minecraft.advancement.AdvancementCriterion;
+import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
@@ -15,4 +17,6 @@ public interface ShapedRecipeJsonBuilderAccessor {
 	int getCount();
 
 	boolean getShowNotification();
+
+	RawShapedRecipe callValidate(Identifier recipeId);
 }

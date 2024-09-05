@@ -68,7 +68,8 @@ allprojects {
 
 	loom {
 		splitEnvironmentSourceSets()
-		accessWidenerPath = rootDir.absoluteFile.resolve("src/main/resources/specter.accesswidener")
+		if (file("src/main/resources/${project.name}.accesswidener").exists()) accessWidenerPath =
+			file("src/main/resources/${project.name}.accesswidener")
 	}
 
 	for (modProject in allprojects) {

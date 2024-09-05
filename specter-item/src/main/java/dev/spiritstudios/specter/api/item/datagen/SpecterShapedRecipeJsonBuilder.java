@@ -40,7 +40,7 @@ public class SpecterShapedRecipeJsonBuilder extends ShapedRecipeJsonBuilder {
 	public void offerTo(RecipeExporter exporter, Identifier recipeId) {
 		ShapedRecipeJsonBuilderAccessor accessor = (ShapedRecipeJsonBuilderAccessor) this;
 
-		RawShapedRecipe rawShapedRecipe = this.validate(recipeId);
+		RawShapedRecipe rawShapedRecipe = accessor.callValidate(recipeId);
 		Advancement.Builder builder = exporter.getAdvancementBuilder()
 			.criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
 			.rewards(AdvancementRewards.Builder.recipe(recipeId))

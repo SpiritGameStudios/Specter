@@ -17,7 +17,6 @@
 		"fabric-api": "*",
 		"java": ">=21"
 	},
-	"accessWidener": "specter.accesswidener",
 	"custom": {
 		"modmenu": {
 			"badges": [
