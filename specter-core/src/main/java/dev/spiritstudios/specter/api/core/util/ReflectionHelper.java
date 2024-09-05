@@ -2,9 +2,11 @@ package dev.spiritstudios.specter.api.core.util;
 
 import org.objectweb.asm.tree.AnnotationNode;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.Optional;
 
 /**
  * A bunch of utilities to reduce boilerplate reflection code.
@@ -123,6 +125,10 @@ public final class ReflectionHelper {
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException("Failed to set field " + field.getName(), e);
 		}
+	}
+
+	public static <T extends Annotation> Optional<T> getAnnotation(Field field, Class<T> annotationClass) {
+		return Optional.ofNullable(field.getAnnotation(annotationClass));
 	}
 
 	@SuppressWarnings("unchecked")

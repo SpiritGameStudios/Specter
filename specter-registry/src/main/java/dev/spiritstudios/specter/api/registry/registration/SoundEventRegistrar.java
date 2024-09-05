@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.api.registry.registration;
 
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
@@ -14,5 +15,15 @@ public interface SoundEventRegistrar extends MinecraftRegistrar<SoundEvent> {
 	@Override
 	default void register(String name, String namespace, SoundEvent object, Field field) {
 		Registry.register(getRegistry(), Identifier.of(namespace, name.replace('-', '.')), object);
+	}
+
+	@Override
+	default Registry<SoundEvent> getRegistry() {
+		return Registries.SOUND_EVENT;
+	}
+
+	@Override
+	default Class<SoundEvent> getObjectType() {
+		return SoundEvent.class;
 	}
 }

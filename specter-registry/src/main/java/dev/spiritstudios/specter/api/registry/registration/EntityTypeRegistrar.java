@@ -9,4 +9,9 @@ public interface EntityTypeRegistrar extends MinecraftRegistrar<EntityType<?>> {
 	default Registry<EntityType<?>> getRegistry() {
 		return Registries.ENTITY_TYPE;
 	}
+
+	@Override
+	default Class<EntityType<?>> getObjectType() {
+		return Registrar.fixGenerics(EntityType.class);
+	}
 }

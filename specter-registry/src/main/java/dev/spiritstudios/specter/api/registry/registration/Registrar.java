@@ -8,7 +8,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 /**
  * Automatically run a function on each object using reflection.
@@ -33,6 +32,15 @@ public interface Registrar<T> {
 	}
 
 	/**
+	 * Workaround for Java's type erasure.
+	 * Use this if {@link T} has a generic type of ?.
+	 */
+	@SuppressWarnings("unchecked")
+	static <T> Class<T> fixGenerics(Class<?> clazz) {
+		return (Class<T>) clazz;
+	}
+
+	/**
 	 * Register an object to the registry.
 	 *
 	 * @param name      Name of the object
@@ -43,6 +51,14 @@ public interface Registrar<T> {
 	void register(String name, String namespace, T object, Field field);
 
 	/**
+	 * Get the type of object to register.
+	 * If {@link T} has a generic type of ?, use {@link Registrar#fixGenerics(Class)} to force the correct type.
+	 *
+	 * @return The type of object to register
+	 */
+	Class<T> getObjectType();
+
+	/**
 	 * Initialize the registrar and register all objects.
 	 * Do not call this method directly, use {@link Registrar#process(Class, String)} instead.
 	 *
@@ -50,20 +66,15 @@ public interface Registrar<T> {
 	 */
 	@ApiStatus.Internal
 	default void init(String namespace) {
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(Ignore.class)) continue;
+		ReflectionHelper.forEachStaticField(this.getClass(), getObjectType(), (value, name, field) -> {
+			if (field.isAnnotationPresent(Ignore.class)) return;
 
-			T value = ReflectionHelper.getFieldValue(field);
-			if (value == null || !field.getType().isAssignableFrom(value.getClass())) continue;
-			
-			String name = field.getName().toLowerCase();
-			if (field.isAnnotationPresent(Name.class)) {
-				Name nameAnnotation = field.getAnnotation(Name.class);
-				name = nameAnnotation.value();
-			}
+			String objectName = ReflectionHelper.getAnnotation(field, Name.class)
+				.map(Name::value)
+				.orElseGet(name::toLowerCase);
 
-			register(name, namespace, value, field);
-		}
+			register(objectName, namespace, value, field);
+		});
 	}
 
 	/**

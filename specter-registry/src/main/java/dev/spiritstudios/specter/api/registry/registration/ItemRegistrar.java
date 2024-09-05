@@ -9,4 +9,9 @@ public interface ItemRegistrar extends MinecraftRegistrar<Item> {
 	default Registry<Item> getRegistry() {
 		return Registries.ITEM;
 	}
+
+	@Override
+	default Class<Item> getObjectType() {
+		return Item.class;
+	}
 }

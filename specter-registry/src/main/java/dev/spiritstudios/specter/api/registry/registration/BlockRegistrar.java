@@ -20,6 +20,11 @@ public interface BlockRegistrar extends MinecraftRegistrar<Block> {
 	}
 
 	@Override
+	default Class<Block> getObjectType() {
+		return Block.class;
+	}
+
+	@Override
 	default void register(String name, String namespace, Block object, Field field) {
 		Registry.register(getRegistry(), Identifier.of(namespace, name), object);
 

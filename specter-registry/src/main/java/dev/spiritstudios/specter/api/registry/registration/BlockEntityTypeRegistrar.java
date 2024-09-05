@@ -9,4 +9,9 @@ public interface BlockEntityTypeRegistrar extends MinecraftRegistrar<BlockEntity
 	default Registry<BlockEntityType<?>> getRegistry() {
 		return Registries.BLOCK_ENTITY_TYPE;
 	}
+
+	@Override
+	default Class<BlockEntityType<?>> getObjectType() {
+		return Registrar.fixGenerics(BlockEntityType.class);
+	}
 }
