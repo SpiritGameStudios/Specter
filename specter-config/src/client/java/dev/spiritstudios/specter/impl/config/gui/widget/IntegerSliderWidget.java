@@ -1,32 +1,31 @@
 package dev.spiritstudios.specter.impl.config.gui.widget;
 
+import com.mojang.datafixers.util.Pair;
+import dev.spiritstudios.specter.api.config.Config;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 public class IntegerSliderWidget extends SliderWidget {
-	private final Supplier<Integer> getter;
-	private final Consumer<Integer> setter;
+	private final Config.Value<Integer> configValue;
 
 	private final int min;
 	private final int max;
 
-	public IntegerSliderWidget(String translationKey, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
-		super(0, 0, 0, 20, Text.translatable(translationKey), 0);
-		this.getter = getter;
-		this.setter = setter;
+	public IntegerSliderWidget(Config.Value<Integer> configValue, Identifier configId) {
+		super(0, 0, 0, 20, Text.translatable(configValue.translationKey(configId)), 0);
+		this.configValue = configValue;
 
-		Text tooltip = Text.translatableWithFallback(translationKey + ".tooltip", "");
+		Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(configValue.translationKey(configId)), "");
 		if (!tooltip.getString().isEmpty()) this.setTooltip(Tooltip.of(tooltip));
 
-		this.min = min;
-		this.max = max;
+		Pair<Integer, Integer> range = configValue.range();
+		this.min = range == null ? 0 : range.getFirst();
+		this.max = range == null ? 100 : range.getSecond();
 
-		this.value = (double) (getter.get() - min) / (max - min);
+		this.value = configValue.get();
 		applyValue();
 	}
 
@@ -36,15 +35,12 @@ public class IntegerSliderWidget extends SliderWidget {
 
 	@Override
 	public Text getMessage() {
-		return Text.of(super.getMessage().getString()
-			+ ": "
-			+ getter.get()
-		);
+		return Text.of("%s: %d".formatted(super.getMessage().getString(), configValue.get()));
 	}
 
 	@Override
 	protected void applyValue() {
 		this.value = MathHelper.clamp(value, 0, 1.0);
-		setter.accept((int) Math.round(this.value * (max - min) + min));
+		configValue.set((int) Math.round(this.value * (max - min) + min));
 	}
 }

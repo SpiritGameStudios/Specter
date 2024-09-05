@@ -39,7 +39,7 @@ public final class SpecterConfigGameTest {
 
 		Files.deleteIfExists(path);
 		GetTestConfig config = ConfigManager.getConfig(GetTestConfig.class);
-		config.testString = "test2";
+		GetTestConfig.testString.set("test2");
 		config.save();
 
 		GetTestConfig newConfig = ConfigManager.getConfig(GetTestConfig.class);

@@ -1,60 +1,40 @@
 package dev.spiritstudios.testmod;
 
 import dev.spiritstudios.specter.api.config.Config;
-import dev.spiritstudios.specter.api.config.NestedConfig;
-import dev.spiritstudios.specter.api.config.annotations.Comment;
-import dev.spiritstudios.specter.api.config.annotations.Range;
-import dev.spiritstudios.specter.api.config.annotations.Sync;
 import net.minecraft.util.Identifier;
 
-public class GetTestConfig implements Config {
+public class GetTestConfig extends Config<GetTestConfig> {
 	@Override
 	public Identifier getId() {
 		return Identifier.of("specter-config-testmod", "gettestconfig");
 	}
 
-	@Comment("This is a test string")
-	@Sync
-	public String testString = "test";
-	@Comment("This is a test int")
-	@Range(min = 2, max = 10)
-	public int testInt = 1;
-	@Comment("This is a test bool")
-	public boolean testBool = true;
-	@Comment("This is a test double")
-	public double testDouble = 1.0;
-	@Comment("This is a test float")
-	public float testFloat = 1.0f;
+	public static Value<String> testString = stringValue("test")
+		.comment("This is a test string")
+		.sync()
+		.build();
 
-	@Comment("This is a nested class")
-	public CreateTestConfig.Nested nested = new CreateTestConfig.Nested();
+	public static Value<Integer> testInt = intValue(2)
+		.comment("This is a test int")
+		.range(2, 10)
+		.build();
 
-	@Comment("This is a test enum")
-	public CreateTestConfig.TestEnum testEnum = CreateTestConfig.TestEnum.TEST_1;
+	public static Value<Boolean> testBool = booleanValue(true)
+		.comment("This is a test bool")
+		.build();
 
-	public static class Nested implements NestedConfig {
-		@Comment("This is a nested string\n" +
-			"With a new line")
-		public String nestedString = "test";
+	public static Value<Double> testDouble = doubleValue(1.0)
+		.comment("This is a test double")
+		.build();
 
-		@Override
-		public Identifier getId() {
-			return Identifier.of("testmod", "nested");
-		}
+	public static Value<Float> testFloat = floatValue(1.0f)
+		.comment("This is a test float")
+		.build();
 
-		@Comment("This is a nested nested class")
-		public CreateTestConfig.Nested.NestedNested nestedNested = new CreateTestConfig.Nested.NestedNested();
+	public static Value<TestEnum> testEnum = enumValue(TestEnum.TEST_1, TestEnum.class)
+		.comment("This is a test enum")
+		.build();
 
-		public static class NestedNested implements NestedConfig {
-			@Comment("This is a nested nested string")
-			public String nestedNestedString = "test";
-
-			@Override
-			public Identifier getId() {
-				return Identifier.of("testmod", "nestednested");
-			}
-		}
-	}
 
 	public enum TestEnum {
 		TEST_1,

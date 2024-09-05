@@ -1,38 +1,34 @@
 package dev.spiritstudios.specter.impl.config.gui.widget;
 
+import dev.spiritstudios.specter.api.config.Config;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import net.minecraft.util.Identifier;
 
 public class BooleanButtonWidget extends ButtonWidget {
-	private final Supplier<Boolean> getter;
+	private final Config.Value<Boolean> configValue;
 
-	public BooleanButtonWidget(String translationKey, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+	public BooleanButtonWidget(Config.Value<Boolean> configValue, Identifier configId) {
 		super(
 			0,
 			0,
 			0,
 			20,
-			Text.translatable(translationKey),
-			button -> setter.accept(!getter.get()),
+			Text.translatable(configValue.translationKey(configId)),
+			button -> configValue.set(!configValue.get()),
 			button -> null
 		);
 
-		Text tooltip = Text.translatableWithFallback(translationKey + ".tooltip", "");
+		Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(configValue.translationKey(configId)), "");
 		if (!tooltip.getString().isEmpty()) this.setTooltip(Tooltip.of(tooltip));
 
-		this.getter = getter;
+		this.configValue = configValue;
 	}
 
 	@Override
 	public Text getMessage() {
-		return Text.literal(super.getMessage().getString()
-			+ ": "
-			+ ScreenTexts.onOrOff(this.getter.get()).getString()
-		);
+		return Text.literal("%s: %s".formatted(super.getMessage().getString(), ScreenTexts.onOrOff(this.configValue.get()).getString()));
 	}
 }

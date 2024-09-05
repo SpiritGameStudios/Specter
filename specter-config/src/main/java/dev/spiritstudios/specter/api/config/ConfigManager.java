@@ -1,16 +1,15 @@
 package dev.spiritstudios.specter.api.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
-import dev.spiritstudios.specter.impl.config.NonSyncExclusionStrategy;
 import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
@@ -20,13 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class ConfigManager {
-	@ApiStatus.Internal
-	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
-	@ApiStatus.Internal
-	public static final Gson GSON_NON_SYNC = new GsonBuilder().setPrettyPrinting().addSerializationExclusionStrategy(new NonSyncExclusionStrategy()).create();
-
-	private static final Map<Identifier, Config> configs = new Object2ObjectOpenHashMap<>();
+	private static final Map<Identifier, Config<?>> configs = new Object2ObjectOpenHashMap<>();
 
 	/**
 	 * Get a config file. If the file does not exist, it will be created and saved.
@@ -36,7 +29,7 @@ public final class ConfigManager {
 	 * @param <T>   The type of the config file
 	 * @return The config file
 	 */
-	public static <T extends Config> T getConfig(Class<T> clazz) {
+	public static <T extends Config<T>> T getConfig(Class<T> clazz) {
 		T config = ReflectionHelper.instantiate(clazz);
 
 		if (!Files.exists(config.getPath())) {
@@ -57,18 +50,12 @@ public final class ConfigManager {
 		lines.removeIf(line -> line.trim().startsWith("//"));
 		StringBuilder stringBuilder = new StringBuilder();
 		lines.forEach(stringBuilder::append);
-		T loadedConfig;
-
-		try {
-			loadedConfig = GSON.fromJson(stringBuilder.toString(), clazz);
-		} catch (JsonSyntaxException e) {
-			SpecterGlobals.LOGGER.error("Failed to parse config file {}. Resetting to default values.", config.getPath().toString());
-			loadedConfig = config;
-		}
+		JsonObject json = JsonHelper.deserialize(stringBuilder.toString());
+		T loadedConfig = config.parse(JsonOps.INSTANCE, json).getOrThrow();
 
 		// Save to make sure any new fields are added
 		loadedConfig.save();
-		CACHED_PAYLOAD = null;
+		ConfigSyncS2CPayload.clearCache();
 
 		T existingConfig = getConfigById(loadedConfig.getId());
 		if (existingConfig != null) {
@@ -83,35 +70,28 @@ public final class ConfigManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Config> T getConfigById(Identifier id) {
+	public static <T extends Config<T>> T getConfigById(Identifier id) {
 		return (T) configs.get(id);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void reloadConfigs() {
-		Map<Identifier, Config> oldConfigs = new Object2ObjectOpenHashMap<>(configs);
+		Map<Identifier, Config<?>> oldConfigs = new Object2ObjectOpenHashMap<>(configs);
 		oldConfigs.values().stream().map(Config::getClass).forEach(ConfigManager::getConfig);
 
-		CACHED_PAYLOAD = null;
+		ConfigSyncS2CPayload.clearCache();
 	}
 
 	public static void reloadConfigs(MinecraftServer server) {
 		reloadConfigs();
-		ConfigSyncS2CPayload payload = ConfigManager.createSyncPayload();
-		server.getPlayerManager().getPlayerList().forEach(player -> ServerPlayNetworking.send(player, payload));
+		List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.createPayloads();
+
+		server.getPlayerManager().getPlayerList().forEach(
+			player -> payloads.forEach(payload -> ServerPlayNetworking.send(player, payload)));
 	}
 
 	@ApiStatus.Internal
-	public static Map<Identifier, Config> getConfigs() {
+	public static Map<Identifier, Config<?>> getConfigs() {
 		return configs;
-	}
-
-	private static ConfigSyncS2CPayload CACHED_PAYLOAD;
-
-	@ApiStatus.Internal
-	public static ConfigSyncS2CPayload createSyncPayload() {
-		if (CACHED_PAYLOAD != null) return CACHED_PAYLOAD;
-
-		Map<Identifier, String> configs = getConfigs().values().stream().collect(Object2ObjectOpenHashMap::new, (map, config) -> map.put(config.getId(), GSON_NON_SYNC.toJson(config)), Map::putAll);
-		return CACHED_PAYLOAD = new ConfigSyncS2CPayload(configs);
 	}
 }
