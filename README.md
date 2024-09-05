@@ -16,4 +16,4 @@ TODO: Add usage instructions here
 
 ## Special Thanks
 
-To the QSL Team, for creating their REA system, which the Attachment API is heavily inspired by.
+To the QSL Team, for creating their REA system, which the Metatag API is heavily inspired by.
