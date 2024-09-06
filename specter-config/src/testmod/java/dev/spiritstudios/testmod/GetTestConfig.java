@@ -9,29 +9,31 @@ public class GetTestConfig extends Config<GetTestConfig> {
 		return Identifier.of("specter-config-testmod", "gettestconfig");
 	}
 
-	public static Value<String> testString = stringValue("test")
+	public static final GetTestConfig INSTANCE = new GetTestConfig();
+
+	public Value<String> testString = stringValue("test")
 		.comment("This is a test string")
 		.sync()
 		.build();
 
-	public static Value<Integer> testInt = intValue(2)
+	public Value<Integer> testInt = intValue(2)
 		.comment("This is a test int")
 		.range(2, 10)
 		.build();
 
-	public static Value<Boolean> testBool = booleanValue(true)
+	public Value<Boolean> testBool = booleanValue(true)
 		.comment("This is a test bool")
 		.build();
 
-	public static Value<Double> testDouble = doubleValue(1.0)
+	public Value<Double> testDouble = doubleValue(1.0)
 		.comment("This is a test double")
 		.build();
 
-	public static Value<Float> testFloat = floatValue(1.0f)
+	public Value<Float> testFloat = floatValue(1.0f)
 		.comment("This is a test float")
 		.build();
 
-	public static Value<TestEnum> testEnum = enumValue(TestEnum.TEST_1, TestEnum.class)
+	public Value<TestEnum> testEnum = enumValue(TestEnum.TEST_1, TestEnum.class)
 		.comment("This is a test enum")
 		.build();
 

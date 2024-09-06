@@ -12,7 +12,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +23,7 @@ public class ConfigScreen extends Screen {
 	private final Screen parent;
 
 	public ConfigScreen(Config<?> config, Screen parent) {
-		super(Text.translatable("config.%s.title".formatted(config.getId())));
+		super(Text.translatable("config.%s.%s.title".formatted(config.getId().getNamespace(), config.getId().getPath())));
 		this.config = config;
 		this.parent = parent;
 	}
@@ -32,23 +31,38 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		super.init();
+		if (this.client == null) close();
 
 		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
 		List<ClickableWidget> options = new ArrayList<>();
-		Arrays.stream(config.getClass().getDeclaredFields())
+		List<? extends Config.Value<?>> values = Arrays.stream(config.getClass().getDeclaredFields())
 			.filter(field -> field.getType().isAssignableFrom(Config.Value.class))
 			.map(field -> (Config.Value<?>) ReflectionHelper.getFieldValue(config, field))
 			.filter(Objects::nonNull)
-			.forEach(option -> {
-				BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenManager.getWidgetFactory(option, this.config.getId());
-				if (factory == null) {
-					SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
-					return;
-				}
+			.toList();
 
-				ClickableWidget widget = factory.apply(option, this.config.getId());
-				if (widget != null) options.add(widget);
-			});
+
+		boolean failed = false;
+		for (Config.Value<?> option : values) {
+			if (!option.sync() || this.client.player == null || this.client.isInSingleplayer()) continue;
+
+			this.client.player.sendMessage(Text.of("Configs cannot be edited in multiplayer"), true);
+			this.client.setScreen(this.parent);
+			failed = true;
+			break;
+		}
+		if (failed) return;
+
+		values.forEach(option -> {
+			BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenManager.getWidgetFactory(option, this.config.getId());
+			if (factory == null) {
+				SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
+				return;
+			}
+
+			ClickableWidget widget = factory.apply(option, this.config.getId());
+			if (widget != null) options.add(widget);
+		});
 
 		scrollableWidget.addOptions(Arrays.copyOf(options.toArray(), options.size(), ClickableWidget[].class));
 		this.addDrawableChild(scrollableWidget);
@@ -64,15 +78,7 @@ public class ConfigScreen extends Screen {
 	}
 
 	public void save() {
-//		if (config instanceof NestedConfig && this.parent instanceof ConfigScreen) {
-//			((ConfigScreen) this.parent).save();
-//			return;
-//		}
 		config.save();
-	}
-	
-	private String getTranslationKey(Field field) {
-		return "config." + this.config.getId() + "." + field.getName();
 	}
 
 	@Override

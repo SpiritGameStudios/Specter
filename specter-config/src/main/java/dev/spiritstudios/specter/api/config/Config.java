@@ -2,6 +2,8 @@ package dev.spiritstudios.specter.api.config;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.datafixers.util.Pair;
@@ -9,6 +11,7 @@ import com.mojang.serialization.*;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.CodecHelper;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.impl.config.ConfigManager;
 import dev.spiritstudios.specter.impl.config.ValueImpl;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -21,6 +24,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +37,11 @@ import java.util.Optional;
  * A configuration file that can be saved to disk.
  */
 public abstract class Config<T extends Config<T>> implements Codec<T> {
-	public Config() {
+	protected Config() {
+		if (ConfigManager.getConfig(getId()) != null)
+			throw new IllegalStateException("Config with id %s already exists".formatted(getId()));
+
+		ConfigManager.registerConfig(getId(), this);
 		for (Field field : this.getClass().getDeclaredFields()) {
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
 			if (value == null) continue;
@@ -87,6 +95,8 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	public <T1> DataResult<T1> encode(T input, DynamicOps<T1> ops, T1 prefix) {
 		RecordBuilder<T1> builder = ops.mapBuilder();
 		for (Field field : this.getClass().getDeclaredFields()) {
+			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
+
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
 			if (value == null) continue;
 
@@ -102,6 +112,8 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		boolean success = true;
 
 		for (Field field : this.getClass().getDeclaredFields()) {
+			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
+
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
 			if (value == null) continue;
 
@@ -125,26 +137,26 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		}
 
 		JsonObject object = result.result().orElseThrow().getAsJsonObject();
+		StringWriter stringWriter = new StringWriter();
+		JsonWriter jsonWriter = new JsonWriter(stringWriter);
 
-		String json;
+		jsonWriter.setLenient(true);
+		jsonWriter.setSerializeNulls(false);
+		jsonWriter.setIndent("	");
+
 		try {
-			StringWriter stringWriter = new StringWriter();
-			JsonWriter jsonWriter = new JsonWriter(stringWriter);
-
-			jsonWriter.setLenient(true);
-			jsonWriter.setSerializeNulls(false);
-			jsonWriter.setIndent("	");
-
 			Streams.write(object, jsonWriter);
-
-			json = stringWriter.toString();
 		} catch (IOException e) {
-			throw new AssertionError(e);
+			throw new RuntimeException(e);
 		}
+
+		String json = stringWriter.toString();
 
 		Map<String, String> comments = new Object2ObjectOpenHashMap<>();
 
 		for (Field field : this.getClass().getDeclaredFields()) {
+			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
+
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
 			if (value == null) continue;
 
@@ -178,7 +190,39 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 			Files.write(path, newLines);
 		} catch (IOException e) {
 			SpecterGlobals.LOGGER.error("Failed to save config file: {}", path, e);
+		}
+	}
 
+	public void load() {
+		if (!Files.exists(getPath())) {
+			save();
+			return;
+		}
+
+		List<String> lines;
+		try {
+			lines = Files.readAllLines(getPath());
+		} catch (IOException e) {
+			SpecterGlobals.LOGGER.error("Failed to load config file {}. Default values will be used instead.", getPath().toString());
+			return;
+		}
+
+		lines.removeIf(line -> line.trim().startsWith("//"));
+		String json = String.join("\n", lines);
+
+		JsonElement jsonElement;
+		try {
+			jsonElement = JsonParser.parseString(json);
+		} catch (JsonSyntaxException e) {
+			SpecterGlobals.LOGGER.error("Failed to parse config file: {}", getPath());
+			SpecterGlobals.LOGGER.error(e.toString());
+			return;
+		}
+
+		DataResult<T> result = parse(JsonOps.INSTANCE, jsonElement);
+		if (result.error().isPresent()) {
+			SpecterGlobals.LOGGER.error("Failed to decode config file: {}", getPath());
+			SpecterGlobals.LOGGER.error(result.error().toString());
 		}
 	}
 
@@ -193,8 +237,11 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	@SuppressWarnings("unchecked")
 	public T packetDecode(ByteBuf buf) {
 		for (Field field : this.getClass().getDeclaredFields()) {
+			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
+
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
 			if (value == null) continue;
+			if (!value.sync()) continue;
 
 			value.packetDecode(buf);
 		}
@@ -206,10 +253,13 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		Identifier.PACKET_CODEC.encode(buf, getId());
 
 		for (Field field : this.getClass().getDeclaredFields()) {
-			Value<?> val = ReflectionHelper.getFieldValue(this, field);
-			if (val == null) continue;
+			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
 
-			val.packetEncode(buf);
+			Value<?> value = ReflectionHelper.getFieldValue(this, field);
+			if (value == null) continue;
+			if (!value.sync()) continue;
+
+			value.packetEncode(buf);
 		}
 	}
 
