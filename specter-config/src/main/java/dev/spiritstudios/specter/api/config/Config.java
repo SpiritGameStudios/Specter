@@ -28,35 +28,48 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A configuration file that can be saved to disk.
  */
 public abstract class Config<T extends Config<T>> implements Codec<T> {
+	@ApiStatus.Internal
 	protected Config() {
-		if (ConfigManager.getConfig(getId()) != null)
-			throw new IllegalStateException("Config with id %s already exists".formatted(getId()));
+	}
 
-		ConfigManager.registerConfig(getId(), this);
-		for (Field field : this.getClass().getDeclaredFields()) {
-			Value<?> value = ReflectionHelper.getFieldValue(this, field);
+	public static <T extends Config<T>> T create(Class<T> clazz) {
+		T instance = ReflectionHelper.instantiate(clazz);
+		Config<?> existing = ConfigManager.getConfig(instance.getId());
+		if (existing != null) {
+			if (existing.getClass() != clazz)
+				throw new IllegalArgumentException("Config with id %s already exists with a different class".formatted(instance.getId()));
+
+			return clazz.cast(existing);
+
+			// QUESTION: does instance get garbage collected here?
+		}
+
+		ConfigManager.registerConfig(instance.getId(), instance);
+		for (Field field : clazz.getDeclaredFields()) {
+			if (!Value.class.isAssignableFrom(field.getType())) continue;
+			if (Modifier.isStatic(field.getModifiers())) continue;
+			if (Modifier.isFinal(field.getModifiers())) continue;
+
+			Value<?> value = ReflectionHelper.getFieldValue(instance, field);
 			if (value == null) continue;
 
 			value.init(field.getName());
+			SpecterGlobals.debug("Registered config value: %s".formatted(value.translationKey(instance.getId())));
 		}
-	}
 
-	/**
-	 * WARNING: Recursive method
-	 */
-	private static void getNestedClasses(List<Class<?>> nestedClasses, Class<?> clazz) {
-		nestedClasses.add(clazz);
-		for (Class<?> nestedClass : clazz.getDeclaredClasses())
-			getNestedClasses(nestedClasses, nestedClass);
+		if (!instance.load())
+			SpecterGlobals.LOGGER.error("Failed to load config file: {}, default values will be used", instance.getPath());
+		else
+			instance.save(); // Save the config to disk to ensure it's up to date
+
+		return instance;
 	}
 
 	protected static <T> ValueBuilder<T> value(T defaultValue, Codec<T> codec) {
@@ -94,33 +107,21 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	@Override
 	public <T1> DataResult<T1> encode(T input, DynamicOps<T1> ops, T1 prefix) {
 		RecordBuilder<T1> builder = ops.mapBuilder();
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
-
-			Value<?> value = ReflectionHelper.getFieldValue(this, field);
-			if (value == null) continue;
-
-			builder = value.encode(ops, builder);
-		}
-
+		for (Value<?> value : getValues().toList()) builder = value.encode(ops, builder);
 		return builder.build(prefix);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
-		boolean success = true;
+		for (Value<?> value : getValues().toList()) {
+			if (value.decode(ops, input)) continue;
 
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
-
-			Value<?> value = ReflectionHelper.getFieldValue(this, field);
-			if (value == null) continue;
-
-			success &= value.decode(ops, input);
+			SpecterGlobals.LOGGER.error("Failed to decode config value: {}", value.translationKey(getId()));
+			return DataResult.error(() -> "Failed to decode config value: %s".formatted(value.translationKey(getId())));
 		}
 
-		return success ? DataResult.success(Pair.of((T) this, input)) : DataResult.error(() -> "Failed to decode config");
+		return DataResult.success(Pair.of((T) this, input));
 	}
 
 	/**
@@ -130,6 +131,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	public void save() {
 		@SuppressWarnings("unchecked")
 		DataResult<JsonElement> result = encodeStart(JsonOps.INSTANCE, (T) this);
+
 		if (result.error().isPresent()) {
 			SpecterGlobals.LOGGER.error("Failed to encode config: {}", getId());
 			SpecterGlobals.LOGGER.error(result.error().toString());
@@ -155,12 +157,17 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		Map<String, String> comments = new Object2ObjectOpenHashMap<>();
 
 		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
+			if (!Value.class.isAssignableFrom(field.getType())) continue;
+			if (Modifier.isStatic(field.getModifiers())) continue;
+			if (Modifier.isFinal(field.getModifiers())) continue;
 
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
 			if (value == null) continue;
 
-			value.comment().ifPresent(comment -> comments.put(field.getName(), comment));
+			String comment = value.comment().orElse(null);
+			if (comment == null) continue;
+
+			comments.put(field.getName(), comment);
 		}
 
 		List<String> newLines = new ArrayList<>();
@@ -193,10 +200,10 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		}
 	}
 
-	public void load() {
+	public boolean load() {
 		if (!Files.exists(getPath())) {
 			save();
-			return;
+			return true;
 		}
 
 		List<String> lines;
@@ -204,7 +211,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 			lines = Files.readAllLines(getPath());
 		} catch (IOException e) {
 			SpecterGlobals.LOGGER.error("Failed to load config file {}. Default values will be used instead.", getPath().toString());
-			return;
+			return false;
 		}
 
 		lines.removeIf(line -> line.trim().startsWith("//"));
@@ -216,14 +223,18 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		} catch (JsonSyntaxException e) {
 			SpecterGlobals.LOGGER.error("Failed to parse config file: {}", getPath());
 			SpecterGlobals.LOGGER.error(e.toString());
-			return;
+			return false;
 		}
 
 		DataResult<T> result = parse(JsonOps.INSTANCE, jsonElement);
 		if (result.error().isPresent()) {
 			SpecterGlobals.LOGGER.error("Failed to decode config file: {}", getPath());
 			SpecterGlobals.LOGGER.error(result.error().toString());
+
+			return false;
 		}
+
+		return true;
 	}
 
 	public Path getPath() {
@@ -234,33 +245,32 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		);
 	}
 
+	@ApiStatus.Internal
+	public Stream<Value<?>> getValues() {
+		return Arrays.stream(this.getClass().getDeclaredFields())
+			.filter(field ->
+				Value.class.isAssignableFrom(field.getType()) &&
+					!Modifier.isStatic(field.getModifiers()) &&
+					!Modifier.isFinal(field.getModifiers())
+			)
+			.<Value<?>>map(field -> ReflectionHelper.getFieldValue(this, field))
+			.filter(Objects::nonNull);
+	}
+
 	@SuppressWarnings("unchecked")
 	public T packetDecode(ByteBuf buf) {
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
-
-			Value<?> value = ReflectionHelper.getFieldValue(this, field);
-			if (value == null) continue;
-			if (!value.sync()) continue;
-
-			value.packetDecode(buf);
-		}
+		getValues()
+			.filter(Value::sync)
+			.forEach(value -> value.packetDecode(buf));
 
 		return (T) this;
 	}
 
 	public void packetEncode(ByteBuf buf) {
 		Identifier.PACKET_CODEC.encode(buf, getId());
-
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType()) || Modifier.isStatic(field.getModifiers())) continue;
-
-			Value<?> value = ReflectionHelper.getFieldValue(this, field);
-			if (value == null) continue;
-			if (!value.sync()) continue;
-
-			value.packetEncode(buf);
-		}
+		getValues()
+			.filter(Value::sync)
+			.forEach(value -> value.packetEncode(buf));
 	}
 
 	public interface Value<T> {
@@ -330,10 +340,10 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	protected static class RangedValueBuilder<T extends Number> {
 		protected final T defaultValue;
 		protected final Codec<T> codec;
+		private final RangeFunction<T, Codec<T>> codecRange;
 		protected String comment;
 		protected boolean sync;
 		protected PacketCodec<ByteBuf, T> packetCodec;
-		private final RangeFunction<T, Codec<T>> codecRange;
 		protected Pair<T, T> range;
 
 		public RangedValueBuilder(T defaultValue, Codec<T> codec, RangeFunction<T, Codec<T>> codecRange) {

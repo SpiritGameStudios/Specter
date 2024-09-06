@@ -12,8 +12,8 @@ public class SpecterConfigClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ConfigManager.reload());
 
 		ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2CPayload.ID, (payload, context) -> {
-			SpecterGlobals.LOGGER.info("Received config sync packet");
-			SpecterGlobals.LOGGER.info("Payload: {}", payload);
+			SpecterGlobals.debug("Received config sync packet");
+			SpecterGlobals.debug("Payload: %s".formatted(payload));
 		});
 	}
 }

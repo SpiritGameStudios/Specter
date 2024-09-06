@@ -21,8 +21,7 @@ public final class SpecterConfigGameTest {
 		);
 
 		Files.deleteIfExists(path);
-		CreateTestConfig.INSTANCE.load();
-
+		context.assertTrue(CreateTestConfig.INSTANCE.load(), "Config file failed to load");
 		context.assertTrue(Files.exists(path), "Config file does not exist");
 		context.assertTrue(CreateTestConfig.INSTANCE.testString.get().equals("test"), "String is not equal to test, Make sure you haven't modified the config");
 		context.complete();
@@ -37,9 +36,11 @@ public final class SpecterConfigGameTest {
 		);
 
 		Files.deleteIfExists(path);
+
+		context.assertTrue(GetTestConfig.INSTANCE.load(), "Config file failed to load");
 		GetTestConfig.INSTANCE.testString.set("test2");
 		GetTestConfig.INSTANCE.save();
-		GetTestConfig.INSTANCE.load();
+		context.assertTrue(GetTestConfig.INSTANCE.load(), "Config file failed to load");
 
 		context.assertTrue(Files.exists(path), "Config file does not exist");
 		context.assertTrue(GetTestConfig.INSTANCE.testString.get().equals("test2"), "String is not equal to test2, Make sure you haven't modified the config");

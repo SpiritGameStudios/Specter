@@ -9,7 +9,9 @@ public class GetTestConfig extends Config<GetTestConfig> {
 		return Identifier.of("specter-config-testmod", "gettestconfig");
 	}
 
-	public static final GetTestConfig INSTANCE = new GetTestConfig();
+	public static final GetTestConfig INSTANCE = Config.create(GetTestConfig.class);
+
+	public String invalidField = "test";
 
 	public Value<String> testString = stringValue("test")
 		.comment("This is a test string")

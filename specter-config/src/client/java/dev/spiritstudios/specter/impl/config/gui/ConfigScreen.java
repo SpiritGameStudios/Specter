@@ -3,7 +3,6 @@ package dev.spiritstudios.specter.impl.config.gui;
 import dev.spiritstudios.specter.api.ConfigScreenManager;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.gui.widget.OptionsScrollableWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,7 +14,6 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class ConfigScreen extends Screen {
@@ -35,12 +33,8 @@ public class ConfigScreen extends Screen {
 
 		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
 		List<ClickableWidget> options = new ArrayList<>();
-		List<? extends Config.Value<?>> values = Arrays.stream(config.getClass().getDeclaredFields())
-			.filter(field -> field.getType().isAssignableFrom(Config.Value.class))
-			.map(field -> (Config.Value<?>) ReflectionHelper.getFieldValue(config, field))
-			.filter(Objects::nonNull)
-			.toList();
 
+		List<Config.Value<?>> values = config.getValues().toList();
 
 		boolean failed = false;
 		for (Config.Value<?> option : values) {

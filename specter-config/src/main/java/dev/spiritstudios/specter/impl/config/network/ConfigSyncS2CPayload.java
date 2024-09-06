@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.impl.config.network;
 
 import dev.spiritstudios.specter.api.config.Config;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.config.ConfigManager;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -21,6 +22,7 @@ public record ConfigSyncS2CPayload(Config<?> config) implements CustomPayload {
 			Config::packetEncode,
 			buf -> {
 				Identifier id = Identifier.PACKET_CODEC.decode(buf);
+				SpecterGlobals.debug("Decoding config sync packet for %s".formatted(id));
 				Config<?> config = ConfigManager.getConfig(id);
 				config.save();
 				return config.packetDecode(buf);
