@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 
 public final class CodecHelper {
 	public static <T extends Enum<T>> Codec<T> createEnumCodec(Class<T> clazz) {
@@ -20,9 +19,24 @@ public final class CodecHelper {
 		}, Enum::name);
 	}
 
-	// TODO: Make this use the enum ordinal instead of the name
 	public static <T extends Enum<T>> PacketCodec<ByteBuf, T> createEnumPacketCodec(Class<T> clazz) {
-		return PacketCodecs.codec(createEnumCodec(clazz));
+		return new PacketCodec<>() {
+			@Override
+			public void encode(ByteBuf buf, T value) {
+				buf.writeInt(value.ordinal());
+			}
+
+			@Override
+			public T decode(ByteBuf buf) {
+				int ordinal = buf.readInt();
+				T[] values = clazz.getEnumConstants();
+
+				if (ordinal < 0 || ordinal >= values.length)
+					throw new IndexOutOfBoundsException("Enum ordinal out of bounds: " + ordinal);
+
+				return values[ordinal];
+			}
+		};
 	}
 
 	public static Codec<Integer> clampedRangeInt(int min, int max) {
