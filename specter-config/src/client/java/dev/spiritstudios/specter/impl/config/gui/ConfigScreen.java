@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class ConfigScreen extends Screen {
@@ -30,26 +31,26 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		super.init();
-		if (this.client == null) close();
+		Objects.requireNonNull(this.client);
 
 		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
 		List<ClickableWidget> options = new ArrayList<>();
 
 		List<Config.Value<?>> values = config.getValues().toList();
 
-		boolean failed = false;
-		for (Config.Value<?> option : values) {
-			if (!option.sync() || this.client.player == null || this.client.isInSingleplayer()) continue;
+		if (this.client.player != null && !this.client.isInSingleplayer()) {
+			for (Config.Value<?> option : values) {
+				if (!option.sync()) continue;
 
-			this.client.player.sendMessage(Text.of("Configs cannot be edited in multiplayer"), true);
-			this.client.setScreen(this.parent);
-			failed = true;
-			break;
+				this.client.player.sendMessage(Text.of("Configs cannot be edited in multiplayer"), true);
+				this.client.setScreen(this.parent);
+
+				return;
+			}
 		}
-		if (failed) return;
 
 		values.forEach(option -> {
-			BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenManager.getWidgetFactory(option, this.config.getId());
+			BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenManager.getWidgetFactory(option);
 			if (factory == null) {
 				SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
 				return;
@@ -71,7 +72,7 @@ public class ConfigScreen extends Screen {
 	public void close() {
 		save();
 
-		if (this.client == null) return;
+		Objects.requireNonNull(this.client);
 		this.client.setScreen(this.parent);
 	}
 

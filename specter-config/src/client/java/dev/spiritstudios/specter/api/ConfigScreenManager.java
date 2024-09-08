@@ -19,7 +19,7 @@ public final class ConfigScreenManager {
 
 	@SuppressWarnings("unchecked")
 	@ApiStatus.Internal
-	public static <T> BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> getWidgetFactory(Config.Value<T> value, Identifier configId) {
+	public static <T> BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> getWidgetFactory(Config.Value<T> value) {
 		// We are using a switch instead of just adding to our map for 2 reasons:
 		// 1. It's (usually) faster than a map lookup, as most of the time the value will be one of these types
 		// 2. It lets us handle the lowercased names of primitive types, which are different Class<> instances because reasons
