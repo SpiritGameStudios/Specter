@@ -57,7 +57,7 @@ public record MetatagSyncS2CPayload<V>(MetatagPair<V> metatagPair) implements Cu
 				if (entry.getValue().getSide() == ResourceType.CLIENT_RESOURCES)
 					return;
 
-				SpecterGlobals.LOGGER.debug("Caching metatag {}", entry.getKey());
+				SpecterGlobals.debug("Caching metatag %s".formatted(entry.getKey()));
 				cacheMetatag(entry.getValue());
 			});
 		}

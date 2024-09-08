@@ -1,27 +1,26 @@
 package dev.spiritstudios.specter.impl.config.gui.widget;
 
+import dev.spiritstudios.specter.api.config.Config;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import net.minecraft.util.Identifier;
 
 public class TextBoxWidget extends TextFieldWidget {
-	private final Consumer<String> setter;
+	private final Config.Value<String> configValue;
 
-	public TextBoxWidget(String translationKey, Supplier<String> getter, Consumer<String> setter) {
-		super(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 20, Text.of(getter.get()));
-		this.setter = setter;
+	public TextBoxWidget(Config.Value<String> configValue, Identifier configId) {
+		super(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 20, Text.of(configValue.get()));
+		this.configValue = configValue;
 
-		setPlaceholder(Text.translatableWithFallback(translationKey + ".placeholder", "").formatted(Formatting.DARK_GRAY));
+		setPlaceholder(Text.translatableWithFallback("%s.placeholder".formatted(configValue.translationKey(configId)), "").formatted(Formatting.DARK_GRAY));
 
-		Text tooltip = Text.translatableWithFallback(translationKey + ".tooltip", "");
+		Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(configValue.translationKey(configId)), "");
 		if (!tooltip.getString().isEmpty()) this.setTooltip(Tooltip.of(tooltip));
 
-		this.setText(getter.get());
+		this.setText(configValue.get());
 		setSelectionEnd(0);
 		setSelectionStart(0);
 	}
@@ -29,18 +28,18 @@ public class TextBoxWidget extends TextFieldWidget {
 	@Override
 	public void write(String text) {
 		super.write(text);
-		this.setter.accept(this.getText());
+		this.configValue.set(this.getText());
 	}
 
 	@Override
 	public void eraseCharacters(int characterOffset) {
 		super.eraseCharacters(characterOffset);
-		this.setter.accept(this.getText());
+		this.configValue.set(this.getText());
 	}
 
 	@Override
 	public void eraseWords(int wordOffset) {
 		super.eraseWords(wordOffset);
-		this.setter.accept(this.getText());
+		this.configValue.set(this.getText());
 	}
 }

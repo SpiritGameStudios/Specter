@@ -1,0 +1,3 @@
+{
+	"screen.specter.config.multiplayer_sync_error": "Configs with server-synced options cannot be edited while connected to a remote server."
+}

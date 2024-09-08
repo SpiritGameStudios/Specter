@@ -30,4 +30,9 @@ public final class SpecterGlobals {
 
 		DEBUG = debug;
 	}
+
+	@ApiStatus.Internal
+	public static void debug(String message) {
+		if (DEBUG) LOGGER.info(message);
+	}
 }

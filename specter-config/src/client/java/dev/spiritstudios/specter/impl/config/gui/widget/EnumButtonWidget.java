@@ -1,47 +1,44 @@
 package dev.spiritstudios.specter.impl.config.gui.widget;
 
+import dev.spiritstudios.specter.api.config.Config;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class EnumButtonWidget extends ButtonWidget {
-	private final Supplier<Enum<?>> getter;
-	private final Consumer<Enum<?>> setter;
-
+	private final Config.Value<Enum<?>> configValue;
+	private final Identifier configId;
 	private final List<Enum<?>> enumValues = new ArrayList<>();
-
-	private final String translationKey;
-
-	public EnumButtonWidget(String translationKey, Supplier<Enum<?>> getter, Consumer<Enum<?>> setter, Enum<?> enumValue) {
+	
+	public EnumButtonWidget(Config.Value<Enum<?>> configValue, Identifier configId) {
 		super(
 			0,
 			0,
 			0,
 			20,
-			Text.translatable(translationKey),
+			Text.translatable(configValue.translationKey(configId)),
 			button -> {
 			},
 			button -> null
 		);
 
-		this.getter = getter;
-		this.setter = setter;
-
-		List<?> values = Arrays.asList(enumValue.getClass().getEnumConstants());
+		this.configValue = configValue;
+		this.configId = configId;
+		List<?> values = Arrays.asList(configValue.defaultValue().getClass().getEnumConstants());
 
 		if (values.isEmpty()) throw new IllegalArgumentException("Enum values cannot be null");
-		for (Object value : values) if (value instanceof Enum<?>) enumValues.add((Enum<?>) value);
+		values.stream()
+			.filter(value -> value instanceof Enum<?>)
+			.map(value -> (Enum<?>) value)
+			.forEach(enumValues::add);
 
-		Text tooltip = Text.translatableWithFallback(translationKey + ".tooltip", "");
+		Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(configValue.translationKey(configId)), "");
 		if (!tooltip.getString().isEmpty()) this.setTooltip(Tooltip.of(tooltip));
-
-		this.translationKey = translationKey;
 	}
 
 	@Override
@@ -51,16 +48,22 @@ public class EnumButtonWidget extends ButtonWidget {
 	}
 
 	private void cycle() {
-		Enum<?> current = getter.get();
+		Enum<?> current = configValue.get();
 		int index = enumValues.indexOf(current);
-		setter.accept(enumValues.get((index + 1) % enumValues.size()));
+		configValue.set(enumValues.get((index + 1) % enumValues.size()));
 	}
 
 	@Override
 	public Text getMessage() {
-		return Text.of(super.getMessage().getString()
-			+ ": "
-			+ Text.translatable(translationKey + "." + getter.get().toString().toLowerCase()).getString()
+		return Text.of("%s: %s".formatted(
+				super.getMessage().getString(),
+				Text.translatable(
+					"%s.%s".formatted(
+						configValue.translationKey(configId),
+						configValue.get().toString().toLowerCase()
+					)
+				).getString()
+			)
 		);
 	}
 }

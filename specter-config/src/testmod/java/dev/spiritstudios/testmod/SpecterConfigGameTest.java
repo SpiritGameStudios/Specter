@@ -1,6 +1,5 @@
 package dev.spiritstudios.testmod;
 
-import dev.spiritstudios.specter.api.config.ConfigManager;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.test.GameTest;
@@ -22,10 +21,9 @@ public final class SpecterConfigGameTest {
 		);
 
 		Files.deleteIfExists(path);
-		CreateTestConfig config = ConfigManager.getConfig(CreateTestConfig.class);
-
+		context.assertTrue(CreateTestConfig.INSTANCE.load(), "Config file failed to load");
 		context.assertTrue(Files.exists(path), "Config file does not exist");
-		context.assertTrue(config.testString.equals("test"), "String is not equal to test, Make sure you haven't modified the config");
+		context.assertTrue(CreateTestConfig.INSTANCE.testString.get().equals("test"), "String is not equal to test, Make sure you haven't modified the config");
 		context.complete();
 	}
 
@@ -38,14 +36,14 @@ public final class SpecterConfigGameTest {
 		);
 
 		Files.deleteIfExists(path);
-		GetTestConfig config = ConfigManager.getConfig(GetTestConfig.class);
-		config.testString = "test2";
-		config.save();
 
-		GetTestConfig newConfig = ConfigManager.getConfig(GetTestConfig.class);
+		context.assertTrue(GetTestConfig.INSTANCE.load(), "Config file failed to load");
+		GetTestConfig.INSTANCE.testString.set("test2");
+		GetTestConfig.INSTANCE.save();
+		context.assertTrue(GetTestConfig.INSTANCE.load(), "Config file failed to load");
 
 		context.assertTrue(Files.exists(path), "Config file does not exist");
-		context.assertTrue(newConfig.testString.equals("test2"), "String is not equal to test2, Make sure you haven't modified the config");
+		context.assertTrue(GetTestConfig.INSTANCE.testString.get().equals("test2"), "String is not equal to test2, Make sure you haven't modified the config");
 		context.complete();
 	}
 }

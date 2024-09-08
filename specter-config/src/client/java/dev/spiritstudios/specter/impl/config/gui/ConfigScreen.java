@@ -1,28 +1,31 @@
 package dev.spiritstudios.specter.impl.config.gui;
 
+import dev.spiritstudios.specter.api.ConfigScreenManager;
 import dev.spiritstudios.specter.api.config.Config;
-import dev.spiritstudios.specter.api.config.NestedConfig;
-import dev.spiritstudios.specter.api.config.annotations.Range;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
-import dev.spiritstudios.specter.impl.config.gui.widget.*;
+import dev.spiritstudios.specter.impl.config.gui.widget.OptionsScrollableWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
 
 public class ConfigScreen extends Screen {
-	private final Config config;
+	private static final Text MULTIPLAYER_SYNC_ERROR = Text.translatable("screen.specter.config.multiplayer_sync_error");
+
+	private final Config<?> config;
 	private final Screen parent;
 
-	public ConfigScreen(Config config, Screen parent) {
-		super(Text.translatable("config." + config.getId() + ".title"));
+	public ConfigScreen(Config<?> config, Screen parent) {
+		super(Text.translatable("config.%s.%s.title".formatted(config.getId().getNamespace(), config.getId().getPath())));
 		this.config = config;
 		this.parent = parent;
 	}
@@ -30,135 +33,53 @@ public class ConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		super.init();
+		Objects.requireNonNull(this.client);
 
 		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
 		List<ClickableWidget> options = new ArrayList<>();
-		for (Field field : config.getClass().getDeclaredFields()) addOptionWidget(field, options);
+
+		List<Config.Value<?>> values = config.getValues().toList();
+
+		if (this.client.player != null && !this.client.isInSingleplayer()) {
+			for (Config.Value<?> option : values) {
+				if (!option.sync()) continue;
+
+				this.client.player.sendMessage(MULTIPLAYER_SYNC_ERROR, false);
+				this.client.setScreen(this.parent);
+
+				return;
+			}
+		}
+
+		values.forEach(option -> {
+			BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenManager.getWidgetFactory(option);
+			if (factory == null) {
+				SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
+				return;
+			}
+
+			ClickableWidget widget = factory.apply(option, this.config.getId());
+			if (widget == null)
+				throw new IllegalStateException("Widget factory returned null for %s".formatted(option.defaultValue().getClass().getSimpleName()));
+
+			options.add(widget);
+		});
 
 		scrollableWidget.addOptions(Arrays.copyOf(options.toArray(), options.size(), ClickableWidget[].class));
 		this.addDrawableChild(scrollableWidget);
-		this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("gui.done"), button -> close()).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build());
+		this.addDrawableChild(new ButtonWidget.Builder(ScreenTexts.DONE, button -> close()).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build());
 	}
 
 	@Override
 	public void close() {
 		save();
 
-		if (this.client == null) return;
+		Objects.requireNonNull(this.client);
 		this.client.setScreen(this.parent);
 	}
 
 	public void save() {
-		if (config instanceof NestedConfig && this.parent instanceof ConfigScreen) {
-			((ConfigScreen) this.parent).save();
-			return;
-		}
 		config.save();
-	}
-
-	private void addOptionWidget(Field option, List<ClickableWidget> options) {
-		Object value = ReflectionHelper.getFieldValue(config, option);
-		options.add(switch (value) {
-			case String ignored ->
-				new TextBoxWidget(getTranslationKey(option), () -> ReflectionHelper.getFieldValue(config, option), newValue -> ReflectionHelper.setFieldValue(config, option, newValue));
-
-			case Boolean ignored ->
-				new BooleanButtonWidget(getTranslationKey(option), () -> ReflectionHelper.getFieldValue(config, option), newValue -> ReflectionHelper.setFieldValue(config, option, newValue));
-
-			case Float ignored -> {
-				float min = 0;
-				float max = 100;
-				if (option.isAnnotationPresent(Range.class)) {
-					Range range = option.getAnnotation(Range.class);
-					min = (float) range.min();
-					max = (float) range.max();
-				}
-
-				yield new FloatSliderWidget(
-					getTranslationKey(option),
-					min,
-					max,
-					() -> ReflectionHelper.getFieldValue(config, option),
-					newValue -> ReflectionHelper.setFieldValue(config, option, newValue)
-				);
-			}
-
-			case Integer ignored -> {
-				int min = 0;
-				int max = 100;
-				if (option.isAnnotationPresent(Range.class)) {
-					Range range = option.getAnnotation(Range.class);
-					min = (int) range.min();
-					max = (int) range.max();
-				}
-
-				yield new IntegerSliderWidget(
-					getTranslationKey(option),
-					min,
-					max,
-					() -> ReflectionHelper.getFieldValue(config, option),
-					newValue -> ReflectionHelper.setFieldValue(config, option, newValue)
-				);
-			}
-
-			case Double ignored -> {
-				double min = 0;
-				double max = 100;
-				if (option.isAnnotationPresent(Range.class)) {
-					Range range = option.getAnnotation(Range.class);
-					min = range.min();
-					max = range.max();
-				}
-
-				yield new DoubleSliderWidget(
-					getTranslationKey(option),
-					min,
-					max,
-					() -> ReflectionHelper.getFieldValue(config, option),
-					newValue -> ReflectionHelper.setFieldValue(config, option, newValue)
-				);
-			}
-
-			case Enum<?> ignored ->
-				new EnumButtonWidget(option.getName(), () -> ReflectionHelper.getFieldValue(config, option), newValue -> ReflectionHelper.setFieldValue(config, option, newValue), (Enum<?>) value);
-
-			case NestedConfig nestedValue -> {
-				getNestedClass(options, nestedValue);
-				yield null;
-			}
-
-			case null, default -> {
-				if (SpecterGlobals.DEBUG)
-					SpecterGlobals.LOGGER.warn("Unsupported config type: {}", option.getType().getName());
-
-				yield null;
-			}
-		});
-	}
-
-	private void getNestedClass(List<ClickableWidget> options, NestedConfig value) {
-		ConfigScreen nestedScreen = new ConfigScreen(value, this);
-
-		for (Field nestedField : value.getClass().getDeclaredFields()) {
-			if (nestedField.getType().isAssignableFrom(NestedConfig.class)) {
-				NestedConfig nestedValue = ReflectionHelper.getFieldValue(value.getClass().getDeclaredFields(), nestedField);
-				getNestedClass(options, nestedValue);
-			}
-		}
-
-		options.add(new ButtonWidget.Builder(
-			Text.translatable("config." + value.getId() + ".title"),
-			button -> {
-				save();
-
-				if (this.client == null) return;
-				this.client.setScreen(nestedScreen);
-			}
-		).dimensions(this.width / 2 - 100, 0, 200, 20).build());
-	}
-
-	private String getTranslationKey(Field field) {
-		return "config." + this.config.getId() + "." + field.getName();
 	}
 
 	@Override

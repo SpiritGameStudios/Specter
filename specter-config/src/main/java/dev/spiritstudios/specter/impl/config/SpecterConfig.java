@@ -1,12 +1,12 @@
 package dev.spiritstudios.specter.impl.config;
 
-import dev.spiritstudios.specter.api.config.ConfigManager;
 import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+
+import java.util.List;
 
 public class SpecterConfig implements ModInitializer {
 	@Override
@@ -17,12 +17,13 @@ public class SpecterConfig implements ModInitializer {
 		);
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			ConfigSyncS2CPayload payload = ConfigManager.createSyncPayload();
-			ServerPlayNetworking.send(handler.getPlayer(), payload);
+			List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.getPayloads();
+			payloads.forEach(sender::sendPacket);
 		});
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> {
-			ConfigManager.reloadConfigs(server);
+			ConfigManager.reload();
+			ConfigSyncS2CPayload.sendPayloadsToAll(server);
 		});
 	}
 }
