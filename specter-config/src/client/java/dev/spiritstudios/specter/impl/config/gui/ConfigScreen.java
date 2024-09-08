@@ -8,6 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -55,12 +56,15 @@ public class ConfigScreen extends Screen {
 			}
 
 			ClickableWidget widget = factory.apply(option, this.config.getId());
-			if (widget != null) options.add(widget);
+			if (widget == null)
+				throw new IllegalStateException("Widget factory returned null for %s".formatted(option.defaultValue().getClass().getSimpleName()));
+
+			options.add(widget);
 		});
 
 		scrollableWidget.addOptions(Arrays.copyOf(options.toArray(), options.size(), ClickableWidget[].class));
 		this.addDrawableChild(scrollableWidget);
-		this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("gui.done"), button -> close()).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build());
+		this.addDrawableChild(new ButtonWidget.Builder(ScreenTexts.DONE, button -> close()).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build());
 	}
 
 	@Override

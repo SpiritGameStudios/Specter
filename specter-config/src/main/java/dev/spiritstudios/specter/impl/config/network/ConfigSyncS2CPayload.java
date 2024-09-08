@@ -38,20 +38,13 @@ public record ConfigSyncS2CPayload(Config<?> config) implements CustomPayload {
 		CACHE.clear();
 	}
 
-	public static List<ConfigSyncS2CPayload> createPayloads() {
-		if (CACHE.isEmpty()) {
-			CACHE.addAll(
-				ConfigManager.getConfigs().stream()
-					.map(ConfigSyncS2CPayload::new)
-					.toList()
-			);
-		}
-
+	public static List<ConfigSyncS2CPayload> getPayloads() {
+		if (CACHE.isEmpty()) CACHE.addAll(ConfigManager.createPayloads());
 		return CACHE;
 	}
 
 	public static void sendPayloadsToAll(MinecraftServer server) {
-		List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.createPayloads();
+		List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.getPayloads();
 
 		server.getPlayerManager().getPlayerList().forEach(
 			player -> payloads.forEach(payload -> ServerPlayNetworking.send(player, payload)));

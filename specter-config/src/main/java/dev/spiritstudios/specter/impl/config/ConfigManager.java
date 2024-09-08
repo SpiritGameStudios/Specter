@@ -25,7 +25,9 @@ public final class ConfigManager {
 	}
 
 
-	public static List<Config<?>> getConfigs() {
-		return List.copyOf(configs.values());
+	public static List<ConfigSyncS2CPayload> createPayloads() {
+		return configs.values().stream()
+			.map(ConfigSyncS2CPayload::new)
+			.toList();
 	}
 }

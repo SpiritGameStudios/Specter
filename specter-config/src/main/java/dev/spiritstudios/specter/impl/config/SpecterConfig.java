@@ -17,7 +17,7 @@ public class SpecterConfig implements ModInitializer {
 		);
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.createPayloads();
+			List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.getPayloads();
 			payloads.forEach(sender::sendPacket);
 		});
 
