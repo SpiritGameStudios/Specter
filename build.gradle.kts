@@ -155,8 +155,8 @@ subprojects {
 
 		repositories {
 			maven {
-				name = "EchosMavenSnapshots"
-				url = URI("https://maven.callmeecho.dev/snapshots")
+				name = "EchosMavenReleases"
+				url = URI("https://maven.callmeecho.dev/releases")
 				credentials(PasswordCredentials::class)
 			}
 		}
@@ -210,8 +210,8 @@ extensions.configure(PublishingExtension::class.java) {
 
 	repositories {
 		maven {
-			name = "EchosMavenSnapshots"
-			url = URI("https://maven.callmeecho.dev/snapshots")
+			name = "EchosMavenReleases"
+			url = URI("https://maven.callmeecho.dev/releases")
 			credentials(PasswordCredentials::class)
 		}
 	}
