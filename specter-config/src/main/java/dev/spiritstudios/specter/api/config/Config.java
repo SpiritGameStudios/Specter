@@ -46,7 +46,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 			if (existing.getClass() != clazz)
 				throw new IllegalArgumentException("Config with id %s already exists with a different class".formatted(instance.getId()));
 
-			throw new IllegalArgumentException("Config with id %s already exists".formatted(instance.getId()));
+			throw new RuntimeException("Config with id %s already exists".formatted(instance.getId()));
 		}
 
 		ConfigManager.registerConfig(instance.getId(), instance);

@@ -19,6 +19,8 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class ConfigScreen extends Screen {
+	private static final Text MULTIPLAYER_SYNC_ERROR = Text.translatable("screen.specter.config.multiplayer_sync_error");
+
 	private final Config<?> config;
 	private final Screen parent;
 
@@ -42,7 +44,7 @@ public class ConfigScreen extends Screen {
 			for (Config.Value<?> option : values) {
 				if (!option.sync()) continue;
 
-				this.client.player.sendMessage(Text.of("Configs cannot be edited in multiplayer"), true);
+				this.client.player.sendMessage(MULTIPLAYER_SYNC_ERROR, true);
 				this.client.setScreen(this.parent);
 
 				return;
