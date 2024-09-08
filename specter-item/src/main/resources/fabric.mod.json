@@ -23,6 +23,7 @@
 			"environment": "client"
 		}
 	],
+	"accessWidener": "specter-item.accesswidener",
 	"custom": {
 		"modmenu": {
 			"parent": "specter",

@@ -35,7 +35,9 @@ import java.util.stream.Stream;
  * A configuration file that can be saved to disk.
  */
 public abstract class Config<T extends Config<T>> implements Codec<T> {
-	@ApiStatus.Internal
+	/**
+	 * Do not call this constructor directly, use {@link #create(Class)} instead.
+	 */
 	protected Config() {
 	}
 
