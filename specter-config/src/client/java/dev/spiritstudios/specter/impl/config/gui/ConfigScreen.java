@@ -44,7 +44,7 @@ public class ConfigScreen extends Screen {
 			for (Config.Value<?> option : values) {
 				if (!option.sync()) continue;
 
-				this.client.player.sendMessage(MULTIPLAYER_SYNC_ERROR, true);
+				this.client.player.sendMessage(MULTIPLAYER_SYNC_ERROR, false);
 				this.client.setScreen(this.parent);
 
 				return;
