@@ -1,0 +1,7 @@
+{
+	"item.specter-debug.loot_loader.no_loot_table": "To use the Loot Loader, rename it to the Id of the loot table you wish to load.",
+	"item.specter-debug.loot_loader.invalid_loot_table": "Loot Table \"%s\" either does not exist or is invalid.",
+	"item.specter-debug.loot_loader.loaded_loot_table": "Loot Table \"%s\" loaded successfully.",
+	"item_group.specter.debug": "Specter Debug",
+	"item.specter-debug.loot_loader": "Loot Loader"
+}

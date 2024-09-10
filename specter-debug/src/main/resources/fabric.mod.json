@@ -26,7 +26,10 @@
 			"badges": [
 				"library"
 			]
-		}
+		},
+		"specter:registrars": [
+			"dev.spiritstudios.specter.impl.debug.registry.SpecterDebugItemRegistrar"
+		]
 	},
 	"depends": {
 		"fabricloader": ">=${loader_version}",

@@ -1,0 +1,9 @@
+{
+	"icon": {
+		"id": "specter-debug:loot_loader"
+	},
+	"items": [
+		"specter-debug:loot_loader"
+	],
+	"translate": "item_group.specter.debug"
+}
