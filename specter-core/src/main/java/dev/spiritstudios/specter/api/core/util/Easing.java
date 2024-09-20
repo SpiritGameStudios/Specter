@@ -95,7 +95,7 @@ public enum Easing {
 	}
 
 	public double out(double t) {
-		return 1 - function.get(1 - t);
+		return 1 - in(1 - t);
 	}
 
 	public double inOut(double t) {

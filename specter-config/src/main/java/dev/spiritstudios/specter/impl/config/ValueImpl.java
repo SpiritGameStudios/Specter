@@ -1,8 +1,7 @@
 package dev.spiritstudios.specter.impl.config;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import dev.spiritstudios.specter.api.config.Config;
+import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -10,13 +9,12 @@ import net.minecraft.util.Identifier;
 
 import java.util.Optional;
 
-public class ValueImpl<T> implements Config.Value<T> {
+public class ValueImpl<T> implements Value<T> {
 	private final T defaultValue;
 	private final Codec<T> codec;
 	private final PacketCodec<ByteBuf, T> packetCodec;
 	private final boolean sync;
 	private final String comment;
-	private final Pair<T, T> range;
 
 	private MapCodec<T> mapCodec;
 	private String name;
@@ -27,15 +25,13 @@ public class ValueImpl<T> implements Config.Value<T> {
 					 Codec<T> codec,
 					 PacketCodec<ByteBuf, T> packetCodec,
 					 String comment,
-					 boolean sync,
-					 Pair<T, T> range
+					 boolean sync
 	) {
 		this.defaultValue = defaultValue;
 		this.codec = codec;
 		this.comment = comment;
 		this.sync = sync;
 		this.packetCodec = packetCodec;
-		this.range = range;
 
 		this.value = defaultValue;
 	}
@@ -108,11 +104,6 @@ public class ValueImpl<T> implements Config.Value<T> {
 	@Override
 	public boolean sync() {
 		return sync;
-	}
-
-	@Override
-	public Pair<T, T> range() {
-		return range;
 	}
 
 	@Override

@@ -2,6 +2,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
+	`java-library`
+	`maven-publish`
 	id("fabric-loom") version "1.7-SNAPSHOT"
 }
 
@@ -41,6 +43,10 @@ allprojects {
 
 	group = mod.group
 	version = mod.version
+
+	repositories {
+		maven("https://maven.terraformersmc.com/releases/")
+	}
 
 	dependencies {
 		minecraft("com.mojang:minecraft:${deps.minecraft}")

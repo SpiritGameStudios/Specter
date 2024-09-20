@@ -1,28 +1,20 @@
 package dev.spiritstudios.specter.api.config;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.CodecHelper;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.ConfigManager;
-import dev.spiritstudios.specter.impl.config.ValueImpl;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
@@ -35,6 +27,10 @@ import java.util.stream.Stream;
  * A configuration file that can be saved to disk.
  */
 public abstract class Config<T extends Config<T>> implements Codec<T> {
+	private static final Gson GSON = new GsonBuilder()
+		.setPrettyPrinting()
+		.create();
+
 	/**
 	 * Do not call this constructor directly, use {@link #create(Class)} instead.
 	 */
@@ -52,17 +48,13 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		}
 
 		ConfigManager.registerConfig(instance.getId(), instance);
-		for (Field field : clazz.getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType())) continue;
-			if (Modifier.isStatic(field.getModifiers())) continue;
-			if (Modifier.isFinal(field.getModifiers())) continue;
-
+		instance.getValuesFields().forEach(field -> {
 			Value<?> value = ReflectionHelper.getFieldValue(instance, field);
-			if (value == null) continue;
+			if (value == null) return;
 
 			value.init(field.getName());
 			SpecterGlobals.debug("Registered config value: %s".formatted(value.translationKey(instance.getId())));
-		}
+		});
 
 		if (!instance.load())
 			SpecterGlobals.LOGGER.error("Failed to load config file: {}, default values will be used", instance.getPath());
@@ -72,34 +64,43 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		return instance;
 	}
 
-	protected static <T> ValueBuilder<T> value(T defaultValue, Codec<T> codec) {
-		return new ValueBuilder<>(defaultValue, codec);
+	protected static <T> Value.Builder<T> value(T defaultValue, Codec<T> codec) {
+		return new Value.Builder<>(defaultValue, codec);
 	}
 
-	protected static <T extends Enum<T>> ValueBuilder<T> enumValue(T defaultValue, Class<T> clazz) {
-		return new ValueBuilder<>(defaultValue, CodecHelper.createEnumCodec(clazz)).packetCodec(
+	protected static <T extends Enum<T>> Value.Builder<T> enumValue(T defaultValue, Class<T> clazz) {
+		return new Value.Builder<>(defaultValue, CodecHelper.createEnumCodec(clazz)).packetCodec(
 			CodecHelper.createEnumPacketCodec(clazz)
 		);
 	}
 
-	protected static ValueBuilder<Boolean> booleanValue(boolean defaultValue) {
-		return new ValueBuilder<>(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOL);
+	protected static Value.Builder<Boolean> booleanValue(boolean defaultValue) {
+		return new Value.Builder<>(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOL);
 	}
 
-	protected static RangedValueBuilder<Integer> intValue(int defaultValue) {
-		return new RangedValueBuilder<>(defaultValue, Codec.INT, CodecHelper::clampedRangeInt).packetCodec(PacketCodecs.INTEGER);
+	protected static NumericValue.Builder<Integer> intValue(int defaultValue) {
+		return new NumericValue.Builder<>(defaultValue, Codec.INT)
+			.codecRange(CodecHelper::clampedRangeInt)
+			.range(0, 100)
+			.packetCodec(PacketCodecs.INTEGER);
 	}
 
-	protected static RangedValueBuilder<Float> floatValue(float defaultValue) {
-		return new RangedValueBuilder<>(defaultValue, Codec.FLOAT, CodecHelper::clampedRangeFloat).packetCodec(PacketCodecs.FLOAT);
+	protected static NumericValue.Builder<Float> floatValue(float defaultValue) {
+		return new NumericValue.Builder<>(defaultValue, Codec.FLOAT)
+			.codecRange(CodecHelper::clampedRangeFloat)
+			.range(0.0F, 1.0F)
+			.packetCodec(PacketCodecs.FLOAT);
 	}
 
-	protected static RangedValueBuilder<Double> doubleValue(double defaultValue) {
-		return new RangedValueBuilder<>(defaultValue, Codec.DOUBLE, CodecHelper::clampedRangeDouble).packetCodec(PacketCodecs.DOUBLE);
+	protected static NumericValue.Builder<Double> doubleValue(double defaultValue) {
+		return new NumericValue.Builder<>(defaultValue, Codec.DOUBLE)
+			.codecRange(CodecHelper::clampedRangeDouble)
+			.range(0.0, 1.0)
+			.packetCodec(PacketCodecs.DOUBLE);
 	}
 
-	protected static ValueBuilder<String> stringValue(String defaultValue) {
-		return new ValueBuilder<>(defaultValue, Codec.STRING).packetCodec(PacketCodecs.STRING);
+	protected static Value.Builder<String> stringValue(String defaultValue) {
+		return new Value.Builder<>(defaultValue, Codec.STRING).packetCodec(PacketCodecs.STRING);
 	}
 
 	public abstract Identifier getId();
@@ -138,37 +139,21 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 			return;
 		}
 
-		JsonObject object = result.result().orElseThrow().getAsJsonObject();
-		StringWriter stringWriter = new StringWriter();
-		JsonWriter jsonWriter = new JsonWriter(stringWriter);
+		JsonElement element = result.result().orElseThrow();
+		String json = GSON.toJson(element);
 
-		jsonWriter.setLenient(true);
-		jsonWriter.setSerializeNulls(false);
-		jsonWriter.setIndent("	");
-
-		try {
-			Streams.write(object, jsonWriter);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		String json = stringWriter.toString();
 
 		Map<String, String> comments = new Object2ObjectOpenHashMap<>();
 
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (!Value.class.isAssignableFrom(field.getType())) continue;
-			if (Modifier.isStatic(field.getModifiers())) continue;
-			if (Modifier.isFinal(field.getModifiers())) continue;
-
+		getValuesFields().forEach(field -> {
 			Value<?> value = ReflectionHelper.getFieldValue(this, field);
-			if (value == null) continue;
+			if (value == null) return;
 
 			String comment = value.comment().orElse(null);
-			if (comment == null) continue;
+			if (comment == null) return;
 
 			comments.put(field.getName(), comment);
-		}
+		});
 
 		List<String> newLines = new ArrayList<>();
 		for (String line : json.split("\n")) {
@@ -213,20 +198,18 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 			SpecterGlobals.LOGGER.error("Failed to load config file {}. Default values will be used instead.", getPath().toString());
 			return false;
 		}
-
-		lines.removeIf(line -> line.trim().startsWith("//"));
 		String json = String.join("\n", lines);
 
-		JsonElement jsonElement;
+		JsonElement element;
 		try {
-			jsonElement = JsonParser.parseString(json);
+			element = JsonParser.parseString(json);
 		} catch (JsonSyntaxException e) {
 			SpecterGlobals.LOGGER.error("Failed to parse config file: {}", getPath());
 			SpecterGlobals.LOGGER.error(e.toString());
 			return false;
 		}
 
-		DataResult<T> result = parse(JsonOps.INSTANCE, jsonElement);
+		DataResult<T> result = parse(JsonOps.INSTANCE, element);
 		if (result.error().isPresent()) {
 			SpecterGlobals.LOGGER.error("Failed to decode config file: {}", getPath());
 			SpecterGlobals.LOGGER.error(result.error().toString());
@@ -246,13 +229,18 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	}
 
 	@ApiStatus.Internal
-	public Stream<Value<?>> getValues() {
+	public Stream<Field> getValuesFields() {
 		return Arrays.stream(this.getClass().getDeclaredFields())
 			.filter(field ->
 				Value.class.isAssignableFrom(field.getType()) &&
 					!Modifier.isStatic(field.getModifiers()) &&
 					!Modifier.isFinal(field.getModifiers())
-			)
+			);
+	}
+
+	@ApiStatus.Internal
+	public Stream<Value<?>> getValues() {
+		return getValuesFields()
 			.<Value<?>>map(field -> ReflectionHelper.getFieldValue(this, field))
 			.filter(Objects::nonNull);
 	}
@@ -271,117 +259,5 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		getValues()
 			.filter(Value::sync)
 			.forEach(value -> value.packetEncode(buf));
-	}
-
-	public interface Value<T> {
-		T get();
-
-		T defaultValue();
-
-		void set(T value);
-
-		@ApiStatus.Internal
-		void init(String name);
-
-		<T1> RecordBuilder<T1> encode(DynamicOps<T1> ops, RecordBuilder<T1> builder);
-
-		<T1> boolean decode(DynamicOps<T1> ops, T1 input);
-
-		void packetDecode(ByteBuf buf);
-
-		void packetEncode(ByteBuf buf);
-
-		Optional<String> comment();
-
-		boolean sync();
-
-		Pair<T, T> range();
-
-		String translationKey(Identifier configId);
-	}
-
-	protected static class ValueBuilder<T> {
-		protected final T defaultValue;
-		protected final Codec<T> codec;
-		protected String comment;
-		protected boolean sync;
-		protected PacketCodec<ByteBuf, T> packetCodec;
-
-		public ValueBuilder(T defaultValue, Codec<T> codec) {
-			this.defaultValue = defaultValue;
-			this.codec = codec;
-		}
-
-		public ValueBuilder<T> comment(String comment) {
-			this.comment = comment;
-			return this;
-		}
-
-		public ValueBuilder<T> sync() {
-			if (packetCodec == null) throw new IllegalStateException("Packet codec must be set to enable syncing");
-			this.sync = true;
-			return this;
-		}
-
-		public ValueBuilder<T> packetCodec(PacketCodec<ByteBuf, T> packetCodec) {
-			this.packetCodec = packetCodec;
-			return this;
-		}
-
-		public ValueBuilder<List<T>> toList() {
-			return new ValueBuilder<>(List.of(defaultValue), Codec.list(codec));
-		}
-
-		public Value<T> build() {
-			return new ValueImpl<>(defaultValue, codec, packetCodec, comment, sync, null);
-		}
-	}
-
-	protected static class RangedValueBuilder<T extends Number> {
-		protected final T defaultValue;
-		protected final Codec<T> codec;
-		private final RangeFunction<T, Codec<T>> codecRange;
-		protected String comment;
-		protected boolean sync;
-		protected PacketCodec<ByteBuf, T> packetCodec;
-		protected Pair<T, T> range;
-
-		public RangedValueBuilder(T defaultValue, Codec<T> codec, RangeFunction<T, Codec<T>> codecRange) {
-			this.defaultValue = defaultValue;
-			this.codec = codec;
-			this.codecRange = codecRange;
-		}
-
-		public RangedValueBuilder<T> range(T min, T max) {
-			this.range = Pair.of(min, max);
-			return this;
-		}
-
-		public RangedValueBuilder<T> comment(String comment) {
-			this.comment = comment;
-			return this;
-		}
-
-		public RangedValueBuilder<T> sync() {
-			if (packetCodec == null) throw new IllegalStateException("Packet codec must be set to enable syncing");
-			this.sync = true;
-			return this;
-		}
-
-		public RangedValueBuilder<T> packetCodec(PacketCodec<ByteBuf, T> packetCodec) {
-			this.packetCodec = packetCodec;
-			return this;
-		}
-
-		public Value<T> build() {
-			Codec<T> rangeCodec = range == null ? codec :
-				Optional.ofNullable(codecRange).map(f -> f.apply(range.getFirst(), range.getSecond())).orElse(codec);
-			return new ValueImpl<>(defaultValue, rangeCodec, packetCodec, comment, sync, range);
-		}
-
-		@FunctionalInterface
-		public interface RangeFunction<T, R> {
-			R apply(T min, T max);
-		}
 	}
 }

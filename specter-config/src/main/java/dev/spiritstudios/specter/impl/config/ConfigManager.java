@@ -24,7 +24,6 @@ public final class ConfigManager {
 		ConfigSyncS2CPayload.clearCache();
 	}
 
-
 	public static List<ConfigSyncS2CPayload> createPayloads() {
 		return configs.values().stream()
 			.map(ConfigSyncS2CPayload::new)

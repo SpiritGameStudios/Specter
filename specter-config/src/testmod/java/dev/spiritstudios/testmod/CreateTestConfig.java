@@ -1,6 +1,7 @@
 package dev.spiritstudios.testmod;
 
 import dev.spiritstudios.specter.api.config.Config;
+import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.util.Identifier;
 
 public class CreateTestConfig extends Config<CreateTestConfig> {

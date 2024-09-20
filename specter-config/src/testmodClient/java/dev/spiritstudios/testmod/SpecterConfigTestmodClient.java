@@ -1,6 +1,6 @@
 package dev.spiritstudios.testmod;
 
-import dev.spiritstudios.specter.api.ModMenuHelper;
+import dev.spiritstudios.specter.api.config.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 
 public class SpecterConfigTestmodClient implements ClientModInitializer {

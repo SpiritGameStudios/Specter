@@ -1,8 +1,4 @@
-moduleDependencies(project, "specter-core")
-
-repositories {
-	maven("https://maven.terraformersmc.com/releases/")
-}
+moduleDependencies(project, "specter-core", "specter-gui")
 
 dependencies {
 	modCompileOnly("com.terraformersmc:modmenu:${property("deps.modmenu")}")
