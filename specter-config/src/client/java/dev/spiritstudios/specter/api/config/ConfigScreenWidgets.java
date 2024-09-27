@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public final class ConfigScreenWidgets {
-	private static final Map<Class<?>, BiFunction<Value<?>, Identifier, ? extends ClickableWidget>> widgetFactories = new Object2ObjectOpenHashMap<>();
+	private static final Map<Class<?>, BiFunction<Value<?>, String, ? extends ClickableWidget>> widgetFactories = new Object2ObjectOpenHashMap<>();
 
-	private static final BiFunction<Value<?>, Identifier, ? extends ClickableWidget> BOOLEAN_WIDGET_FACTORY = (configValue, id) -> {
+	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> BOOLEAN_WIDGET_FACTORY = (configValue, id) -> {
 		Value<Boolean> value = (Value<Boolean>) configValue;
 
 		return SpecterButtonWidget.builder(
@@ -32,7 +32,7 @@ public final class ConfigScreenWidgets {
 		).build();
 	};
 
-	private static final BiFunction<Value<?>, Identifier, ? extends ClickableWidget> INTEGER_WIDGET_FACTORY = (configValue, id) -> {
+	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> INTEGER_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Integer> value = (NumericValue<Integer>) configValue;
 
 		return SpecterSliderWidget.builder(MathHelper.map(value.get(), value.range().min(), value.range().max(), 0.0, 1.0))
@@ -43,7 +43,7 @@ public final class ConfigScreenWidgets {
 			.build();
 	};
 
-	private static final BiFunction<Value<?>, Identifier, ? extends ClickableWidget> DOUBLE_WIDGET_FACTORY = (configValue, id) -> {
+	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> DOUBLE_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Double> value = (NumericValue<Double>) configValue;
 
 		return SpecterSliderWidget.builder(MathHelper.map(value.get(), value.range().min(), value.range().max(), 0.0, 1.0))
@@ -54,7 +54,7 @@ public final class ConfigScreenWidgets {
 			.build();
 	};
 
-	private static final BiFunction<Value<?>, Identifier, ? extends ClickableWidget> FLOAT_WIDGET_FACTORY = (configValue, id) -> {
+	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> FLOAT_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Float> value = (NumericValue<Float>) configValue;
 
 		return SpecterSliderWidget.builder(MathHelper.map(value.get(), value.range().min(), value.range().max(), 0.0, 1.0))
@@ -65,7 +65,7 @@ public final class ConfigScreenWidgets {
 			.build();
 	};
 
-	private static final BiFunction<Value<?>, Identifier, ? extends ClickableWidget> STRING_WIDGET_FACTORY = (configValue, id) -> {
+	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> STRING_WIDGET_FACTORY = (configValue, id) -> {
 		Value<String> value = (Value<String>) configValue;
 
 		TextFieldWidget widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 0, Text.of(value.get()));
@@ -79,7 +79,7 @@ public final class ConfigScreenWidgets {
 		return widget;
 	};
 
-	private static final BiFunction<Value<?>, Identifier, ? extends ClickableWidget> ENUM_WIDGET_FACTORY = (configValue, id) -> {
+	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> ENUM_WIDGET_FACTORY = (configValue, id) -> {
 		Value<Enum<?>> value = (Value<Enum<?>>) configValue;
 
 		List<Enum<?>> enumValues = Arrays.stream(configValue.defaultValue().getClass().getEnumConstants())
@@ -102,12 +102,12 @@ public final class ConfigScreenWidgets {
 	private ConfigScreenWidgets() {
 	}
 
-	public static void add(Class<?> clazz, BiFunction<Value<?>, Identifier, ? extends ClickableWidget> factory) {
+	public static void add(Class<?> clazz, BiFunction<Value<?>, String, ? extends ClickableWidget> factory) {
 		widgetFactories.put(clazz, factory);
 	}
 
 	@ApiStatus.Internal
-	public static <T> BiFunction<Value<?>, Identifier, ? extends ClickableWidget> getWidgetFactory(Value<T> value) {
+	public static <T> BiFunction<Value<?>, String, ? extends ClickableWidget> getWidgetFactory(Value<T> value) {
 		// We are using a switch instead of just adding to our map for 2 reasons:
 		// 1. It's (usually) faster than a map lookup, as most of the time the value will be one of these types
 		// 2. It lets us handle the lowercased names of primitive types, which are different Class<> instances because reasons

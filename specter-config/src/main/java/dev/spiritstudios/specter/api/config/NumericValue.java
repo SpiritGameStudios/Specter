@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+/**
+ * A config value of a numeric type.
+ *
+ * @param <T> The type of the numeric value.
+ */
 public interface NumericValue<T extends Number & Comparable<T>> extends Value<T> {
 	Range<T> range();
 

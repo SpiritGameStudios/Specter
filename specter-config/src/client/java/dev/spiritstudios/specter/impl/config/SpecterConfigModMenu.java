@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.impl.config;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
+import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.ConfigScreen;
 import dev.spiritstudios.specter.api.config.ModMenuHelper;
 
@@ -17,7 +18,10 @@ public class SpecterConfigModMenu implements ModMenuApi {
 			.collect(Collectors.toMap(
 				Map.Entry::getKey,
 				entry ->
-					parent -> new ConfigScreen(ConfigManager.getConfig(entry.getValue()), parent)
+					parent -> {
+						ConfigHolder<?, ?> holder = ConfigHolderRegistry.get(entry.getValue());
+						return new ConfigScreen(holder.get(), holder.id().toTranslationKey(), parent, holder);
+					}
 			));
 	}
 }

@@ -17,7 +17,7 @@ fun Project.moduleDependencies(project: Project, vararg modules: String) {
 
 	project.dependencies {
 		depList.forEach {
-			"api"(it)
+			"implementation"(it)
 			"testmodImplementation"(it)
 		}
 		clientOutputs.forEach {

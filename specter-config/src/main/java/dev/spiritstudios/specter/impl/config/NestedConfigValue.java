@@ -1,38 +1,38 @@
 package dev.spiritstudios.specter.impl.config;
 
-import com.mojang.serialization.*;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.RecordBuilder;
+import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.Value;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.serialization.CommentedCodec;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 
 import java.util.Optional;
 
-public class ValueImpl<T> implements Value<T> {
+public class NestedConfigValue<T extends Config<T>> implements Value<T> {
 	private final T defaultValue;
-	private final Codec<T> codec;
-	private final PacketCodec<ByteBuf, T> packetCodec;
 	private final boolean sync;
 	private final String comment;
-
+	private T value;
 	private MapCodec<T> mapCodec;
 	private String name;
 
-	private T value;
-
-	public ValueImpl(T defaultValue,
-					 Codec<T> codec,
-					 PacketCodec<ByteBuf, T> packetCodec,
-					 String comment,
-					 boolean sync
-	) {
+	public NestedConfigValue(T defaultValue, boolean sync, String comment) {
 		this.defaultValue = defaultValue;
-		this.comment = comment;
-		this.sync = sync;
-		this.packetCodec = packetCodec;
+		this.defaultValue.getValueFields().forEach(field -> {
+			Value<?> value = ReflectionHelper.getFieldValue(this.defaultValue, field);
+			if (value == null) return;
 
-		this.codec = codec;
+			value.init(field.getName());
+			SpecterGlobals.debug("Registered config value: %s".formatted(value.name()));
+		});
+
+		this.sync = sync;
+		this.comment = comment;
 		this.value = defaultValue;
 	}
 
@@ -53,8 +53,8 @@ public class ValueImpl<T> implements Value<T> {
 
 	@Override
 	public void init(String name) {
-		this.mapCodec = new CommentedCodec<>(codec, comment).fieldOf(name);
 		this.name = name;
+		this.mapCodec = new CommentedCodec<>(defaultValue, comment).fieldOf(name);
 	}
 
 	@Override
@@ -88,12 +88,12 @@ public class ValueImpl<T> implements Value<T> {
 
 	@Override
 	public void packetDecode(ByteBuf buf) {
-		set(packetCodec.decode(buf));
+		value.packetCodec().decode(buf);
 	}
 
 	@Override
 	public void packetEncode(ByteBuf buf) {
-		packetCodec.encode(buf, get());
+		value.packetCodec().encode(buf, value);
 	}
 
 	@Override

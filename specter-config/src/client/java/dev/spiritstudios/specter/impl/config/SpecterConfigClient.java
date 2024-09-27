@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 public class SpecterConfigClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ConfigManager.reload());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ConfigHolderRegistry.reload());
 
 		ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2CPayload.ID, (payload, context) -> {
 			SpecterGlobals.debug("Received config sync packet");

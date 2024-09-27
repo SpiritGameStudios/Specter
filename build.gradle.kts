@@ -44,10 +44,6 @@ allprojects {
 	group = mod.group
 	version = mod.version
 
-	repositories {
-		maven("https://maven.terraformersmc.com/releases/")
-	}
-
 	dependencies {
 		minecraft("com.mojang:minecraft:${deps.minecraft}")
 		mappings("net.fabricmc:yarn:${deps.yarn}:v2")
@@ -273,6 +269,7 @@ dependencies {
 			"clientImplementation"(project(":${it.name}").sourceSets.getByName("client").output)
 			include(project(":${it.name}"))
 
+			"testmodImplementation"("org.tomlj:tomlj:${property("deps.tomlj")}")
 			"testmodImplementation"(project(":${it.name}").sourceSets["testmod"].output)
 			"testmodClientImplementation"(project(":${it.name}").sourceSets["testmodClient"].output)
 		}

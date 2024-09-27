@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "specter-config",
+	"id": "specter-serialization",
 	"version": "${version}",
-	"name": "Specter Config",
-	"description": "Library for Spirit Studios mods (Config module)",
+	"name": "Specter Serialization",
+	"description": "Library for Spirit Studios mods (Serialization module)",
 	"authors": [],
 	"contact": {
 		"repo": "https://github.com/SpiritGameStudios/Specter",
@@ -12,22 +12,9 @@
 	"license": "MPL-2.0",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"dev.spiritstudios.specter.impl.config.SpecterConfig"
-		],
-		"client": [
-			"dev.spiritstudios.specter.impl.config.SpecterConfigClient"
-		],
-		"modmenu": [
-			"dev.spiritstudios.specter.impl.config.SpecterConfigModMenu"
-		]
 	},
 	"mixins": [
-		"specter-config.mixins.json",
-		{
-			"config": "specter-config.client.mixins.json",
-			"environment": "client"
-		}
+		"specter-serialization.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=${loader_version}",

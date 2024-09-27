@@ -6,6 +6,6 @@ import net.fabricmc.api.ClientModInitializer;
 public class SpecterConfigTestmodClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		ModMenuHelper.addConfig("specter-config-testmod", GetTestConfig.INSTANCE.getId());
+		ModMenuHelper.addConfig("specter-config-testmod", TestConfig.TOML_HOLDER.id());
 	}
 }

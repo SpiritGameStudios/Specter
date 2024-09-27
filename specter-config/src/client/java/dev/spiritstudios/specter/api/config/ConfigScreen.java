@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.config;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.gui.widget.OptionsScrollableWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,12 +22,21 @@ public class ConfigScreen extends Screen {
 
 	private final Config<?> config;
 	private final Screen parent;
+	private final String id;
+	private final ConfigHolder<?, ?> holder;
 
-	public ConfigScreen(Config<?> config, Screen parent) {
-		super(Text.translatable("config.%s.title".formatted(config.getId().toTranslationKey())));
+	public ConfigScreen(Config<?> config, String id, Screen parent) {
+		this(config, id, parent, null);
+	}
+
+	public ConfigScreen(Config<?> config, String id, Screen parent, ConfigHolder<?, ?> holder) {
+		super(Text.translatable("config.%s.title".formatted(id)));
 		this.config = config;
 		this.parent = parent;
+		this.id = id;
+		this.holder = holder;
 	}
+
 
 	@Override
 	protected void init() {
@@ -51,20 +61,37 @@ public class ConfigScreen extends Screen {
 		List<ClickableWidget> options = new ArrayList<>();
 
 		values.forEach(option -> {
-			BiFunction<Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenWidgets.getWidgetFactory(option);
+			if (option instanceof NestedConfigValue<?> nestedOption) {
+				String nestedId = "%s.%s".formatted(id, option.name());
+				ConfigScreen screen = new ConfigScreen(nestedOption.get(), nestedId, this);
+
+				options.add(
+					ButtonWidget.builder(
+						Text.translatable("config.%s.title".formatted(nestedId)),
+						button -> {
+							save();
+							this.client.setScreen(screen);
+						}
+					).dimensions(this.width / 2 - 100, 0, 200, 20).build()
+				);
+
+				return;
+			}
+
+			BiFunction<Value<?>, String, ? extends ClickableWidget> factory = ConfigScreenWidgets.getWidgetFactory(option);
 			if (factory == null) {
 				SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
 				return;
 			}
 
-			ClickableWidget widget = factory.apply(option, this.config.getId());
+			ClickableWidget widget = factory.apply(option, id);
 			if (widget == null)
 				throw new IllegalStateException("Widget factory returned null for %s".formatted(option.defaultValue().getClass().getSimpleName()));
 
 			widget.setWidth(0);
 			widget.setHeight(20);
 
-			Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(option.translationKey(config.getId())), "");
+			Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(option.translationKey(id)), "");
 			if (!tooltip.getString().isEmpty()) widget.setTooltip(Tooltip.of(tooltip));
 
 			options.add(widget);
@@ -84,7 +111,10 @@ public class ConfigScreen extends Screen {
 	}
 
 	public void save() {
-		config.save();
+		if (this.parent instanceof ConfigScreen screen) screen.save();
+
+		if (this.holder == null) return;
+		holder.save();
 	}
 
 	@Override
