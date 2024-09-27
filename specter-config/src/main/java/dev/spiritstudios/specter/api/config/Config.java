@@ -10,6 +10,8 @@ import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Field;
@@ -116,6 +118,19 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static Value.Builder<String> stringValue(String defaultValue) {
 		return new Value.Builder<>(defaultValue, Codec.STRING).packetCodec(PacketCodecs.STRING);
+	}
+
+	/**
+	 * Creates a new value for a registry entry with the given default value and registry.
+	 * This will be stored in the config as an {@link Identifier}.
+	 *
+	 * @param defaultValue The default value.
+	 * @param registry     The registry used to create the codec.
+	 * @param <T>          The type of the value.
+	 * @return A new value builder.
+	 */
+	protected static <T> Value.Builder<T> registryValue(T defaultValue, Registry<T> registry) {
+		return value(defaultValue, registry.getCodec());
 	}
 
 	/**

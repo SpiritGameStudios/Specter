@@ -5,6 +5,9 @@ import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.api.serialization.format.TomlFormat;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 public class TestConfig extends Config<TestConfig> {
@@ -52,6 +55,10 @@ public class TestConfig extends Config<TestConfig> {
 
 	public final Value<TestEnum> testEnum = enumValue(TestEnum.TEST_1, TestEnum.class)
 		.comment("This is a test enum")
+		.build();
+
+	public final Value<Item> testItem = registryValue(Items.BEDROCK, Registries.ITEM)
+		.comment("This is a test item")
 		.build();
 
 	public final Value<NestedConfig> nestedConfig = nestedValue(NestedConfig.class)
