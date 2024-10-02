@@ -3,5 +3,7 @@
 	"item.specter-debug.loot_loader.invalid_loot_table": "Loot Table \"%s\" either does not exist or is invalid.",
 	"item.specter-debug.loot_loader.loaded_loot_table": "Loot Table \"%s\" loaded successfully.",
 	"item_group.specter.debug": "Specter Debug",
-	"item.specter-debug.loot_loader": "Loot Loader"
+	"item.specter-debug.loot_loader": "Loot Loader",
+	"commands.heal.not_living": "Cannot heal non-living entity",
+	"commands.heal.success": "Healed %s for %s health"
 }
