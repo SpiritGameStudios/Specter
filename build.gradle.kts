@@ -100,9 +100,12 @@ tasks.javadoc {
 		addStringOption("Xdoclint:none", "-quiet")
 	}
 
-	allprojects.forEach { proj -> source(proj.sourceSets.main.map { it.allJava.srcDirs }) }
+	allprojects.forEach { proj ->
+		source(proj.sourceSets.main.map { it.allJava.srcDirs })
+		source(proj.sourceSets.getByName("client").allSource.srcDirs)
+	}
+	classpath = project.files(sourceSets.main.map { it.compileClasspath }, sourceSets.getByName("client").compileClasspath)
 
-	classpath = project.files(sourceSets.main.map { it.compileClasspath })
 	include("**/api/**")
 	isFailOnError = false
 }
@@ -173,7 +176,7 @@ subprojects {
 val remapMavenJar by tasks.registering(RemapJarTask::class) {
 	inputFile.set(tasks.jar.flatMap { it.archiveFile })
 	archiveFileName.set("${project.properties["archivesBaseName"]}-${project.version}-maven.jar")
-	addNestedDependencies = false
+	addNestedDependencies = true
 	dependsOn(tasks.jar)
 }
 
@@ -267,11 +270,13 @@ dependencies {
 		subprojects.forEach {
 			api(project(":${it.name}", "namedElements"))
 			"clientImplementation"(project(":${it.name}").sourceSets.getByName("client").output)
-			include(project(":${it.name}"))
+			include(project("${it.name}:"))
 
+
+			compileOnly("org.tomlj:tomlj:${property("deps.tomlj")}")
 			"testmodImplementation"("org.tomlj:tomlj:${property("deps.tomlj")}")
 			"testmodImplementation"(project(":${it.name}").sourceSets["testmod"].output)
-			"testmodClientImplementation"(project(":${it.name}").sourceSets["testmodClient"].output)
+			"testmodClientImplementation"(project("${it.name}:").sourceSets["testmodClient"].output)
 		}
 	}
 }
