@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import org.tomlj.TomlPosition;
 import org.tomlj.TomlTable;
 
+import java.util.List;
+
 /**
  * A base class for all TOML elements.
  * Only exists so that we can make a {@link DynamicOps DynamicOps}. Otherwise, we would just use Tomlj's types.
@@ -13,11 +15,11 @@ import org.tomlj.TomlTable;
 public abstract class TomlElement implements Commentable {
 	@Nullable
 	private final TomlPosition position;
-	private String[] comments;
+	private List<String> comments;
 
 	protected TomlElement(@Nullable TomlPosition position, String... comments) {
 		this.position = position;
-		this.comments = comments;
+		this.comments = List.of(comments);
 	}
 
 	protected TomlElement(String... comments) {
@@ -44,12 +46,12 @@ public abstract class TomlElement implements Commentable {
 	}
 
 	@Override
-	public String[] comments() {
+	public List<String> comments() {
 		return comments;
 	}
 
 	@Override
-	public void setComments(String... comments) {
+	public void setComments(List<String> comments) {
 		this.comments = comments;
 	}
 

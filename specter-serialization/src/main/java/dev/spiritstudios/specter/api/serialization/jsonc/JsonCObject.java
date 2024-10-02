@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Map;
 public class JsonCObject extends JsonCElement {
 	private final Map<String, JsonCElement> members = new LinkedHashMap<>();
 
-	public JsonCObject(Map<String, JsonCElement> members, String... comments) {
+	public JsonCObject(Map<String, JsonCElement> members, List<String> comments) {
 		super(new JsonObject(), comments);
 		this.members.putAll(members);
 	}

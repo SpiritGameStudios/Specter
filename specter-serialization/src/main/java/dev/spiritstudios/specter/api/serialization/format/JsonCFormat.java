@@ -191,7 +191,7 @@ public class JsonCFormat implements DynamicFormat<JsonCElement> {
 
 	@Override
 	public JsonCElement createMap(Stream<Pair<JsonCElement, JsonCElement>> map) {
-		JsonCObject object = new JsonCObject(new LinkedHashMap<>());
+		JsonCObject object = new JsonCObject(new LinkedHashMap<>(), Collections.emptyList());
 		map.forEach(pair -> object.put(pair.getFirst().element().getAsString(), pair.getSecond()));
 		return object;
 	}

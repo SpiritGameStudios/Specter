@@ -36,7 +36,7 @@ public class CommentedCodec<T> implements Codec<T> {
 		if (!result.hasResultOrPartial() || !(result.getPartialOrThrow() instanceof Commentable commentable))
 			return result;
 
-		commentable.setComments(comments.toArray(String[]::new));
+		commentable.setComments(comments);
 		return DataResult.success((T1) commentable);
 
 	}

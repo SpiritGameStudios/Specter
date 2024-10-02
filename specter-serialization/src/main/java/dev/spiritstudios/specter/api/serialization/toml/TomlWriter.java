@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class TomlWriter implements AutoCloseable, Flushable {
 	private final Writer writer;
-	private String[] comments;
+	private List<String> comments;
 	private String key;
 	private boolean noKey;
 	private int indent;
@@ -95,11 +95,11 @@ public class TomlWriter implements AutoCloseable, Flushable {
 
 	private void writeComments() throws IOException {
 		if (comments == null) return;
-		for (int i = 0; i < comments.length; i++) {
-			String comment = comments[i];
+		for (int i = 0; i < comments.size(); i++) {
+			String comment = comments.get(i);
 			if (i > 1) indent();
 			writer.append("# ").append(comment);
-			if (i < comments.length - 1) writer.append('\n');
+			if (i < comments.size() - 1) writer.append('\n');
 		}
 		this.comments = null;
 	}

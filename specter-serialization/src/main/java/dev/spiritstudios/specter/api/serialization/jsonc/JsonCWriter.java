@@ -17,7 +17,7 @@ import java.util.*;
 public class JsonCWriter implements Closeable, Flushable {
 	private final Writer writer;
 	private final Deque<Boolean> stack = new ArrayDeque<>();
-	private String[] comments;
+	private List<String> comments;
 	private String key;
 
 	public JsonCWriter(Writer out) {

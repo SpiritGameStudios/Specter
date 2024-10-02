@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import dev.spiritstudios.specter.api.serialization.Commentable;
 
+import java.util.List;
+
 /**
  * A {@link JsonElement} with comments.
  */
@@ -11,9 +13,14 @@ public class JsonCElement implements Commentable {
 	public static final JsonCElement NULL = new JsonCElement(JsonNull.INSTANCE);
 
 	private final JsonElement element;
-	private String[] comments;
+	private List<String> comments;
 
 	public JsonCElement(JsonElement element, String... comments) {
+		this.element = element;
+		this.comments = List.of(comments);
+	}
+
+	public JsonCElement(JsonElement element, List<String> comments) {
 		this.element = element;
 		this.comments = comments;
 	}
@@ -23,12 +30,12 @@ public class JsonCElement implements Commentable {
 	}
 
 	@Override
-	public String[] comments() {
+	public List<String> comments() {
 		return comments;
 	}
 
 	@Override
-	public void setComments(String... comments) {
+	public void setComments(List<String> comments) {
 		this.comments = comments;
 	}
 }

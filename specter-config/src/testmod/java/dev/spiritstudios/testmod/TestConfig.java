@@ -21,9 +21,6 @@ public class TestConfig extends Config<TestConfig> {
 		.format(TomlFormat.INSTANCE)
 		.build();
 
-	public static final TestConfig JSON = JSON_HOLDER.get();
-	public static final TestConfig TOML = TOML_HOLDER.get();
-
 	public final String invalidField = "test";
 
 	public final Value<String> testString = stringValue("test")
