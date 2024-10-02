@@ -2,6 +2,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
+	`java-library`
+	`maven-publish`
 	id("fabric-loom") version "1.7-SNAPSHOT"
 }
 
@@ -267,6 +269,7 @@ dependencies {
 			"clientImplementation"(project(":${it.name}").sourceSets.getByName("client").output)
 			include(project(":${it.name}"))
 
+			"testmodImplementation"("org.tomlj:tomlj:${property("deps.tomlj")}")
 			"testmodImplementation"(project(":${it.name}").sourceSets["testmod"].output)
 			"testmodClientImplementation"(project(":${it.name}").sourceSets["testmodClient"].output)
 		}

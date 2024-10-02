@@ -1,8 +1,8 @@
 package dev.spiritstudios.specter.impl.config.network;
 
-import dev.spiritstudios.specter.api.config.Config;
+import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.impl.config.ConfigManager;
+import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.codec.PacketCodec;
@@ -15,16 +15,21 @@ import java.util.List;
 
 import static dev.spiritstudios.specter.api.core.SpecterGlobals.MODID;
 
-public record ConfigSyncS2CPayload(Config<?> config) implements CustomPayload {
+public record ConfigSyncS2CPayload(ConfigHolder<?, ?> config) implements CustomPayload {
 	public static final Id<ConfigSyncS2CPayload> ID = new Id<>(Identifier.of(MODID, "config_sync"));
 	public static final PacketCodec<ByteBuf, ConfigSyncS2CPayload> CODEC = PacketCodec.tuple(
-		PacketCodec.of(
-			Config::packetEncode,
+		PacketCodec.<ByteBuf, ConfigHolder<?, ?>>of(
+			(value, buf) -> {
+				Identifier.PACKET_CODEC.encode(buf, value.id());
+				SpecterGlobals.debug("Encoding config sync packet for %s".formatted(value.id()));
+				value.packetEncode(buf);
+			},
 			buf -> {
 				Identifier id = Identifier.PACKET_CODEC.decode(buf);
 				SpecterGlobals.debug("Decoding config sync packet for %s".formatted(id));
-				Config<?> config = ConfigManager.getConfig(id);
+				ConfigHolder<?, ?> config = ConfigHolderRegistry.get(id);
 				config.save();
+
 				return config.packetDecode(buf);
 			}
 		),
@@ -39,7 +44,7 @@ public record ConfigSyncS2CPayload(Config<?> config) implements CustomPayload {
 	}
 
 	public static List<ConfigSyncS2CPayload> getPayloads() {
-		if (CACHE.isEmpty()) CACHE.addAll(ConfigManager.createPayloads());
+		if (CACHE.isEmpty()) CACHE.addAll(ConfigHolderRegistry.createPayloads());
 		return CACHE;
 	}
 

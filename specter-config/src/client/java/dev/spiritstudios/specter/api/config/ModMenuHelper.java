@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api;
+package dev.spiritstudios.specter.api.config;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;

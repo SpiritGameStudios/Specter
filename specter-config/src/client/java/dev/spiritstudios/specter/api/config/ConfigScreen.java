@@ -1,34 +1,36 @@
-package dev.spiritstudios.specter.impl.config.gui;
+package dev.spiritstudios.specter.api.config;
 
-import dev.spiritstudios.specter.api.ConfigScreenManager;
-import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.config.NestedConfigScreen;
+import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.gui.widget.OptionsScrollableWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-public class ConfigScreen extends Screen {
+public abstract class ConfigScreen extends Screen {
 	private static final Text MULTIPLAYER_SYNC_ERROR = Text.translatable("screen.specter.config.multiplayer_sync_error");
 
-	private final Config<?> config;
-	private final Screen parent;
+	protected final Config<?> config;
+	protected final Screen parent;
+	protected final String id;
 
-	public ConfigScreen(Config<?> config, Screen parent) {
-		super(Text.translatable("config.%s.%s.title".formatted(config.getId().getNamespace(), config.getId().getPath())));
+	public ConfigScreen(Config<?> config, String id, Screen parent) {
+		super(Text.translatable("config.%s.title".formatted(id)));
 		this.config = config;
 		this.parent = parent;
+		this.id = id;
 	}
+
 
 	@Override
 	protected void init() {
@@ -36,12 +38,11 @@ public class ConfigScreen extends Screen {
 		Objects.requireNonNull(this.client);
 
 		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
-		List<ClickableWidget> options = new ArrayList<>();
 
-		List<Config.Value<?>> values = config.getValues().toList();
+		List<Value<?>> values = config.getValues().toList();
 
 		if (this.client.player != null && !this.client.isInSingleplayer()) {
-			for (Config.Value<?> option : values) {
+			for (Value<?> option : values) {
 				if (!option.sync()) continue;
 
 				this.client.player.sendMessage(MULTIPLAYER_SYNC_ERROR, false);
@@ -51,21 +52,46 @@ public class ConfigScreen extends Screen {
 			}
 		}
 
+		List<ClickableWidget> options = new ArrayList<>();
+
 		values.forEach(option -> {
-			BiFunction<Config.Value<?>, Identifier, ? extends ClickableWidget> factory = ConfigScreenManager.getWidgetFactory(option);
+			if (option instanceof NestedConfigValue<?> nestedOption) {
+				String nestedId = "%s.%s".formatted(id, option.name());
+				ConfigScreen screen = new NestedConfigScreen(nestedOption.get(), nestedId, this);
+
+				options.add(
+					ButtonWidget.builder(
+						Text.translatable("config.%s.title".formatted(nestedId)),
+						button -> {
+							save();
+							this.client.setScreen(screen);
+						}
+					).dimensions(this.width / 2 - 100, 0, 200, 20).build()
+				);
+
+				return;
+			}
+
+			BiFunction<Value<?>, String, ? extends ClickableWidget> factory = ConfigScreenWidgets.getWidgetFactory(option);
 			if (factory == null) {
 				SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
 				return;
 			}
 
-			ClickableWidget widget = factory.apply(option, this.config.getId());
+			ClickableWidget widget = factory.apply(option, id);
 			if (widget == null)
 				throw new IllegalStateException("Widget factory returned null for %s".formatted(option.defaultValue().getClass().getSimpleName()));
+
+			widget.setWidth(0);
+			widget.setHeight(20);
+
+			Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(option.translationKey(id)), "");
+			if (!tooltip.getString().isEmpty()) widget.setTooltip(Tooltip.of(tooltip));
 
 			options.add(widget);
 		});
 
-		scrollableWidget.addOptions(Arrays.copyOf(options.toArray(), options.size(), ClickableWidget[].class));
+		scrollableWidget.addOptions(options);
 		this.addDrawableChild(scrollableWidget);
 		this.addDrawableChild(new ButtonWidget.Builder(ScreenTexts.DONE, button -> close()).dimensions(this.width / 2 - 100, this.height - 27, 200, 20).build());
 	}
@@ -78,9 +104,7 @@ public class ConfigScreen extends Screen {
 		this.client.setScreen(this.parent);
 	}
 
-	public void save() {
-		config.save();
-	}
+	public abstract void save();
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {

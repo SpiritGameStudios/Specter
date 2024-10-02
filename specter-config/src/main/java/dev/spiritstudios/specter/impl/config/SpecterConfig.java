@@ -22,7 +22,7 @@ public class SpecterConfig implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> {
-			ConfigManager.reload();
+			ConfigHolderRegistry.reload();
 			ConfigSyncS2CPayload.sendPayloadsToAll(server);
 		});
 	}
