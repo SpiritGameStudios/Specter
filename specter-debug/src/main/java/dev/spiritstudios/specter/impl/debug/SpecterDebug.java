@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.impl.debug;
 
+import dev.spiritstudios.specter.impl.debug.command.ComponentsCommand;
 import dev.spiritstudios.specter.impl.debug.command.HealCommand;
 import dev.spiritstudios.specter.impl.debug.command.MetatagCommand;
 import net.fabricmc.api.ModInitializer;
@@ -11,6 +12,7 @@ public class SpecterDebug implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			MetatagCommand.register(dispatcher);
 			HealCommand.register(dispatcher);
+			ComponentsCommand.register(dispatcher);
 		});
 	}
 }

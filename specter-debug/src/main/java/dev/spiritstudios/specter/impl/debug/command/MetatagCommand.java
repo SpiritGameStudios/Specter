@@ -44,6 +44,7 @@ public final class MetatagCommand {
 
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		dispatcher.register(CommandManager.literal("metatag")
+			.requires(source -> source.hasPermissionLevel(2))
 			.then(CommandManager.literal("dump")
 				.then(CommandManager.argument("registry", IdentifierArgumentType.identifier())
 					.suggests(REGISTRY_SUGGESTIONS)
