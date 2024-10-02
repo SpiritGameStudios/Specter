@@ -4,51 +4,53 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.List;
 
 public class TomlPrimitive extends TomlElement {
 	private final Object value;
 
-	public TomlPrimitive(String value, String[] comments) {
+	public TomlPrimitive(String value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(long value, String[] comments) {
+	public TomlPrimitive(long value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(double value, String[] comments) {
+	public TomlPrimitive(double value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(boolean value, String[] comments) {
+	public TomlPrimitive(boolean value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(OffsetDateTime value, String[] comments) {
+	public TomlPrimitive(OffsetDateTime value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(LocalDateTime value, String[] comments) {
+	public TomlPrimitive(LocalDateTime value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(LocalDate value, String[] comments) {
+	public TomlPrimitive(LocalDate value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public TomlPrimitive(LocalTime value, String[] comments) {
+	public TomlPrimitive(LocalTime value, List<String> comments) {
 		super(comments);
 		this.value = value;
 	}
 
-	public static TomlPrimitive of(Object value, String... comments) {
+	public static TomlPrimitive of(Object value, List<String> comments) {
 		return switch (value) {
 			case String s -> new TomlPrimitive(s, comments);
 			case Integer i -> new TomlPrimitive(i.longValue(), comments);
@@ -65,7 +67,7 @@ public class TomlPrimitive extends TomlElement {
 	}
 
 	public static TomlPrimitive of(Object value) {
-		return of(value, new String[0]);
+		return of(value, Collections.emptyList());
 	}
 
 	public Object value() {

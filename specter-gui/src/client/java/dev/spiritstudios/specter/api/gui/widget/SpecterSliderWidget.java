@@ -67,7 +67,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 	}
 
 	private void setValueFromMouse(double mouseX) {
-		setValue((mouseX - (double) (this.getX() + 4)) / (double) (this.getWidth() - 8));
+		setValue(range.map(MathHelper.clamp((mouseX - (double) (this.getX() + 4)) / (double) (this.getWidth() - 8), 0.0, 1.0), ZERO_ONE));
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 
 		if (keyCode == GLFW.GLFW_KEY_LEFT || keyCode == GLFW.GLFW_KEY_RIGHT) {
 			float sign = keyCode == GLFW.GLFW_KEY_LEFT ? -1.0F : 1.0F;
-			this.setValue(this.value + (sign / (float) (this.width - 8)));
+			this.setValue(this.value + sign * (this.step == 0.0 ? 0.01 : this.step));
 
 			return true;
 		}
@@ -105,7 +105,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 	}
 
 	protected void onValueChanged() {
-		this.valueChangedListener.accept(getValue());
+		this.valueChangedListener.accept(value);
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 
 		context.drawGuiTexture(
 			this.getHandleTexture(),
-			this.getX() + (int) (this.value * (this.getWidth() - 8)),
+			this.getX() + (int) (ZERO_ONE.map(this.value, range) * (this.getWidth() - 8)),
 			this.getY(),
 			8,
 			this.getHeight()
@@ -147,7 +147,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 
 	@Override
 	public Text getMessage() {
-		return this.messageSupplier.apply(getValue());
+		return this.messageSupplier.apply(value);
 	}
 
 	protected Identifier getTexture() {
@@ -180,16 +180,11 @@ public class SpecterSliderWidget extends ClickableWidget {
 	protected void setValue(double value) {
 		double oldValue = this.value;
 
-		double newValue = MathHelper.clamp(value, 0.0, 1.0);
-		newValue = step <= 0.0 ? newValue : step * Math.round(newValue / step);
-		
-		this.value = MathHelper.clamp(newValue, 0.0, 1.0);
+		double newValue = value;
+		newValue = step <= 0.0 ? newValue : range.map(Math.round(ZERO_ONE.map(newValue, range) / step) * step, ZERO_ONE);
+		this.value = range.clamp(newValue);
 
 		if (oldValue != this.value) onValueChanged();
-	}
-
-	public double getValue() {
-		return this.range.map(this.value, ZERO_ONE);
 	}
 
 	public static class Builder {

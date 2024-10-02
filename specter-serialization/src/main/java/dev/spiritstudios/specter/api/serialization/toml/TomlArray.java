@@ -11,6 +11,10 @@ import java.util.stream.Stream;
 public class TomlArray extends TomlElement implements Iterable<TomlElement> {
 	private final List<TomlElement> elements = new ArrayList<>();
 
+	public TomlArray(List<String> comments) {
+		super(comments);
+	}
+
 	public TomlArray() {
 	}
 

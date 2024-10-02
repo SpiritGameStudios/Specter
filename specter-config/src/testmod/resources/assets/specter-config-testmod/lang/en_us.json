@@ -1,12 +1,12 @@
 {
-	"config.specter-config-testmod.gettestconfig.title": "Testmod Config",
-	"config.specter-config-testmod.gettestconfig.testInt": "Test Integer",
-	"config.specter-config-testmod.gettestconfig.testString": "Test String",
-	"config.specter-config-testmod.gettestconfig.testBool": "Test Boolean",
-	"config.specter-config-testmod.gettestconfig.testFloat": "Test Float",
-	"config.specter-config-testmod.gettestconfig.testDouble": "Test Double",
-	"config.specter-config-testmod.gettestconfig.testEnum": "Test Enum",
-	"config.specter-config-testmod.gettestconfig.testEnum.test_1": "1",
-	"config.specter-config-testmod.gettestconfig.testEnum.test_2": "2",
-	"config.specter-config-testmod.gettestconfig.testEnum.test_3": "3"
+	"config.specter-config-testmod.tomltestconfig.title": "Testmod Config",
+	"config.specter-config-testmod.tomltestconfig.testInt": "Test Integer",
+	"config.specter-config-testmod.tomltestconfig.testString": "Test String",
+	"config.specter-config-testmod.tomltestconfig.testBool": "Test Boolean",
+	"config.specter-config-testmod.tomltestconfig.testFloat": "Test Float",
+	"config.specter-config-testmod.tomltestconfig.testDouble": "Test Double",
+	"config.specter-config-testmod.tomltestconfig.testEnum": "Test Enum",
+	"config.specter-config-testmod.tomltestconfig.testEnum.test_1": "1",
+	"config.specter-config-testmod.tomltestconfig.testEnum.test_2": "2",
+	"config.specter-config-testmod.tomltestconfig.testEnum.test_3": "3"
 }

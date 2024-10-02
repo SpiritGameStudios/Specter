@@ -12,13 +12,16 @@ import java.util.stream.Stream;
 public class TomlTableElement extends TomlElement implements TomlTable {
 	private final Map<String, TomlElement> members;
 
-	public TomlTableElement(String... comments) {
+	public TomlTableElement(List<String> comments) {
 		super(comments);
 		this.members = new LinkedHashMap<>();
 	}
 
-	public TomlTableElement(TomlTable table, String... comments) {
-		super(comments);
+	public TomlTableElement() {
+		this.members = new LinkedHashMap<>();
+	}
+
+	public TomlTableElement(TomlTable table) {
 		this.members = table.toMap().entrySet().stream()
 			.collect(Collectors.toMap(Map.Entry::getKey, entry -> TomlElement.of(entry.getValue())));
 	}
@@ -109,8 +112,7 @@ public class TomlTableElement extends TomlElement implements TomlTable {
 	@Override
 	public TomlPosition inputPositionOf(List<String> path) {
 		if (path.isEmpty()) return TomlPosition.positionAt(1, 1);
-		TomlElement element = getEntry(path);
-		return element == null ? null : element.position();
+		return null;
 	}
 
 	private TomlElement getEntry(List<String> path) {

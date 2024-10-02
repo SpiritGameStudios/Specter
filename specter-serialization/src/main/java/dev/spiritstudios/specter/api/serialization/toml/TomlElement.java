@@ -1,11 +1,11 @@
 package dev.spiritstudios.specter.api.serialization.toml;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.DynamicOps;
 import dev.spiritstudios.specter.api.serialization.Commentable;
-import org.jetbrains.annotations.Nullable;
-import org.tomlj.TomlPosition;
 import org.tomlj.TomlTable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,17 +13,14 @@ import java.util.List;
  * Only exists so that we can make a {@link DynamicOps DynamicOps}. Otherwise, we would just use Tomlj's types.
  */
 public abstract class TomlElement implements Commentable {
-	@Nullable
-	private final TomlPosition position;
 	private List<String> comments;
 
-	protected TomlElement(@Nullable TomlPosition position, String... comments) {
-		this.position = position;
-		this.comments = List.of(comments);
+	protected TomlElement(List<String> comments) {
+		this.comments = comments;
 	}
 
-	protected TomlElement(String... comments) {
-		this(null, comments);
+	protected TomlElement() {
+		this.comments = Collections.emptyList();
 	}
 
 	public static TomlElement of(Object value) {
@@ -47,15 +44,11 @@ public abstract class TomlElement implements Commentable {
 
 	@Override
 	public List<String> comments() {
-		return comments;
+		return ImmutableList.copyOf(comments);
 	}
 
 	@Override
 	public void setComments(List<String> comments) {
 		this.comments = comments;
-	}
-
-	public @Nullable TomlPosition position() {
-		return position;
 	}
 }

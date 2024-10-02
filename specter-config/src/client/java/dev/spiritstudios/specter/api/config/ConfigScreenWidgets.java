@@ -14,7 +14,6 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
@@ -43,7 +42,7 @@ public final class ConfigScreenWidgets {
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> INTEGER_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Integer> value = (NumericValue<Integer>) configValue;
 
-		return SpecterSliderWidget.builder(MathHelper.map(value.get(), value.range().min(), value.range().max(), 0.0, 1.0))
+		return SpecterSliderWidget.builder(value.get())
 			.message((val) -> Text.translatable(value.translationKey(id)).append(String.format(": %.0f", val)))
 			.range(value.range().min(), value.range().max())
 			.step(value.step() == 0 ? 1 : value.step())
@@ -54,7 +53,7 @@ public final class ConfigScreenWidgets {
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> DOUBLE_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Double> value = (NumericValue<Double>) configValue;
 
-		return SpecterSliderWidget.builder(MathHelper.map(value.get(), value.range().min(), value.range().max(), 0.0, 1.0))
+		return SpecterSliderWidget.builder(value.get())
 			.message((val) -> Text.translatable(value.translationKey(id)).append(String.format(": %.2f", val)))
 			.range(value.range())
 			.step(value.step())
@@ -65,7 +64,7 @@ public final class ConfigScreenWidgets {
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> FLOAT_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Float> value = (NumericValue<Float>) configValue;
 
-		return SpecterSliderWidget.builder(MathHelper.map(value.get(), value.range().min(), value.range().max(), 0.0, 1.0))
+		return SpecterSliderWidget.builder(value.get())
 			.message((val) -> Text.translatable(configValue.translationKey(id)).append(String.format(": %.1f", val)))
 			.range(value.range().min(), value.range().max())
 			.step(value.step())
