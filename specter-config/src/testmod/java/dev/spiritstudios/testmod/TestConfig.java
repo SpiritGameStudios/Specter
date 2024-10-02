@@ -2,6 +2,7 @@ package dev.spiritstudios.testmod;
 
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
+import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.api.serialization.format.TomlFormat;
@@ -58,12 +59,12 @@ public class TestConfig extends Config<TestConfig> {
 		.comment("This is a test item")
 		.build();
 
-	public final Value<NestedConfig> nestedConfig = nestedValue(NestedConfig.class)
+	public final Value<NestedTestConfig> nestedConfig = nestedValue(NestedTestConfig.class)
 		.comment("This is a nested config")
 		.sync()
 		.build();
 
-	public static class NestedConfig extends Config<NestedConfig> {
+	public static class NestedTestConfig extends NestedConfig<NestedTestConfig> {
 		public final Value<String> nestedString = stringValue("nested")
 			.comment("This is a nested string")
 			.sync()
@@ -94,12 +95,12 @@ public class TestConfig extends Config<TestConfig> {
 			.sync()
 			.build();
 
-		public final Value<NestedNestedConfig> nestedNestedConfig = nestedValue(NestedNestedConfig.class)
+		public final Value<NestedNestedTestConfig> nestedNestedConfig = nestedValue(NestedNestedTestConfig.class)
 			.comment("This is a nested nested config")
 			.sync()
 			.build();
 
-		public static class NestedNestedConfig extends Config<NestedNestedConfig> {
+		public static class NestedNestedTestConfig extends NestedConfig<NestedNestedTestConfig> {
 			public final Value<String> nestedNestedString = stringValue("nestednested")
 				.comment("This is a nested nested string")
 				.sync()

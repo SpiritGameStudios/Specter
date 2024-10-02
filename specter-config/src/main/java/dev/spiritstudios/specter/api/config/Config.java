@@ -140,7 +140,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @param <T>          The type of the nested config.
 	 * @return A new nested value builder.
 	 */
-	protected static <T extends Config<T>> Value.NestedBuilder<T> nestedValue(Class<T> clazz) {
+	protected static <T extends NestedConfig<T>> Value.NestedBuilder<T> nestedValue(Class<T> clazz) {
 		return new Value.NestedBuilder<>(clazz);
 	}
 

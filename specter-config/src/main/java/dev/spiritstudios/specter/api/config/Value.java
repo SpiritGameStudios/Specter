@@ -86,7 +86,7 @@ public interface Value<T> {
 		}
 	}
 
-	class NestedBuilder<T extends Config<T>> {
+	class NestedBuilder<T extends NestedConfig<T>> {
 		protected final T defaultValue;
 		protected String comment;
 		protected boolean sync;

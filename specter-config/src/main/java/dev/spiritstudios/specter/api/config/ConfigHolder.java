@@ -36,6 +36,9 @@ public class ConfigHolder<T extends Config<T>, F> {
 		this.id = id;
 		this.path = path;
 
+		if (NestedConfig.class.isAssignableFrom(clazz))
+			throw new IllegalArgumentException("Nested configs cannot be registered with config holders");
+
 		ConfigHolder<?, ?> existing = ConfigHolderRegistry.get(id);
 		if (existing != null) throw new IllegalStateException("Config with id %s already exists".formatted(id));
 

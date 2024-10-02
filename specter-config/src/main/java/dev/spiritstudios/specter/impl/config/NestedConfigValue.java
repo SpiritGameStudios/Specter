@@ -4,16 +4,16 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.RecordBuilder;
-import dev.spiritstudios.specter.api.config.Config;
+import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.Value;
-import dev.spiritstudios.specter.api.serialization.CommentedCodec;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.serialization.CommentedCodec;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Optional;
 
-public class NestedConfigValue<T extends Config<T>> implements Value<T> {
+public class NestedConfigValue<T extends NestedConfig<T>> implements Value<T> {
 	private final T defaultValue;
 	private final boolean sync;
 	private final String comment;

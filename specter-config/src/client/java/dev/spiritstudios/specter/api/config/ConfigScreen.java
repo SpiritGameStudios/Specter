@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.config;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.config.NestedConfigScreen;
 import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.gui.widget.OptionsScrollableWidget;
 import net.minecraft.client.gui.DrawContext;
@@ -10,31 +11,24 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-public class ConfigScreen extends Screen {
+public abstract class ConfigScreen extends Screen {
 	private static final Text MULTIPLAYER_SYNC_ERROR = Text.translatable("screen.specter.config.multiplayer_sync_error");
 
-	private final Config<?> config;
-	private final Screen parent;
-	private final String id;
-	private final ConfigHolder<?, ?> holder;
+	protected final Config<?> config;
+	protected final Screen parent;
+	protected final String id;
 
 	public ConfigScreen(Config<?> config, String id, Screen parent) {
-		this(config, id, parent, null);
-	}
-
-	public ConfigScreen(Config<?> config, String id, Screen parent, ConfigHolder<?, ?> holder) {
 		super(Text.translatable("config.%s.title".formatted(id)));
 		this.config = config;
 		this.parent = parent;
 		this.id = id;
-		this.holder = holder;
 	}
 
 
@@ -63,7 +57,7 @@ public class ConfigScreen extends Screen {
 		values.forEach(option -> {
 			if (option instanceof NestedConfigValue<?> nestedOption) {
 				String nestedId = "%s.%s".formatted(id, option.name());
-				ConfigScreen screen = new ConfigScreen(nestedOption.get(), nestedId, this);
+				ConfigScreen screen = new NestedConfigScreen(nestedOption.get(), nestedId, this);
 
 				options.add(
 					ButtonWidget.builder(
@@ -110,12 +104,7 @@ public class ConfigScreen extends Screen {
 		this.client.setScreen(this.parent);
 	}
 
-	public void save() {
-		if (this.parent instanceof ConfigScreen screen) screen.save();
-
-		if (this.holder == null) return;
-		holder.save();
-	}
+	public abstract void save();
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
