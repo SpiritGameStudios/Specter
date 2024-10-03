@@ -14,6 +14,9 @@
 	"entrypoints": {
 		"main": [
 			"dev.spiritstudios.specter.impl.debug.SpecterDebug"
+		],
+		"client": [
+			"dev.spiritstudios.specter.impl.debug.SpecterDebugClient"
 		]
 	},
 	"mixins": [

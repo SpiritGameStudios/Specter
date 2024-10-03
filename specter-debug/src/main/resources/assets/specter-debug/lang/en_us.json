@@ -6,5 +6,19 @@
 	"item.specter-debug.loot_loader": "Loot Loader",
 	"commands.heal.not_living": "Cannot heal non-living entity",
 	"commands.heal.success": "Healed %s for %s health",
-	"commands.components.no_components": "No components found"
+	"commands.components.no_components": "No components found",
+	"tooltip.metatag.flammable": "Flammable:",
+	"tooltip.metatag.flammable.text": "%s burn chance, %s spread chance",
+	"tooltip.metatag.flattenable": "Flattens to:",
+	"tooltip.metatag.flattenable.text": "%s",
+	"tooltip.metatag.oxidizable": "Oxidizes to:",
+	"tooltip.metatag.oxidizable.text": "%s",
+	"tooltip.metatag.strippable": "Strips to:",
+	"tooltip.metatag.strippable.text": "%s",
+	"tooltip.metatag.waxable": "Waxes to:",
+	"tooltip.metatag.waxable.text": "%s",
+	"tooltip.metatag.fuel": "Fuel burns for:",
+	"tooltip.metatag.fuel.text": "%s ticks",
+	"tooltip.metatag.composting_chance": "Composting chance:",
+	"tooltip.metatag.composting_chance.text": "%s%%"
 }
