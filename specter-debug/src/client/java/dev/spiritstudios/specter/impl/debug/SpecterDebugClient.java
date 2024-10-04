@@ -2,27 +2,19 @@ package dev.spiritstudios.specter.impl.debug;
 
 import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.item.ItemMetatags;
+import dev.spiritstudios.specter.api.render.RenderMetatags;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.block.Block;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.List;
 
 public class SpecterDebugClient implements ClientModInitializer {
-	private static Text getMetatagHeader(String key) {
-		return Text.translatable("tooltip.metatag." + key).formatted(Formatting.DARK_PURPLE);
-	}
-
-	private static Text getMetatagText(String key, Object... values) {
-		return Text.translatable("tooltip.metatag." + key + ".text", values).formatted(Formatting.BLUE);
-	}
-
 	private static void addMetatagLine(List<Text> lines, String key, Object... values) {
-		lines.add(getMetatagHeader(key));
-		lines.add(getMetatagText(key, values));
+		lines.add(Text.translatable("tooltip.metatag." + key));
+		lines.add(Text.translatable("tooltip.metatag." + key + ".text", values));
 	}
 
 	@Override
@@ -40,6 +32,8 @@ public class SpecterDebugClient implements ClientModInitializer {
 			BlockMetatags.OXIDIZABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "oxidizable", entry.getName()));
 			BlockMetatags.STRIPPABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "strippable", entry.getName()));
 			BlockMetatags.WAXABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "waxable", entry.getName()));
+
+			RenderMetatags.RENDER_LAYER.get(block).ifPresent(entry -> addMetatagLine(lines, "render_layer", entry.asString()));
 		});
 	}
 }
