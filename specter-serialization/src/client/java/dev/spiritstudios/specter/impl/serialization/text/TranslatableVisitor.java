@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.serialization;
+package dev.spiritstudios.specter.impl.serialization.text;
 
 import net.minecraft.text.StringVisitable;
 

@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.serialization;
+package dev.spiritstudios.specter.impl.serialization.text;
 
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

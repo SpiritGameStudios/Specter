@@ -1,26 +1,21 @@
 package dev.spiritstudios.specter.api.serialization.text;
 
-import com.google.common.collect.ImmutableMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.text.TextContent;
-import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Map;
-
+/**
+ * Allows adding your own {@link TextContent.Type} to be encoded and decoded by {@link TextCodecs}.
+ */
 public final class TextContentRegistry {
-	private static final Map<String, Entry<?>> types = new Object2ObjectOpenHashMap<>();
-
-	public static void register(String field, TextContent.Type<?> type) {
-		types.put(type.id(), new Entry<>(field, type));
-	}
-
-	@ApiStatus.Internal
-	public static Map<String, Entry<?>> getTypes() {
-		return ImmutableMap.copyOf(types);
-	}
-
-	@ApiStatus.Internal
-	public record Entry<T extends TextContent>(String field, TextContent.Type<T> type) {
-
-	}
+    /**
+     * Registers a new {@link TextContent.Type}.
+     * This type will be used when either the type field is set to your types id or it contains a field with the name you provided.
+     *
+     * @param field The field name
+     * @param type  The type
+     */
+    public static void register(String field, TextContent.Type<?> type) {
+        TextContentRegistryImpl.register(field, type);
+    }
 }
