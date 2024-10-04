@@ -10,7 +10,7 @@ import net.minecraft.text.TextContent;
 public final class TextContentRegistry {
     /**
      * Registers a new {@link TextContent.Type}.
-     * This type will be used when either the type field is set to your types id or it contains a field with the name you provided.
+     * This type will be used when either the type field is set to the id of your type, or it contains a field with the name you provided.
      *
      * @param field The field name
      * @param type  The type

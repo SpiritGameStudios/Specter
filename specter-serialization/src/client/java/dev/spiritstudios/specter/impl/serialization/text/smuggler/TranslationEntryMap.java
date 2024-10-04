@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.serialization.text;
+package dev.spiritstudios.specter.impl.serialization.text.smuggler;
 
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

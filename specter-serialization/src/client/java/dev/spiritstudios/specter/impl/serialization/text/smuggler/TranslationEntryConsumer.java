@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.serialization.text;
+package dev.spiritstudios.specter.impl.serialization.text.smuggler;
 
 import net.minecraft.text.Text;
 

@@ -8,7 +8,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.mojang.serialization.JsonOps;
-import dev.spiritstudios.specter.impl.serialization.text.TranslationEntryConsumer;
+import dev.spiritstudios.specter.impl.serialization.text.smuggler.TranslationEntryConsumer;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Language;

@@ -12,6 +12,11 @@ import net.minecraft.text.TextContent;
 
 import java.util.Optional;
 
+/**
+ * A text content that is resolved at runtime.
+ *
+ * @param index The index of the argument to resolve this content to.
+ */
 public record DynamicTextContent(int index) implements TextContent {
     public static MapCodec<DynamicTextContent> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(Codec.INT.fieldOf("index").forGetter(DynamicTextContent::index)).apply(instance, DynamicTextContent::new)
