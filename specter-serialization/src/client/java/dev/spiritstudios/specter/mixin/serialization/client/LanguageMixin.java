@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.mixin.serialization.client;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -33,9 +34,8 @@ public class LanguageMixin {
 		return "";
 	}
 
-	@WrapOperation(method = "load(Ljava/io/InputStream;Ljava/util/function/BiConsumer;)V", at = @At(value = "INVOKE", target = "Ljava/util/function/BiConsumer;accept(Ljava/lang/Object;Ljava/lang/Object;)V"))
-	private static <T, U> void skip(BiConsumer<T, U> instance, T t, U u, Operation<Void> original, @Share("skip") LocalBooleanRef skip) {
-		if (skip.get()) return;
-		instance.accept(t, u);
+	@WrapWithCondition(method = "load(Ljava/io/InputStream;Ljava/util/function/BiConsumer;)V", at = @At(value = "INVOKE", target = "Ljava/util/function/BiConsumer;accept(Ljava/lang/Object;Ljava/lang/Object;)V"))
+	private static <T, U> boolean skip(BiConsumer<T, U> instance, T t, U u, @Share("skip") LocalBooleanRef skip) {
+		return !skip.get();
 	}
 }

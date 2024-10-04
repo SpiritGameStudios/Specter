@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.mixin.serialization.client;
 
 import com.google.common.collect.ImmutableList;
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.spiritstudios.specter.impl.serialization.SpecterSerializationClient;
 import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 import net.minecraft.text.StringVisitable;
@@ -57,9 +58,15 @@ public abstract class TranslatableTextContentMixin {
 	}
 
 
-	@Inject(method = "updateTranslations", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;)Ljava/lang/String;"), cancellable = true)
-	private void updateTranslations(CallbackInfo ci) {
-		Language language = Language.getInstance();
+	@Inject(
+		method = "updateTranslations",
+		at = {
+			@At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;)Ljava/lang/String;"),
+			@At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;")
+		},
+		cancellable = true
+	)
+	private void updateTranslations(CallbackInfo ci, @Local Language language) {
 		if (!(language instanceof TextTranslationSupplier supplier))
 			return;
 
