@@ -13,6 +13,7 @@ public class CreativeInventoryScreenMixin {
 	@Inject(method = "init", at = @At("RETURN"))
 	private void init(CallbackInfo ci) {
 		if (!ItemGroupReloader.RELOADED) return;
+		
 		((FabricCreativeInventoryScreen) this).switchToPage(0);
 		ItemGroupReloader.RELOADED = false;
 	}

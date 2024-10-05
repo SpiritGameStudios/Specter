@@ -4,6 +4,9 @@
 	"package": "dev.spiritstudios.specter.mixin.serialization",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"LanguageMixin",
+		"TextCodecsMixin",
+		"TranslatableTextContentMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

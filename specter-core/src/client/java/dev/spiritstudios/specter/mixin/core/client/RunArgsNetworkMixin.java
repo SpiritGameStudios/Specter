@@ -23,7 +23,7 @@ public class RunArgsNetworkMixin {
 	@Mutable
 	public Session session;
 
-	@Inject(method = "<init>", at = @At("TAIL"))
+	@Inject(method = "<init>", at = @At("RETURN"))
 	private void init(Session session, PropertyMap userProperties, PropertyMap profileProperties, Proxy proxy, CallbackInfo ci) {
 		if (!SpecterGlobals.DEBUG) return;
 
@@ -35,7 +35,7 @@ public class RunArgsNetworkMixin {
 		String username = System.getProperty("specter.development.username");
 		UUID uuid = UndashedUuid.fromString(System.getProperty("specter.development.uuid").replace("-", ""));
 
-		SpecterGlobals.LOGGER.info(String.format("Using development account %s (%s)", username, uuid));
+		SpecterGlobals.LOGGER.info("Using development account {} ({})", username, uuid);
 		this.session = new Session(
 			username,
 			uuid,

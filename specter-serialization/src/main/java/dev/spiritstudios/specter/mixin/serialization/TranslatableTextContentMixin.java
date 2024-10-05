@@ -1,8 +1,8 @@
-package dev.spiritstudios.specter.mixin.serialization.client;
+package dev.spiritstudios.specter.mixin.serialization;
 
 import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerializationClient;
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
@@ -36,10 +36,10 @@ public abstract class TranslatableTextContentMixin {
 		at = @At("HEAD")
 	)
 	private <T> void push(CallbackInfoReturnable<Optional<T>> cir) {
-		if (SpecterSerializationClient.CURRENT_TRANSLATABLE.get().contains((TranslatableTextContent) (Object) this))
+		if (SpecterSerialization.CURRENT_TRANSLATABLE.get().contains((TranslatableTextContent) (Object) this))
 			throw new IllegalStateException("Detected recursive translation: " + key);
 
-		SpecterSerializationClient.CURRENT_TRANSLATABLE.get().push((TranslatableTextContent) (Object) this);
+		SpecterSerialization.CURRENT_TRANSLATABLE.get().push((TranslatableTextContent) (Object) this);
 	}
 
 
@@ -51,10 +51,10 @@ public abstract class TranslatableTextContentMixin {
 		at = @At("RETURN")
 	)
 	private <T> void pop(CallbackInfoReturnable<Optional<T>> cir) {
-		SpecterSerializationClient.CURRENT_TRANSLATABLE.get().pop();
+		SpecterSerialization.CURRENT_TRANSLATABLE.get().pop();
 
-		if (SpecterSerializationClient.CURRENT_TRANSLATABLE.get().isEmpty())
-			SpecterSerializationClient.CURRENT_TRANSLATABLE.remove();
+		if (SpecterSerialization.CURRENT_TRANSLATABLE.get().isEmpty())
+			SpecterSerialization.CURRENT_TRANSLATABLE.remove();
 	}
 
 

@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.mixin.serialization.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerializationClient;
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.text.Text;
@@ -19,9 +19,9 @@ public class TranslationStorageMixin implements TextTranslationSupplier {
 
 	@ModifyReturnValue(method = "load(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Z)Lnet/minecraft/client/resource/language/TranslationStorage;", at = @At("RETURN"))
 	private static TranslationStorage load(TranslationStorage original) {
-		((TranslationStorageMixin) (Object) original).textTranslations = SpecterSerializationClient.TEXT_TRANSLATIONS_BUILDER.get().build();
+		((TranslationStorageMixin) (Object) original).textTranslations = SpecterSerialization.TEXT_TRANSLATIONS_BUILDER.get().build();
 
-		SpecterSerializationClient.TEXT_TRANSLATIONS_BUILDER.remove();
+		SpecterSerialization.TEXT_TRANSLATIONS_BUILDER.remove();
 		return original;
 	}
 

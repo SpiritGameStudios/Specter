@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.mixin.serialization.client;
+package dev.spiritstudios.specter.mixin.serialization;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
@@ -9,7 +9,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.mojang.serialization.JsonOps;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerializationClient;
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Language;
@@ -28,7 +28,7 @@ public class LanguageMixin {
 		}
 
 		Text text = TextCodecs.CODEC.parse(JsonOps.INSTANCE, element).getOrThrow(JsonParseException::new);
-		SpecterSerializationClient.TEXT_TRANSLATIONS_BUILDER.get().put(name, text);
+		SpecterSerialization.TEXT_TRANSLATIONS_BUILDER.get().put(name, text);
 
 		skip.set(true);
 		return "";

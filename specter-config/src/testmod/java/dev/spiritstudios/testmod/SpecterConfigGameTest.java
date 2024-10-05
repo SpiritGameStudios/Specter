@@ -34,6 +34,7 @@ public final class SpecterConfigGameTest {
 		context.assertTrue(TestConfig.TOML_HOLDER.load(), "Config file failed to load");
 		context.assertTrue(Files.exists(path), "Config file does not exist");
 		context.assertTrue(TestConfig.TOML_HOLDER.get().testString.get().equals("test2"), "String is not equal to test2, Make sure you haven't modified the config");
+		Files.deleteIfExists(path);
 
 		context.complete();
 	}
@@ -59,6 +60,7 @@ public final class SpecterConfigGameTest {
 		context.assertTrue(TestConfig.JSON_HOLDER.load(), "Config file failed to load");
 		context.assertTrue(Files.exists(path), "Config file does not exist");
 		context.assertTrue(TestConfig.JSON_HOLDER.get().testString.get().equals("test2"), "String is not equal to test2, Make sure you haven't modified the config");
+		Files.deleteIfExists(path);
 
 		context.complete();
 	}

@@ -3,7 +3,7 @@ package dev.spiritstudios.specter.api.serialization.text;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerializationClient;
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 import net.minecraft.text.*;
 
 import java.util.Optional;
@@ -30,7 +30,7 @@ public record DynamicTextContent(int index) implements TextContent {
 
 	@Override
 	public <T> Optional<T> visit(StringVisitable.Visitor<T> visitor) {
-		TranslatableTextContent parent = SpecterSerializationClient.CURRENT_TRANSLATABLE.get().peek();
+		TranslatableTextContent parent = SpecterSerialization.CURRENT_TRANSLATABLE.get().peek();
 		if (parent == null || parent.getArgs().length <= index)
 			return visitor.accept("{" + index + "}");
 
@@ -41,7 +41,7 @@ public record DynamicTextContent(int index) implements TextContent {
 
 	@Override
 	public <T> Optional<T> visit(StringVisitable.StyledVisitor<T> visitor, Style style) {
-		TranslatableTextContent parent = SpecterSerializationClient.CURRENT_TRANSLATABLE.get().peek();
+		TranslatableTextContent parent = SpecterSerialization.CURRENT_TRANSLATABLE.get().peek();
 		if (parent == null || parent.getArgs().length <= index)
 			return visitor.accept(style, "{" + index + "}");
 

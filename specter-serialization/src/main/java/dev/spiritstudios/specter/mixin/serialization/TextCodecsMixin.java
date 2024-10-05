@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.mixin.serialization.client;
+package dev.spiritstudios.specter.mixin.serialization;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

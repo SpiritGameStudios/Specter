@@ -20,15 +20,14 @@ public abstract class ItemGroupMixin {
 
 	@ModifyReturnValue(method = {"getDisplayStacks", "getSearchTabStacks"}, at = @At("RETURN"))
 	private Collection<ItemStack> getDisplayStacks(Collection<ItemStack> original) {
-		if (this.getType() == ItemGroup.Type.SEARCH) {
-			List<ItemStack> stacks = new ArrayList<>(original);
-			for (DataItemGroup group : ItemGroupReloader.ITEM_GROUPS) {
-				if (group.getSearchTabStacks().isEmpty()) continue;
-				stacks.addAll(group.getSearchTabStacks());
-			}
-			return stacks;
-		}
+		if (this.getType() != ItemGroup.Type.SEARCH) return original;
 
-		return original;
+		List<ItemStack> stacks = new ArrayList<>(original);
+		ItemGroupReloader.ITEM_GROUPS.stream()
+			.map(DataItemGroup::getSearchTabStacks)
+			.filter(searchTabStacks -> !searchTabStacks.isEmpty())
+			.forEach(stacks::addAll);
+
+		return stacks;
 	}
 }

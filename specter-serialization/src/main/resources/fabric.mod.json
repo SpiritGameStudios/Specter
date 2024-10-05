@@ -12,8 +12,8 @@
 	"license": "MPL-2.0",
 	"environment": "*",
 	"entrypoints": {
-		"client": [
-			"dev.spiritstudios.specter.impl.serialization.SpecterSerializationClient"
+		"main": [
+			"dev.spiritstudios.specter.impl.serialization.SpecterSerialization"
 		]
 	},
 	"mixins": [
