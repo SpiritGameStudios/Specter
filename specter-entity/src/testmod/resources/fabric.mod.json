@@ -12,6 +12,9 @@
 	"license": "MPL-2.0",
 	"environment": "*",
 	"entrypoints": {
+		"fabric-gametest": [
+			"dev.spiritstudios.testmod.SpecterEntityGameTest"
+		]
 	},
 	"depends": {
 		"fabricloader": ">=${loader_version}",

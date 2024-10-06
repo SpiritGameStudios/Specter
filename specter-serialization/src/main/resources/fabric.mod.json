@@ -12,9 +12,16 @@
 	"license": "MPL-2.0",
 	"environment": "*",
 	"entrypoints": {
+		"main": [
+			"dev.spiritstudios.specter.impl.serialization.SpecterSerialization"
+		]
 	},
 	"mixins": [
-		"specter-serialization.mixins.json"
+		"specter-serialization.mixins.json",
+		{
+			"config": "specter-serialization.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"depends": {
 		"fabricloader": ">=${loader_version}",

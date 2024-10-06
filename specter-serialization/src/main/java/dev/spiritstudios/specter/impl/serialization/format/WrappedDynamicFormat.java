@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.serialization;
+package dev.spiritstudios.specter.impl.serialization.format;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;

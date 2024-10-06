@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.specter.mixin.serialization.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"TranslationStorageMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

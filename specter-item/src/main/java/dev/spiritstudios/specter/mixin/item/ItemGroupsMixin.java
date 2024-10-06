@@ -32,6 +32,7 @@ public abstract class ItemGroupsMixin {
 		int offset = 0;
 		for (DataItemGroup group : ItemGroupReloader.ITEM_GROUPS) {
 			if (groups.contains(group)) continue;
+
 			group.setup(filtered, offset);
 			groups.add(group);
 			offset++;
