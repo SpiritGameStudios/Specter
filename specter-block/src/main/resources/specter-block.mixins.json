@@ -5,6 +5,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"AxeItemMixin",
+		"BlockAccessor",
 		"FireBlockMixin",
 		"HoneycombItemMixin",
 		"OxidizableMixin",

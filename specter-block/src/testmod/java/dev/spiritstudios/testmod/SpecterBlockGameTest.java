@@ -74,4 +74,17 @@ public final class SpecterBlockGameTest {
 
 		context.complete();
 	}
+
+	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	public void testBlockStatePropertyModification(TestContext context) {
+		BlockPos pos = new BlockPos(0, 1, 0);
+		
+		context.setBlockState(pos, SpecterBlockTestmod.TEST_BLOCK.getDefaultState());
+		context.expectBlockProperty(pos, SpecterBlockTestmod.TEST_PROPERTY, false);
+
+		context.setBlockState(pos, SpecterBlockTestmod.TEST_BLOCK.getDefaultState().with(SpecterBlockTestmod.TEST_PROPERTY, true));
+		context.expectBlockProperty(pos, SpecterBlockTestmod.TEST_PROPERTY, true);
+
+		context.complete();
+	}
 }
