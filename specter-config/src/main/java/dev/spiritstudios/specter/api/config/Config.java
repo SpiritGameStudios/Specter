@@ -5,8 +5,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
-import dev.spiritstudios.specter.api.core.util.CodecHelper;
 import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
+import dev.spiritstudios.specter.api.serialization.SpecterPacketCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -52,7 +53,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static <T extends Enum<T>> Value.Builder<T> enumValue(T defaultValue, Class<T> clazz) {
-		return value(defaultValue, CodecHelper.createEnumCodec(clazz)).packetCodec(CodecHelper.createEnumPacketCodec(clazz));
+		return value(defaultValue, SpecterCodecs.enumCodec(clazz)).packetCodec(SpecterPacketCodecs.enumPacketCodec(clazz));
 	}
 
 	/**
@@ -75,7 +76,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static NumericValue.Builder<Integer> intValue(int defaultValue) {
 		return new NumericValue.Builder<>(defaultValue, Codec.INT)
-			.codecRange(CodecHelper::clampedRangeInt)
+			.codecRange(SpecterCodecs::clampedRange)
 			.range(0, 100)
 			.packetCodec(PacketCodecs.INTEGER);
 	}
@@ -90,7 +91,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static NumericValue.Builder<Float> floatValue(float defaultValue) {
 		return new NumericValue.Builder<>(defaultValue, Codec.FLOAT)
-			.codecRange(CodecHelper::clampedRangeFloat)
+			.codecRange(SpecterCodecs::clampedRange)
 			.range(0.0F, 1.0F)
 			.packetCodec(PacketCodecs.FLOAT);
 	}
@@ -104,7 +105,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static NumericValue.Builder<Double> doubleValue(double defaultValue) {
 		return new NumericValue.Builder<>(defaultValue, Codec.DOUBLE)
-			.codecRange(CodecHelper::clampedRangeDouble)
+			.codecRange(SpecterCodecs::clampedRange)
 			.range(0.0, 1.0)
 			.packetCodec(PacketCodecs.DOUBLE);
 	}
@@ -136,8 +137,8 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	/**
 	 * Creates a new nested config value with the given class.
 	 *
-	 * @param clazz        The class of the nested config.
-	 * @param <T>          The type of the nested config.
+	 * @param clazz The class of the nested config.
+	 * @param <T>   The type of the nested config.
 	 * @return A new nested value builder.
 	 */
 	protected static <T extends NestedConfig<T>> Value.NestedBuilder<T> nestedValue(Class<T> clazz) {
