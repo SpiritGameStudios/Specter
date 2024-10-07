@@ -17,6 +17,9 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A simple {@link BlockEntity} with an inventory that is synchronized with the client.
+ */
 public class InventoryBlockEntity extends BlockEntity implements ImplementedInventory {
 	protected final DefaultedList<ItemStack> inventory;
 

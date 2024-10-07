@@ -40,12 +40,18 @@ public enum Easing {
 		else return 1 - (7.5625 * (t -= 2.625F / 2.75F) * t + 0.984375F);
 	}); // TODO: Make this customizable and clean up the if mess
 
+	final Double2DoubleFunction function;
+
+	Easing(Double2DoubleFunction function) {
+		this.function = function;
+	}
+
 	/**
 	 * Creates a polynomial easing function (e.g. t^2, t^3, t^4, etc.)
-	 * Only use this for powers above 5, otherwise use the predefined easing functions
 	 *
 	 * @param power The power of the polynomial
 	 * @return The polynomial easing function
+	 * @apiNote Only use this for powers above 5, otherwise use the predefined easing functions
 	 * @see #QUAD
 	 * @see #CUBIC
 	 * @see #QUART
@@ -82,12 +88,6 @@ public enum Easing {
 		}
 
 		return t -> a * Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / period) + 1;
-	}
-
-	final Double2DoubleFunction function;
-
-	Easing(Double2DoubleFunction function) {
-		this.function = function;
 	}
 
 	public double in(double t) {

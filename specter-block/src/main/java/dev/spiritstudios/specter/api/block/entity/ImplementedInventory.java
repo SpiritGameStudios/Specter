@@ -10,14 +10,6 @@ import net.minecraft.util.collection.DefaultedList;
  * Simple {@link net.minecraft.inventory.Inventory} implementation.
  */
 public interface ImplementedInventory extends Inventory {
-	/**
-	 * Gets the item list of this inventory.
-	 * Must always return the same instance.
-	 *
-	 * @return The item list of this inventory.
-	 */
-	DefaultedList<ItemStack> getItems();
-
 	static ImplementedInventory of(DefaultedList<ItemStack> items) {
 		return () -> items;
 	}
@@ -25,6 +17,14 @@ public interface ImplementedInventory extends Inventory {
 	static ImplementedInventory ofSize(int size) {
 		return of(DefaultedList.ofSize(size, ItemStack.EMPTY));
 	}
+
+	/**
+	 * Gets the item list of this inventory.
+	 *
+	 * @return The item list of this inventory.
+	 * @implSpec Must always return the same instance.
+	 */
+	DefaultedList<ItemStack> getItems();
 
 	@Override
 	default int size() {

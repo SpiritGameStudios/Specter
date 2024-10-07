@@ -7,6 +7,9 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import org.jetbrains.annotations.Range;
 
+/**
+ * The flammability data of a block.
+ */
 public record FlammableBlockData(@Range(from = 0, to = Integer.MAX_VALUE) int burn,
 								 @Range(from = 0, to = Integer.MAX_VALUE) int spread) {
 	public static final Codec<FlammableBlockData> CODEC = RecordCodecBuilder.create(instance -> instance

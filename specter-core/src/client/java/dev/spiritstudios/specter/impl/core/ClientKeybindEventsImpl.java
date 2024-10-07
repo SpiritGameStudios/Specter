@@ -24,11 +24,8 @@ public class ClientKeybindEventsImpl {
 	}
 
 	public static void tick(MinecraftClient client) {
-		for (Map.Entry<KeyBinding, Event<ClientKeybindEvents.KeybindListener>> entry : EVENTS.entrySet())
-			while (entry.getKey().wasPressed()) entry.getValue().invoker().onKeybind(client);
-	}
-	
-	public enum KeybindEvent {
-		PRESSED, RELEASED
+		EVENTS.forEach((key, value) -> {
+			while (key.wasPressed()) value.invoker().onKeybind(client);
+		});
 	}
 }

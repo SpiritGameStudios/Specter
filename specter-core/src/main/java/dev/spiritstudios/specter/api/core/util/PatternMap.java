@@ -23,7 +23,6 @@ public class PatternMap<V> implements Map<Class<?>, V> {
 			.findFirst()
 			.map(Pair::getSecond)
 			.orElse(null);
-
 	}
 
 	@Override

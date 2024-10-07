@@ -55,24 +55,24 @@ public class LootableInventoryBlockEntity extends BlockEntity implements Impleme
 		return ImplementedInventory.super.isEmpty();
 	}
 
-	public ItemStack getStack(int i) {
+	public ItemStack getStack(int slot) {
 		this.generateLoot(null);
-		return ImplementedInventory.super.getStack(i);
+		return ImplementedInventory.super.getStack(slot);
 	}
 
-	public ItemStack removeStack(int i, int j) {
+	public ItemStack removeStack(int slot, int amount) {
 		this.generateLoot(null);
-		return ImplementedInventory.super.removeStack(i, j);
+		return ImplementedInventory.super.removeStack(slot, amount);
 	}
 
-	public ItemStack removeStack(int i) {
+	public ItemStack removeStack(int slot) {
 		this.generateLoot(null);
-		return ImplementedInventory.super.removeStack(i);
+		return ImplementedInventory.super.removeStack(slot);
 	}
 
-	public void setStack(int i, ItemStack itemStack) {
+	public void setStack(int slot, ItemStack itemStack) {
 		this.generateLoot(null);
-		ImplementedInventory.super.setStack(i, itemStack);
+		ImplementedInventory.super.setStack(slot, itemStack);
 	}
 
 
@@ -84,18 +84,14 @@ public class LootableInventoryBlockEntity extends BlockEntity implements Impleme
 	@Override
 	protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
 		super.writeNbt(nbt, registryLookup);
-		if (!this.writeLootTable(nbt)) {
-			Inventories.writeNbt(nbt, this.inventory, registryLookup);
-		}
+		if (!this.writeLootTable(nbt)) Inventories.writeNbt(nbt, this.inventory, registryLookup);
 	}
 
 	@Override
 	protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
 		super.readNbt(nbt, registryLookup);
 		this.clear();
-		if (!this.readLootTable(nbt)) {
-			Inventories.readNbt(nbt, this.inventory, registryLookup);
-		}
+		if (!this.readLootTable(nbt)) Inventories.readNbt(nbt, this.inventory, registryLookup);
 	}
 
 	@Override
@@ -111,9 +107,8 @@ public class LootableInventoryBlockEntity extends BlockEntity implements Impleme
 	@Override
 	protected void addComponents(ComponentMap.Builder componentMapBuilder) {
 		super.addComponents(componentMapBuilder);
-		if (this.lootTable != null) {
+		if (this.lootTable != null)
 			componentMapBuilder.add(DataComponentTypes.CONTAINER_LOOT, new ContainerLootComponent(this.lootTable, this.lootTableSeed));
-		}
 	}
 
 	@SuppressWarnings("deprecation")
