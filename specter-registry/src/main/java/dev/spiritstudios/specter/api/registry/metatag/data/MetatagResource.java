@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.impl.registry.metatag.data;
+package dev.spiritstudios.specter.api.registry.metatag.data;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;

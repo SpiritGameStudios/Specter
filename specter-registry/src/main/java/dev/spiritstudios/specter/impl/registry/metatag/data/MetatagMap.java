@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.Resource;
