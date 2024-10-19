@@ -10,7 +10,7 @@ public final class SpecterPacketCodecs {
 		throw new UnsupportedOperationException("Cannot instantiate utility class");
 	}
 
-	public static <T extends Enum<T>> PacketCodec<ByteBuf, T> enumPacketCodec(Class<T> clazz) {
+	public static <T extends Enum<T>> PacketCodec<ByteBuf, T> enumCodec(Class<T> clazz) {
 		T[] values = clazz.getEnumConstants();
 
 		return PacketCodecs.indexed(id -> {

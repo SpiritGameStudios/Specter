@@ -8,7 +8,16 @@ public final class SpecterCodecs {
 	}
 
 	public static <T extends Enum<T>> Codec<T> enumCodec(Class<T> clazz) {
-		return Codec.stringResolver(Enum::name, string -> Enum.valueOf(clazz, string));
+		return Codec.stringResolver(
+			Enum::name,
+			string -> {
+				try {
+					return Enum.valueOf(clazz, string);
+				} catch (IllegalArgumentException | NullPointerException e) {
+					return null;
+				}
+			}
+		);
 	}
 
 	public static Codec<Integer> clampedRange(int min, int max) {

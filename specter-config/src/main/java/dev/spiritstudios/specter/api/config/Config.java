@@ -53,7 +53,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static <T extends Enum<T>> Value.Builder<T> enumValue(T defaultValue, Class<T> clazz) {
-		return value(defaultValue, SpecterCodecs.enumCodec(clazz)).packetCodec(SpecterPacketCodecs.enumPacketCodec(clazz));
+		return value(defaultValue, SpecterCodecs.enumCodec(clazz)).packetCodec(SpecterPacketCodecs.enumCodec(clazz));
 	}
 
 	/**
