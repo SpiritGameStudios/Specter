@@ -53,7 +53,7 @@ public class ValueImpl<T> implements Value<T> {
 
 	@Override
 	public void init(String name) {
-		this.mapCodec = new CommentedCodec<>(codec, comment).fieldOf(name);
+		this.mapCodec = (comment().isPresent() ? new CommentedCodec<>(codec, comment) : codec).fieldOf(name);
 		this.name = name;
 	}
 

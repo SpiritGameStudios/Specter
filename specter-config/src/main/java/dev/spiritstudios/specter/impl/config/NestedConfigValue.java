@@ -54,7 +54,7 @@ public class NestedConfigValue<T extends NestedConfig<T>> implements Value<T> {
 	@Override
 	public void init(String name) {
 		this.name = name;
-		this.mapCodec = new CommentedCodec<>(defaultValue, comment).fieldOf(name);
+		this.mapCodec = (comment().isPresent() ? new CommentedCodec<>(defaultValue, comment) : defaultValue).fieldOf(name);
 	}
 
 	@Override
