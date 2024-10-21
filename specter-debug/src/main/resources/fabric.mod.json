@@ -20,7 +20,11 @@
 		]
 	},
 	"mixins": [
-		"specter-debug.mixins.json"
+		"specter-debug.mixins.json",
+		{
+			"config": "specter-debug.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"accessWidener": "specter-debug.accesswidener",
 	"custom": {

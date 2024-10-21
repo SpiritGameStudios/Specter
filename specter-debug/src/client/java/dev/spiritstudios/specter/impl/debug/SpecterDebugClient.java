@@ -4,6 +4,7 @@ import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.item.ItemMetatags;
 import dev.spiritstudios.specter.api.render.RenderMetatags;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.block.Block;
 import net.minecraft.item.tooltip.TooltipType;
@@ -34,6 +35,10 @@ public class SpecterDebugClient implements ClientModInitializer {
 			BlockMetatags.WAXABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "waxable", entry.getName()));
 
 			RenderMetatags.RENDER_LAYER.get(block).ifPresent(entry -> addMetatagLine(lines, "render_layer", entry.asString()));
+		});
+
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			DebugRenderCommand.register(dispatcher);
 		});
 	}
 }
