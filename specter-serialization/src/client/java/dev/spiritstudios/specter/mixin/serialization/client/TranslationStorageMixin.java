@@ -19,7 +19,7 @@ public class TranslationStorageMixin implements TextTranslationSupplier {
 
 	@ModifyReturnValue(method = "load(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Z)Lnet/minecraft/client/resource/language/TranslationStorage;", at = @At("RETURN"))
 	private static TranslationStorage load(TranslationStorage original) {
-		((TranslationStorageMixin) (Object) original).textTranslations = SpecterSerialization.TEXT_TRANSLATIONS_BUILDER.get().build();
+		((TranslationStorageMixin) (Object) original).textTranslations = SpecterSerialization.TEXT_TRANSLATIONS_BUILDER.get().buildKeepingLast();
 
 		SpecterSerialization.TEXT_TRANSLATIONS_BUILDER.remove();
 		return original;
