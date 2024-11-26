@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "specter-item",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Specter Item",
 	"description": "Library for Spirit Studios mods (Item module)",
 	"authors": [],
@@ -33,7 +33,7 @@
 		}
 	},
 	"depends": {
-		"fabricloader": ">=${loader_version}",
+		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}-",
 		"fabric-api": "*",
 		"java": ">=21"

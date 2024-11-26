@@ -5,5 +5,5 @@ repositories {
 }
 
 dependencies {
-	modCompileOnly("com.terraformersmc:modmenu:${property("deps.modmenu")}")
+	modCompileOnly(rootProject.libs.modmenu)
 }

@@ -4,7 +4,7 @@ import java.net.URI
 plugins {
 	`java-library`
 	`maven-publish`
-	id("fabric-loom") version "1.7-SNAPSHOT"
+	alias(libs.plugins.fabric.loom)
 }
 
 class ModInfo {
@@ -13,17 +13,19 @@ class ModInfo {
 	val version = property("mod.version").toString()
 }
 
-class Dependencies {
-	val minecraft = property("deps.minecraft").toString()
-	val loader = property("deps.loader").toString()
-	val yarn = property("deps.yarn").toString()
-
-	val fabricApi = property("deps.fabricapi").toString()
-}
-
 allprojects {
-	apply(plugin = "java-library")
+	val mod = ModInfo()
+
+	group = mod.group
+	version = mod.version
+
 	apply(plugin = "maven-publish")
+
+	tasks.withType<GenerateModuleMetadata>().configureEach {
+		enabled = false
+	}
+
+	apply(plugin = "java-library")
 	apply(plugin = "fabric-loom")
 
 	tasks.withType<JavaCompile> {
@@ -38,56 +40,80 @@ allprojects {
 		targetCompatibility = JavaVersion.VERSION_21
 	}
 
-	val mod = ModInfo()
-	val deps = Dependencies()
-
-	group = mod.group
-	version = mod.version
-
-	dependencies {
-		minecraft("com.mojang:minecraft:${deps.minecraft}")
-		mappings("net.fabricmc:yarn:${deps.yarn}:v2")
-		modImplementation("net.fabricmc:fabric-loader:${deps.loader}")
-
-		modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
-	}
-
-	tasks.withType<ProcessResources> {
-		inputs.property("id", mod.id)
-		inputs.property("version", mod.version)
-		inputs.property("loader_version", deps.loader)
-		inputs.property("minecraft_version", deps.minecraft)
-
-		val map = mapOf(
-			"id" to mod.id,
-			"version" to mod.version,
-			"loader_version" to deps.loader,
-			"minecraft_version" to deps.minecraft
-		)
-
-		filesMatching("fabric.mod.json") { expand(map) }
-	}
-
 	loom {
 		splitEnvironmentSourceSets()
 		if (file("src/main/resources/${project.name}.accesswidener").exists()) accessWidenerPath =
 			file("src/main/resources/${project.name}.accesswidener")
 	}
 
-	for (modProject in allprojects) {
-		loom.mods.register(modProject.name) {
-			sourceSet(modProject.sourceSets.getByName("main"))
-			sourceSet(modProject.sourceSets.getByName("client"))
+	sourceSets {
+		create("testmod") {
+			compileClasspath += sourceSets.main.get().compileClasspath
+			runtimeClasspath += sourceSets.main.get().runtimeClasspath
 		}
 
-		loom.mods.register(modProject.name + "-testmod") {
-			sourceSet(modProject.sourceSets.getByName("testmod"))
-			sourceSet(modProject.sourceSets.getByName("testmodClient"))
+		create("testmodClient") {
+			compileClasspath += sourceSets.main.get().compileClasspath
+			runtimeClasspath += sourceSets.main.get().runtimeClasspath
+
+			compileClasspath += sourceSets.getByName("client").compileClasspath
+			runtimeClasspath += sourceSets.getByName("client").runtimeClasspath
+
+			compileClasspath += sourceSets.getByName("testmod").compileClasspath
+			runtimeClasspath += sourceSets.getByName("testmod").runtimeClasspath
 		}
 	}
 
-	tasks.withType<GenerateModuleMetadata>().configureEach {
-		enabled = false
+	loom.runs {
+		create("testmodClient") {
+			client()
+			ideConfigGenerated(project.rootProject == project)
+			name = "Testmod Client"
+			source(sourceSets["testmodClient"])
+		}
+
+		create("testmodServer") {
+			server()
+			ideConfigGenerated(project.rootProject == project)
+			name = "Testmod Server"
+			source(sourceSets["testmod"])
+		}
+	}
+
+	allprojects.forEach {
+		loom.mods.register(it.name) {
+			sourceSet(it.sourceSets.main.get())
+			sourceSet(it.sourceSets["client"])
+		}
+
+		loom.mods.register("${it.name}-testmod") {
+			sourceSet(it.sourceSets["testmod"])
+			sourceSet(it.sourceSets["testmodClient"])
+		}
+	}
+
+	dependencies {
+		minecraft(rootProject.libs.minecraft)
+		mappings(variantOf(rootProject.libs.yarn) { classifier("v2") })
+		modImplementation(rootProject.libs.fabric.loader)
+
+		modImplementation(rootProject.libs.fabric.api)
+
+		"testmodImplementation"(sourceSets.main.get().output)
+		"testmodClientImplementation"(sourceSets.main.get().output)
+		"testmodClientImplementation"(sourceSets["client"].output)
+		"testmodClientImplementation"(sourceSets["testmod"].output)
+	}
+
+	tasks.withType<ProcessResources> {
+		val map = mapOf(
+			"mod_version" to mod.version,
+			"fabric_loader_version" to rootProject.libs.versions.fabric.loader.get(),
+			"minecraft_version" to rootProject.libs.versions.minecraft.get()
+		)
+
+		inputs.properties(map)
+		filesMatching("fabric.mod.json") { expand(map) }
 	}
 }
 
@@ -98,13 +124,17 @@ tasks.javadoc {
 		charset("UTF-8")
 		memberLevel = JavadocMemberLevel.PACKAGE
 		addStringOption("Xdoclint:none", "-quiet")
+		links(
+			"https://maven.fabricmc.net/docs/yarn-${rootProject.libs.versions.yarn.get()}/"
+		)
 	}
 
 	allprojects.forEach { proj ->
 		source(proj.sourceSets.main.map { it.allJava.srcDirs })
 		source(proj.sourceSets.getByName("client").allSource.srcDirs)
 	}
-	classpath = project.files(sourceSets.main.map { it.compileClasspath }, sourceSets.getByName("client").compileClasspath)
+	classpath =
+		project.files(sourceSets.main.map { it.compileClasspath }, sourceSets.getByName("client").compileClasspath)
 
 	include("**/api/**")
 	isFailOnError = false
@@ -112,43 +142,31 @@ tasks.javadoc {
 
 val javadocJar by tasks.registering(Jar::class) {
 	dependsOn(tasks.javadoc)
-	from(tasks.javadoc.map { it.destinationDir!! })
+	from(tasks.javadoc.map { it.destinationDir })
 
 	archiveClassifier.set("fatjavadoc")
 }
 
-tasks.assemble.configure {
-	dependsOn(javadocJar)
+tasks.build.configure { dependsOn(javadocJar) }
+
+loom {
+	runs.create("gametest") {
+		inherit(runs["testmodServer"])
+		name = "Game Test"
+
+		vmArg("-Dfabric-api.gametest")
+		vmArg("-Dfabric-api.gametest.report-file=${project.layout.buildDirectory.get()}/junit.xml")
+		runDir = "build/gametest"
+	}
 }
 
-tasks.test.configure {
-	dependsOn(tasks.named("runGametest"))
-}
+tasks.test { dependsOn(":runGametest") }
 
 subprojects {
-	version = rootProject.version
-
-	sourceSets.create("testmod") {
-		compileClasspath += sourceSets.main.get().compileClasspath
-		runtimeClasspath += sourceSets.main.get().runtimeClasspath
-	}
-
-	sourceSets.create("testmodClient") {
-		compileClasspath += sourceSets.main.get().compileClasspath
-		runtimeClasspath += sourceSets.main.get().runtimeClasspath
-
-		compileClasspath += sourceSets.getByName("client").compileClasspath
-		runtimeClasspath += sourceSets.getByName("client").runtimeClasspath
-
-		compileClasspath += sourceSets.getByName("testmod").compileClasspath
-		runtimeClasspath += sourceSets.getByName("testmod").runtimeClasspath
-	}
+	base.archivesName = project.name
 
 	dependencies {
 		"testmodImplementation"(sourceSets.main.map { it.output })
-
-		"testmodClientImplementation"(sourceSets.getByName("client").output)
-		"testmodClientImplementation"(sourceSets.getByName("testmod").output)
 	}
 
 	extensions.configure(PublishingExtension::class.java) {
@@ -169,6 +187,24 @@ subprojects {
 
 	tasks.javadoc.configure {
 		isEnabled = false
+	}
+}
+
+subprojects.forEach { tasks.remapJar.configure { dependsOn(":${it.name}:remapJar") } }
+
+dependencies {
+	afterEvaluate {
+		subprojects.forEach {
+			api(project(":${it.name}", "namedElements"))
+			"clientImplementation"(project(":${it.name}").sourceSets["client"].output)
+			include(project("${it.name}:"))
+
+
+			compileOnly(rootProject.libs.tomlj)
+			"testmodImplementation"(rootProject.libs.tomlj)
+			"testmodImplementation"(project(":${it.name}").sourceSets["testmod"].output)
+			"testmodClientImplementation"(project("${it.name}:").sourceSets["testmodClient"].output)
+		}
 	}
 }
 
@@ -220,64 +256,3 @@ extensions.configure(PublishingExtension::class.java) {
 		}
 	}
 }
-
-sourceSets.create("testmod") {
-	compileClasspath += sourceSets.main.get().compileClasspath
-	runtimeClasspath += sourceSets.main.get().runtimeClasspath
-}
-
-sourceSets.create("testmodClient") {
-	compileClasspath += sourceSets.main.get().compileClasspath
-	runtimeClasspath += sourceSets.main.get().runtimeClasspath
-
-	compileClasspath += sourceSets.getByName("client").compileClasspath
-	runtimeClasspath += sourceSets.getByName("client").runtimeClasspath
-
-	compileClasspath += sourceSets.getByName("testmod").compileClasspath
-	runtimeClasspath += sourceSets.getByName("testmod").runtimeClasspath
-}
-
-loom {
-	runs.create("testmodClient") {
-		client()
-		ideConfigGenerated(project.rootProject == project)
-		name = "Testmod Client"
-		source(sourceSets.getByName("testmodClient"))
-	}
-
-	runs.create("testmodServer") {
-		server()
-		ideConfigGenerated(project.rootProject == project)
-		name = "Testmod Server"
-		source(sourceSets.getByName("testmod"))
-	}
-
-	runs.create("gametest") {
-		server()
-		ideConfigGenerated(project.rootProject == project)
-		name = "Game Test"
-		source(sourceSets.getByName("testmod"))
-
-		vmArg("-Dfabric-api.gametest")
-		vmArg("-Dfabric-api.gametest.report-file=${project.layout.buildDirectory.get()}/junit.xml")
-		runDir = "build/gametest"
-	}
-}
-
-dependencies {
-	afterEvaluate {
-		subprojects.forEach {
-			api(project(":${it.name}", "namedElements"))
-			"clientImplementation"(project(":${it.name}").sourceSets.getByName("client").output)
-			include(project("${it.name}:"))
-
-
-			compileOnly("org.tomlj:tomlj:${property("deps.tomlj")}")
-			"testmodImplementation"("org.tomlj:tomlj:${property("deps.tomlj")}")
-			"testmodImplementation"(project(":${it.name}").sourceSets["testmod"].output)
-			"testmodClientImplementation"(project("${it.name}:").sourceSets["testmodClient"].output)
-		}
-	}
-}
-
-for (subproject in subprojects) tasks.remapJar.configure { dependsOn(":${subproject.name}:remapJar") }

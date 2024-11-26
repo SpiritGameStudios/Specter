@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "specter-gui",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Specter GUI",
 	"description": "Library for Spirit Studios mods (GUI module)",
 	"authors": [],
@@ -21,7 +21,7 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=${loader_version}",
+		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}-",
 		"fabric-api": "*",
 		"java": ">=21"

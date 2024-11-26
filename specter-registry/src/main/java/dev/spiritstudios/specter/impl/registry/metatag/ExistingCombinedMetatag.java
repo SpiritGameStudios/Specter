@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
+import com.google.common.collect.Iterators;
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
@@ -13,19 +14,24 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-public record MetatagImpl<R, V>(
+public record ExistingCombinedMetatag<R, V>(
 	Registry<R> registry,
 	Identifier id,
 	Codec<V> codec,
 	PacketCodec<RegistryByteBuf, V> packetCodec,
-	ResourceType side
+	ResourceType side,
+	Function<R, V> existingGetter,
+	Supplier<Iterator<Entry<R, V>>> existingIterator
 ) implements Metatag<R, V> {
 	@Override
 	public Optional<V> get(R entry) {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
-		return Optional.ofNullable(MetatagHolder.of(registry).specter$getMetatagValue(this, entry));
+		return Optional.ofNullable(MetatagHolder.of(registry).specter$getMetatagValue(this, entry))
+			.or(() -> Optional.ofNullable(existingGetter.apply(entry)));
 	}
 
 	@NotNull
@@ -33,10 +39,13 @@ public record MetatagImpl<R, V>(
 	public Iterator<Entry<R, V>> iterator() {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
-		return this.registry.stream().map(entry -> {
-			V value = MetatagHolder.of(registry).specter$getMetatagValue(this, entry);
-			return value == null ? null : new Entry<>(entry, value);
-		}).filter(Objects::nonNull).iterator();
+		return Iterators.concat(
+			this.registry.stream().map(entry -> {
+				V value = MetatagHolder.of(registry).specter$getMetatagValue(this, entry);
+				return value == null ? null : new Entry<>(entry, value);
+			}).filter(Objects::nonNull).iterator(),
+			this.existingIterator().get()
+		);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.registry.metatag;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.registry.metatag.ExistingCombinedMetatag;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagImpl;
 import net.fabricmc.api.EnvType;
@@ -15,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Metatags are used to store additional data about a registry object.
@@ -30,18 +33,19 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 		return new Builder<>(registry, id, codec, packetCodec);
 	}
 
-	Registry<R> getRegistry();
+	Registry<R> registry();
 
-	Identifier getId();
+	Identifier id();
 
-	Codec<V> getCodec();
+	Codec<V> codec();
 
-	PacketCodec<RegistryByteBuf, V> getPacketCodec();
+	PacketCodec<RegistryByteBuf, V> packetCodec();
 
-	ResourceType getSide();
+	ResourceType side();
 
 	Optional<V> get(R entry);
 
+	@Override
 	@NotNull
 	Iterator<Entry<R, V>> iterator();
 
@@ -66,6 +70,8 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 		private final Codec<V> codec;
 		private final PacketCodec<RegistryByteBuf, V> packetCodec;
 		private ResourceType side = ResourceType.SERVER_DATA;
+		private Function<R, V> existingGetter;
+		private Supplier<Iterator<Entry<R, V>>> existingIterator;
 
 		private Builder(Registry<R> registry, Identifier id, Codec<V> codec, PacketCodec<RegistryByteBuf, V> packetCodec) {
 			this.registry = registry;
@@ -89,8 +95,17 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 			return this;
 		}
 
+		public Builder<R, V> existingCombined(Function<R, V> existingGetter,
+											  Supplier<Iterator<Entry<R, V>>> existingIterator) {
+			this.existingGetter = existingGetter;
+			this.existingIterator = existingIterator;
+			return this;
+		}
+
 		public Metatag<R, V> build() {
-			Metatag<R, V> metatag = new MetatagImpl<>(registry, id, codec, packetCodec, side);
+			Metatag<R, V> metatag = existingGetter != null && existingIterator != null ?
+				new ExistingCombinedMetatag<>(registry, id, codec, packetCodec, side, existingGetter, existingIterator) :
+				new MetatagImpl<>(registry, id, codec, packetCodec, side);
 
 			if (side == ResourceType.CLIENT_RESOURCES && FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
 				SpecterGlobals.LOGGER.warn(

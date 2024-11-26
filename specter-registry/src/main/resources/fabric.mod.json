@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "specter-registry",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Specter Registry",
 	"description": "Library for Spirit Studios mods (Registry module)",
 	"authors": [],
@@ -24,7 +24,7 @@
 	],
 	"accessWidener": "specter-registry.accesswidener",
 	"depends": {
-		"fabricloader": ">=${loader_version}",
+		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}-",
 		"fabric-api": "*",
 		"java": ">=21"

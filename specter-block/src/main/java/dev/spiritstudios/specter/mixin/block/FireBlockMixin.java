@@ -23,7 +23,7 @@ public class FireBlockMixin {
 	) {
 		return BlockMetatags.FLAMMABLE.get((state).getBlock())
 			.map(FlammableBlockData::burn)
-			.orElse(original.call(instance, value));
+			.orElseGet(() -> original.call(instance, value));
 	}
 
 	@WrapOperation(method = "getSpreadChance(Lnet/minecraft/block/BlockState;)I", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2IntMap;getInt(Ljava/lang/Object;)I", remap = false))
@@ -35,6 +35,6 @@ public class FireBlockMixin {
 	) {
 		return BlockMetatags.FLAMMABLE.get((state).getBlock())
 			.map(FlammableBlockData::spread)
-			.orElse(original.call(instance, value));
+			.orElseGet(() -> original.call(instance, value));
 	}
 }

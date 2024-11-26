@@ -34,7 +34,7 @@ public abstract class TomlElement implements Commentable {
 
 	public Object to() {
 		return switch (this) {
-			case TomlNull nullValue -> null;
+			case TomlNull ignored -> null;
 			case TomlTableElement table -> table;
 			case TomlArray array -> array;
 			case TomlPrimitive primitive -> primitive.value();

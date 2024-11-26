@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "specter-entity-testmod",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Specter",
 	"description": "Library for Spirit Studios mods (Entity module tests)",
 	"authors": [],
@@ -17,7 +17,7 @@
 		]
 	},
 	"depends": {
-		"fabricloader": ">=${loader_version}",
+		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}-",
 		"fabric-api": "*",
 		"java": ">=21"

@@ -65,8 +65,7 @@ public class TomlTableElement extends TomlElement implements TomlTable {
 				return path;
 			});
 
-			if (includeTables) return Stream.concat(Stream.of(basePath), subKeys);
-			else return subKeys;
+			return includeTables ? Stream.concat(Stream.of(basePath), subKeys) : subKeys;
 		}).collect(Collectors.toSet());
 	}
 
@@ -85,7 +84,8 @@ public class TomlTableElement extends TomlElement implements TomlTable {
 			List<String> entryPath = Collections.singletonList(key);
 			TomlElement element = entry.getValue();
 
-			if (!(element instanceof TomlTable table)) return Stream.of(new AbstractMap.SimpleEntry<>(entryPath, element.to()));
+			if (!(element instanceof TomlTable table))
+				return Stream.of(new AbstractMap.SimpleEntry<>(entryPath, element.to()));
 
 			Stream<Map.Entry<List<String>, Object>> subEntries =
 				table.entryPathSet(includeTables).stream().map(subEntry -> {
@@ -96,9 +96,7 @@ public class TomlTableElement extends TomlElement implements TomlTable {
 					return new AbstractMap.SimpleEntry<>(path, subEntry.getValue());
 				});
 
-			if (includeTables)
-				return Stream.concat(Stream.of(new AbstractMap.SimpleEntry<>(entryPath, element.to())), subEntries);
-			else return subEntries;
+			return includeTables ? Stream.concat(Stream.of(new AbstractMap.SimpleEntry<>(entryPath, element.to())), subEntries) : subEntries;
 		}).collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 

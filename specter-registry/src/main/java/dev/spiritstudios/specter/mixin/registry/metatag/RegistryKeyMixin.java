@@ -23,10 +23,9 @@ import java.util.Set;
 @Mixin(RegistryKey.class)
 public class RegistryKeyMixin<R> implements MetatagHolder<R> {
 	@Unique
-	private Map<Identifier, Metatag<R, ?>> metatags;
-
-	@Unique
 	private final Table<Metatag<R, ?>, R, Object> values = Tables.newCustomTable(new Object2ReferenceOpenHashMap<>(), Reference2ObjectOpenHashMap::new);
+	@Unique
+	private Map<Identifier, Metatag<R, ?>> metatags;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void init(Identifier registry, Identifier value, CallbackInfo ci) {
@@ -35,7 +34,7 @@ public class RegistryKeyMixin<R> implements MetatagHolder<R> {
 
 	@Override
 	public void specter$registerMetatag(Metatag<R, ?> metatag) {
-		metatags.put(metatag.getId(), metatag);
+		metatags.put(metatag.id(), metatag);
 	}
 
 	@Override

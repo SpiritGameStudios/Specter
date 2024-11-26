@@ -23,6 +23,10 @@ public class TomlWriter implements AutoCloseable, Flushable {
 	private boolean noKey;
 	private int indent;
 
+	public TomlWriter(Writer writer) {
+		this.writer = writer;
+	}
+
 	/**
 	 * Writes the given {@link TomlElement} to the underlying writer.
 	 *
@@ -46,7 +50,7 @@ public class TomlWriter implements AutoCloseable, Flushable {
 				}
 
 				List<Map.Entry<String, TomlElement>> sorted = table.members().entrySet().stream()
-					.sorted(Comparator.comparing(entry -> (entry.getValue() instanceof TomlTableElement || (entry.getValue() instanceof TomlArray array && getArrayType(array) == TomlTableElement.class)) ? 1 : 0))
+					.sorted(Comparator.comparing(entry -> entry.getValue() instanceof TomlTableElement || entry.getValue() instanceof TomlArray array && getArrayType(array) == TomlTableElement.class ? 1 : 0))
 					.toList();
 
 				SpecterGlobals.debug(sorted.toString());
@@ -88,10 +92,6 @@ public class TomlWriter implements AutoCloseable, Flushable {
 			}
 			default -> throw new IllegalArgumentException("Unsupported TomlElement type: " + element);
 		}
-	}
-
-	public TomlWriter(Writer writer) {
-		this.writer = writer;
 	}
 
 	private void writeComments() throws IOException {

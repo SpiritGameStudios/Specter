@@ -18,6 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
@@ -32,14 +33,14 @@ public record MetatagSyncS2CPayload<V>(MetatagPair<V> metatagPair) implements Cu
 			Identifier.PACKET_CODEC.xmap(
 					id -> (Registry<Object>) Registries.ROOT.get(id),
 					registry -> registry.getKey().getValue()
-				).<RegistryByteBuf>cast()
+				)
 				.dispatch(
-					Metatag::getRegistry,
+					Metatag::registry,
 					registry -> Identifier.PACKET_CODEC.xmap(
 						id -> (Metatag<Object, Object>) MetatagHolder.of(registry).specter$getMetatag(id),
-						Metatag::getId
-					).cast()
-				)
+						Metatag::id
+					)
+				).<RegistryByteBuf>cast()
 				.dispatch(
 					entry -> (Metatag<Object, Object>) entry.metatag,
 					MetatagPair::packetCodec
@@ -54,7 +55,7 @@ public record MetatagSyncS2CPayload<V>(MetatagPair<V> metatagPair) implements Cu
 		for (Registry<?> registry : Registries.ROOT) {
 			MetatagHolder<?> metatagHolder = MetatagHolder.of(registry);
 			metatagHolder.specter$getMetatags().forEach(entry -> {
-				if (entry.getValue().getSide() == ResourceType.CLIENT_RESOURCES)
+				if (entry.getValue().side() == ResourceType.CLIENT_RESOURCES)
 					return;
 
 				SpecterGlobals.debug("Caching metatag %s".formatted(entry.getKey()));
@@ -67,18 +68,18 @@ public record MetatagSyncS2CPayload<V>(MetatagPair<V> metatagPair) implements Cu
 		Map<String, Set<MetatagSyncEntry<V>>> encodedEntries = new Object2ObjectOpenHashMap<>();
 
 		for (Metatag.Entry<R, V> entry : metatag) {
-			Identifier id = metatag.getRegistry().getId(entry.key());
+			Identifier id = metatag.registry().getId(entry.key());
 			if (id == null)
 				throw new IllegalStateException("Registry entry " + entry.key() + " has no identifier");
 
 			encodedEntries.computeIfAbsent(id.getNamespace(), identifier -> new HashSet<>()).add(new MetatagSyncEntry<>(id.getPath(), entry.value()));
 		}
 
-		Set<MetatagPair<V>> metatagPairs = new HashSet<>();
-		for (Map.Entry<String, Set<MetatagSyncEntry<V>>> entry : encodedEntries.entrySet())
-			metatagPairs.add(new MetatagPair<>(entry.getKey(), entry.getValue(), metatag));
+		Set<MetatagPair<V>> metatagPairs = encodedEntries.entrySet().stream()
+			.map(entry -> new MetatagPair<>(entry.getKey(), entry.getValue(), metatag))
+			.collect(Collectors.toSet());
 
-		CACHE.put(metatag.getId(), new CacheEntry<>(metatagPairs));
+		CACHE.put(metatag.id(), new CacheEntry<>(metatagPairs));
 	}
 
 	public static Stream<MetatagSyncS2CPayload<?>> createPayloads() {
@@ -107,7 +108,7 @@ public record MetatagSyncS2CPayload<V>(MetatagPair<V> metatagPair) implements Cu
 			return PacketCodec.tuple(
 				PacketCodecs.STRING,
 				MetatagSyncEntry::id,
-				metatag.getPacketCodec(),
+				metatag.packetCodec(),
 				MetatagSyncEntry::value,
 				MetatagSyncEntry::new
 			);
