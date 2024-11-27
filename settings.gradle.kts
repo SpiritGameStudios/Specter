@@ -8,6 +8,7 @@ pluginManagement {
 rootProject.name = "specter-api"
 
 include("specter-core")
+include("specter-dfu")
 include("specter-render")
 include("specter-config")
 include("specter-registry")
