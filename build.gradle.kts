@@ -164,6 +164,8 @@ tasks.test { dependsOn(":runGametest") }
 
 subprojects {
 	base.archivesName = project.name
+	val mod = ModInfo()
+	version = mod.version
 
 	dependencies {
 		"testmodImplementation"(sourceSets.main.map { it.output })
@@ -172,14 +174,20 @@ subprojects {
 	extensions.configure(PublishingExtension::class.java) {
 		publications {
 			create("mavenJava", MavenPublication::class.java) {
-				from(components.getByName("java"))
+				artifact(tasks.remapJar) {
+					builtBy(tasks.remapJar)
+				}
+
+				artifact(tasks.named("sourcesJar")) {
+					builtBy(tasks.remapSourcesJar)
+				}
 			}
 		}
 
 		repositories {
 			maven {
 				name = "EchosMavenReleases"
-				url = URI("https://maven.callmeecho.dev/releases")
+				url = URI("https://maven.spiritstudios.dev/releases")
 				credentials(PasswordCredentials::class)
 			}
 		}
@@ -251,7 +259,7 @@ extensions.configure(PublishingExtension::class.java) {
 	repositories {
 		maven {
 			name = "EchosMavenReleases"
-			url = URI("https://maven.callmeecho.dev/releases")
+			url = URI("https://maven.spiritstudios.dev/releases")
 			credentials(PasswordCredentials::class)
 		}
 	}
