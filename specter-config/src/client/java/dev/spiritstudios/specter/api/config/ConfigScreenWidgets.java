@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.api.config;
 
-import dev.spiritstudios.specter.api.core.util.PatternMap;
+import dev.spiritstudios.specter.api.core.collect.PatternMap;
 import dev.spiritstudios.specter.api.gui.widget.SpecterButtonWidget;
 import dev.spiritstudios.specter.api.gui.widget.SpecterSliderWidget;
 import net.minecraft.block.Block;
@@ -24,12 +24,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public final class ConfigScreenWidgets {
 	private static final PatternMap<BiFunction<Value<?>, String, ? extends ClickableWidget>> widgetFactories = new PatternMap<>();
-
-	static {
-		addRegistry(Item.class, Registries.ITEM);
-		addRegistry(Block.class, Registries.BLOCK);
-	}
-
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> BOOLEAN_WIDGET_FACTORY = (configValue, id) -> {
 		Value<Boolean> value = (Value<Boolean>) configValue;
 
@@ -38,7 +32,6 @@ public final class ConfigScreenWidgets {
 			button -> value.set(!value.get())
 		).build();
 	};
-
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> INTEGER_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Integer> value = (NumericValue<Integer>) configValue;
 
@@ -49,7 +42,6 @@ public final class ConfigScreenWidgets {
 			.onValueChanged((val) -> value.set(val.intValue()))
 			.build();
 	};
-
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> DOUBLE_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Double> value = (NumericValue<Double>) configValue;
 
@@ -60,7 +52,6 @@ public final class ConfigScreenWidgets {
 			.onValueChanged(value::set)
 			.build();
 	};
-
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> FLOAT_WIDGET_FACTORY = (configValue, id) -> {
 		NumericValue<Float> value = (NumericValue<Float>) configValue;
 
@@ -71,7 +62,6 @@ public final class ConfigScreenWidgets {
 			.onValueChanged((val) -> value.set(val.floatValue()))
 			.build();
 	};
-
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> STRING_WIDGET_FACTORY = (configValue, id) -> {
 		Value<String> value = (Value<String>) configValue;
 
@@ -85,7 +75,6 @@ public final class ConfigScreenWidgets {
 
 		return widget;
 	};
-
 	private static final BiFunction<Value<?>, String, ? extends ClickableWidget> ENUM_WIDGET_FACTORY = (configValue, id) -> {
 		Value<Enum<?>> value = (Value<Enum<?>>) configValue;
 
@@ -105,6 +94,11 @@ public final class ConfigScreenWidgets {
 			}
 		).build();
 	};
+
+	static {
+		addRegistry(Item.class, Registries.ITEM);
+		addRegistry(Block.class, Registries.BLOCK);
+	}
 
 	private ConfigScreenWidgets() {
 	}

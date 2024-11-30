@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.core.util;
+package dev.spiritstudios.specter.api.core.math;
 
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
 

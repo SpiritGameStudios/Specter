@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.api.config;
 
 import com.mojang.serialization.DataResult;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;

@@ -33,10 +33,7 @@
 			"badges": [
 				"library"
 			]
-		},
-		"specter:registrars": [
-			"dev.spiritstudios.specter.impl.debug.registry.SpecterDebugItemRegistrar"
-		]
+		}
 	},
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",

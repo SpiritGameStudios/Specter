@@ -24,10 +24,5 @@
 		"minecraft": "~${minecraft_version}-",
 		"fabric-api": "*",
 		"java": ">=21"
-	},
-	"custom": {
-		"specter:registrars": [
-			"dev.spiritstudios.testmod.SpecterRegistryTestBlockRegistrar"
-		]
 	}
 }

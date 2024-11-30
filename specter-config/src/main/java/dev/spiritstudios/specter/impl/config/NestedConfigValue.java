@@ -7,7 +7,7 @@ import com.mojang.serialization.RecordBuilder;
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.CommentedCodec;
 import io.netty.buffer.ByteBuf;
 

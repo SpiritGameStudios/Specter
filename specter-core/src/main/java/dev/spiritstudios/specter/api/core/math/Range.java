@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.core.util;
+package dev.spiritstudios.specter.api.core.math;
 
 public record Range<T extends Number & Comparable<T>>(T min, T max) {
 	public boolean contains(T value) {

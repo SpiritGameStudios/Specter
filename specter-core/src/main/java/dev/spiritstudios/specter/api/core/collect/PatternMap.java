@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.core.util;
+package dev.spiritstudios.specter.api.core.collect;
 
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;

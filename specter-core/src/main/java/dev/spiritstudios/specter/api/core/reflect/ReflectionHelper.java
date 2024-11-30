@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.core.util;
+package dev.spiritstudios.specter.api.core.reflect;
 
 import org.objectweb.asm.tree.AnnotationNode;
 
@@ -6,10 +6,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
- * A bunch of utilities to reduce boilerplate reflection code.
+ * Utilities to reduce boilerplate reflection code.
  */
 public final class ReflectionHelper {
 	private ReflectionHelper() {
@@ -48,37 +51,27 @@ public final class ReflectionHelper {
 	 *
 	 * @param clazz  Class to search for fields in
 	 * @param target Type to find fields of
-	 * @param action Action to perform on each field
 	 * @param <T>    Type of {@code clazz}
 	 * @param <F>    Type of {@code target}
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T, F> void forEachStaticField(Class<T> clazz, Class<F> target, FieldAction<F> action) {
-		for (Field field : clazz.getDeclaredFields()) {
-			if (!Modifier.isStatic(field.getModifiers())) continue;
+	public static <T, F> Stream<FieldValuePair<F>> getStaticFields(Class<T> clazz, Class<F> target) {
+		return Arrays.stream(clazz.getDeclaredFields())
+			.map(field -> {
+				if (!Modifier.isStatic(field.getModifiers())) return null;
+				if (field.isAnnotationPresent(Ignore.class)) return null;
+				F value;
+				try {
+					Object objectValue = field.get(null);
+					if (!target.isAssignableFrom(objectValue.getClass())) return null;
+					value = target.cast(objectValue);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException("Failed to access field " + field.getName(), e);
+				} catch (ClassCastException e) {
+					return null;
+				}
 
-			F value;
-			try {
-				value = (F) field.get(null);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException("Failed to access field " + field.getName(), e);
-			}
-
-			if (value == null) continue;
-			if (!target.isAssignableFrom(value.getClass())) continue;
-
-			action.run(value, field.getName(), field);
-		}
-	}
-
-	/**
-	 * Functional interface for actions to perform on fields.
-	 *
-	 * @param <T> Type of the field
-	 */
-	@FunctionalInterface
-	public interface FieldAction<T> {
-		void run(T value, String name, Field field);
+				return new FieldValuePair<>(field, value);
+			}).filter(Objects::nonNull);
 	}
 
 	/**
@@ -139,5 +132,8 @@ public final class ReflectionHelper {
 			if (annotation.values.get(i).equals(key)) return (T) annotation.values.get(i + 1);
 
 		return defaultValue;
+	}
+
+	public record FieldValuePair<T>(Field field, T value) {
 	}
 }

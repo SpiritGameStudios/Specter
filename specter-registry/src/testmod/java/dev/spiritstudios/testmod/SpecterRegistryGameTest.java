@@ -11,9 +11,9 @@ import net.minecraft.util.math.BlockPos;
 public class SpecterRegistryGameTest {
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
 	public void testRegistrar(TestContext context) {
-		context.setBlockState(new BlockPos(0, 1, 0), SpecterRegistryTestBlockRegistrar.TEST_BLOCK);
+		context.setBlockState(new BlockPos(0, 1, 0), SpecterRegistryTestBlocks.TEST_BLOCK);
 
-		context.expectBlock(SpecterRegistryTestBlockRegistrar.TEST_BLOCK, new BlockPos(0, 1, 0));
+		context.expectBlock(SpecterRegistryTestBlocks.TEST_BLOCK, new BlockPos(0, 1, 0));
 		context.complete();
 	}
 

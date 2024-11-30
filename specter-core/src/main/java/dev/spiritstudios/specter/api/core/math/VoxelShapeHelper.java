@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.core.util;
+package dev.spiritstudios.specter.api.core.math;
 
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.Direction;
