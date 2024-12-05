@@ -71,10 +71,12 @@ public class TomlWriter implements AutoCloseable, Flushable {
 				writeComments();
 			}
 			case TomlPrimitive primitive -> {
-				if (primitive.value() instanceof Double d) writer.append(Double.toString(d));
-				else if (primitive.value() instanceof Long l) writer.append(Long.toString(l));
-				else if (primitive.value() instanceof Boolean bool) writer.append(bool ? "true" : "false");
-				else writer.append('"').append(primitive.toString()).append('"');
+				switch (primitive.value()) {
+					case Double d -> writer.append(Double.toString(d));
+					case Long l -> writer.append(Long.toString(l));
+					case Boolean bool -> writer.append(bool ? "true" : "false");
+					case null, default -> writer.append('"').append(primitive.toString()).append('"');
+				}
 				writer.append(' ');
 				writeComments();
 				writer.append('\n');

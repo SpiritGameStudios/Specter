@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.core.math;
 
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Easing functions for animations
@@ -15,7 +16,7 @@ public enum Easing {
 	QUART(t -> t * t * t * t),
 	QUINT(t -> t * t * t * t * t),
 
-	SINE(t -> 1 - Math.cos((t * Math.PI) / 2)),
+	SINE(t -> 1 - MathHelper.cos((float) ((t * Math.PI) / 2))),
 	CIRC(t -> 1 - Math.sqrt(1 - t * t)),
 	EXP(t -> Math.pow(2, 10 * (t - 1))),
 

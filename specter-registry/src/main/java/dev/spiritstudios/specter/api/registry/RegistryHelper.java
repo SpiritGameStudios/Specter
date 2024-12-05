@@ -35,6 +35,11 @@ public final class RegistryHelper {
 		registerFields(Registries.DATA_COMPONENT_TYPE, fixGenerics(ComponentType.class), clazz, namespace);
 	}
 
+	/**
+	 * Registers all blocks contained within a class
+	 * All blocks will be given a block item by default,
+	 * to override this behavior, user {@link NoBlockItem}
+	 */
 	public static void registerBlocks(Class<?> clazz, String namespace) {
 		ReflectionHelper.getStaticFields(clazz, Block.class).forEach(pair -> {
 				String objectName = ReflectionHelper.getAnnotation(pair.field(), Name.class)
