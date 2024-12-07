@@ -76,7 +76,7 @@ public final class RegistryHelper {
 	 * Use this if {@link T} has a generic type of ?.
 	 */
 	@SuppressWarnings("unchecked")
-	static <T> Class<T> fixGenerics(Class<?> clazz) {
+	public static <T> Class<T> fixGenerics(Class<?> clazz) {
 		return (Class<T>) clazz;
 	}
 }
