@@ -17,6 +17,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * WARNING: Due to its complexity, TOML can be extremely slow. Avoid using it for large files.
+ */
 public class TomlFormat implements DynamicFormat<TomlElement> {
 	public static final TomlFormat INSTANCE = new TomlFormat();
 
