@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * A writer for TOML files, with added comment support.
@@ -17,6 +18,7 @@ import java.util.Map;
  * @see TomlFormat
  */
 public class TomlWriter implements AutoCloseable, Flushable {
+	private static final Pattern UNQUOTED_KEY_REGEX = Pattern.compile("[a-zA-Z0-9_-]*");
 	private final Writer writer;
 	private List<String> comments;
 	private String key;
@@ -58,7 +60,7 @@ public class TomlWriter implements AutoCloseable, Flushable {
 				for (Map.Entry<String, TomlElement> entry : sorted) {
 					key = entry.getKey();
 					key = Toml.tomlEscape(key).toString();
-					if (!key.matches("[a-zA-Z0-9_-]*")) key = "\"%s\"".formatted(key);
+					if (!UNQUOTED_KEY_REGEX.matcher(key).matches()) key = "\"%s\"".formatted(key);
 					TomlElement value = entry.getValue();
 
 					write(value, (!path.isEmpty() ? "%s.".formatted(path) : "") + Toml.tomlEscape(key));
@@ -108,7 +110,7 @@ public class TomlWriter implements AutoCloseable, Flushable {
 	}
 
 	private void indent() throws IOException {
-		writer.append("\t".repeat(indent));
+		writer.append("    ".repeat(indent));
 	}
 
 	private Class<? extends TomlElement> getArrayType(TomlArray array) {
