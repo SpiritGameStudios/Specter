@@ -4,6 +4,7 @@ import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.registry.SpecterRegistry;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -99,7 +100,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<Map<Metatag
 	private <R, V> void loadMetatag(Metatag<R, V> metatag, MetatagMap<R, V> map) {
 		Registry<R> registry = metatag.registry();
 
-		MetatagHolder<R> holder = MetatagHolder.of(registry);
+		MetatagValueHolder<R> holder = MetatagValueHolder.getOrCreate(registry);
 		if (metatag.side() == this.side)
 			holder.specter$clearMetatag(metatag);
 

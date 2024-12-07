@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.impl.registry;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
@@ -20,7 +20,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 
 		Metatag<Object, V> metatag = (Metatag<Object, V>) payload.metatagPair().metatag();
 		Registry<Object> registry = metatag.registry();
-		MetatagHolder<Object> metatagHolder = MetatagHolder.of(registry);
+		MetatagValueHolder<Object> metatagHolder = MetatagValueHolder.getOrCreate(registry);
 
 		metatagHolder.specter$clearMetatag(metatag);
 

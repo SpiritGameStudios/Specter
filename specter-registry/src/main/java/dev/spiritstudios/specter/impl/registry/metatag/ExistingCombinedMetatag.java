@@ -30,7 +30,7 @@ public record ExistingCombinedMetatag<R, V>(
 	public Optional<V> get(R entry) {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
-		return Optional.ofNullable(MetatagHolder.of(registry).specter$getMetatagValue(this, entry))
+		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry))
 			.or(() -> Optional.ofNullable(existingGetter.apply(entry)));
 	}
 
@@ -41,7 +41,7 @@ public record ExistingCombinedMetatag<R, V>(
 
 		return Iterators.concat(
 			this.registry.stream().map(entry -> {
-				V value = MetatagHolder.of(registry).specter$getMetatagValue(this, entry);
+				V value = MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry);
 				return value == null ? null : new Entry<>(entry, value);
 			}).filter(Objects::nonNull).iterator(),
 			this.existingIterator().get()
@@ -53,6 +53,18 @@ public record ExistingCombinedMetatag<R, V>(
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		if (this.registry.getId(entry) == null) throw new IllegalArgumentException("Entry is not in the registry");
-		MetatagHolder.of(registry).specter$putMetatagValue(this, entry, value);
+		MetatagValueHolder.getOrCreate(registry).specter$putMetatagValue(this, entry, value);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ExistingCombinedMetatag<?, ?> that)) return false;
+		return Objects.equals(id, that.id) && Objects.equals(registry.getKey(), that.registry.getKey());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(registry.getKey(), id);
 	}
 }
