@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.impl.registry;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
@@ -13,21 +13,14 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
 public class SpecterRegistryClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new MetatagReloader(ResourceType.CLIENT_RESOURCES));
-
-		ClientPlayNetworking.registerGlobalReceiver(MetatagSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyMetatagSync(payload)));
-	}
-
 	@SuppressWarnings("unchecked")
 	private static <V> void applyMetatagSync(MetatagSyncS2CPayload<V> payload) {
 		if (MinecraftClient.getInstance().isIntegratedServerRunning())
 			return;
 
 		Metatag<Object, V> metatag = (Metatag<Object, V>) payload.metatagPair().metatag();
-		Registry<Object> registry = metatag.getRegistry();
-		MetatagHolder<Object> metatagHolder = MetatagHolder.of(registry);
+		Registry<Object> registry = metatag.registry();
+		MetatagValueHolder<Object> metatagHolder = MetatagValueHolder.getOrCreate(registry);
 
 		metatagHolder.specter$clearMetatag(metatag);
 
@@ -41,5 +34,12 @@ public class SpecterRegistryClient implements ClientModInitializer {
 			V value = entry.value();
 			metatagHolder.specter$putMetatagValue(metatag, object, value);
 		});
+	}
+
+	@Override
+	public void onInitializeClient() {
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new MetatagReloader(ResourceType.CLIENT_RESOURCES));
+
+		ClientPlayNetworking.registerGlobalReceiver(MetatagSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyMetatagSync(payload)));
 	}
 }

@@ -14,7 +14,7 @@ public record MetatagResource<V>(boolean replace, List<Pair<Identifier, V>> entr
 			Codec.BOOL.optionalFieldOf("replace", false).forGetter(MetatagResource::replace),
 			Codec.compoundList(
 				Identifier.CODEC,
-				metatag.getCodec()
+				metatag.codec()
 			).fieldOf("values").forGetter(MetatagResource::entries)
 		).apply(instance, MetatagResource::new));
 	}

@@ -4,6 +4,7 @@ import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.registry.SpecterRegistry;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -33,7 +34,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<Map<Metatag
 	}
 
 	private <R, V> MetatagMap<R, V> createMap(Metatag<R, V> metatag) {
-		return new MetatagMap<>(metatag.getRegistry(), metatag);
+		return new MetatagMap<>(metatag.registry(), metatag);
 	}
 
 	@Override
@@ -53,8 +54,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<Map<Metatag
 
 				if (metatagResources.isEmpty()) continue;
 
-				Registry<?> registry = entry.value();
-				parseMetatagResources(metatagResources, registry, metatagMaps);
+				parseMetatagResources(metatagResources, entry.value(), metatagMaps);
 			}
 
 			return metatagMaps;
@@ -73,8 +73,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<Map<Metatag
 
 			List<Resource> metatagResources = resource.getValue();
 			Metatag<?, ?> metatag = MetatagHolder.of(registry).specter$getMetatag(metatagId);
-			if (metatag == null) continue;
-			if (metatag.getSide() != this.side) continue;
+			if (metatag == null || metatag.side() != this.side) continue;
 
 			MetatagMap<?, ?> map = metatagMaps.computeIfAbsent(metatag, this::createMap);
 			metatagResources.forEach(metatagResource -> map.parseResource(metatagId, metatagResource));
@@ -99,10 +98,10 @@ public class MetatagReloader implements SimpleResourceReloadListener<Map<Metatag
 	}
 
 	private <R, V> void loadMetatag(Metatag<R, V> metatag, MetatagMap<R, V> map) {
-		Registry<R> registry = metatag.getRegistry();
+		Registry<R> registry = metatag.registry();
 
-		MetatagHolder<R> holder = MetatagHolder.of(registry);
-		if (metatag.getSide() == this.side)
+		MetatagValueHolder<R> holder = MetatagValueHolder.getOrCreate(registry);
+		if (metatag.side() == this.side)
 			holder.specter$clearMetatag(metatag);
 
 		map.getValues().forEach((id, value) -> metatag.put(registry.get(id), value));

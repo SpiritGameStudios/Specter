@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.api.serialization.text;
 
+import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.text.TextContent;
@@ -8,6 +9,10 @@ import net.minecraft.text.TextContent;
  * Allows adding your own {@link TextContent.Type} to be encoded and decoded by {@link TextCodecs}.
  */
 public final class TextContentRegistry {
+	private TextContentRegistry() {
+		throw new UnreachableException();
+	}
+
 	/**
 	 * Registers a new {@link TextContent.Type}.
 	 * This type will be used when either the type field is set to the id of your type, or it contains a field with the name you provided.

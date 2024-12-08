@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.api.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.spiritstudios.specter.api.core.util.Range;
+import dev.spiritstudios.specter.api.core.math.Range;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.navigation.GuiNavigationType;
@@ -26,13 +26,11 @@ public class SpecterSliderWidget extends ClickableWidget {
 	private static final Identifier SLIDER_HANDLE_HIGHLIGHTED = Identifier.ofVanilla("widget/slider_handle_highlighted");
 
 	private static final Range<Double> ZERO_ONE = new Range<>(0.0, 1.0);
-
-	protected double value;
 	protected final double step;
 	protected final Range<Double> range;
 	protected final Consumer<Double> valueChangedListener;
 	protected final Function<Double, Text> messageSupplier;
-
+	protected double value;
 	protected boolean sliderFocused;
 
 	protected SpecterSliderWidget(int x, int y, int width, int height, double value, double step, Range<Double> range, Consumer<Double> valueChangedListener, Function<Double, Text> messageSupplier) {
@@ -188,19 +186,16 @@ public class SpecterSliderWidget extends ClickableWidget {
 	}
 
 	public static class Builder {
+		private final double value;
 		private int x;
 		private int y;
-
 		private int width = 150;
 		private int height = 20;
-
 		private double step;
 		private Range<Double> range = new Range<>(0.0, 1.0);
 		private Consumer<Double> valueChangedListener = value -> {
 		};
 		private Function<Double, Text> messageSupplier = (value) -> Text.of(String.format("%.2f", value));
-
-		private final double value;
 
 		protected Builder(double value) {
 			this.value = value;

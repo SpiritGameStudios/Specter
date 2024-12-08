@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.api.config;
 
 import com.mojang.serialization.DataResult;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
@@ -46,12 +46,9 @@ public class ConfigHolder<T extends Config<T>, F> {
 
 		this.config = ReflectionHelper.instantiate(clazz);
 
-		this.config.getValueFields().forEach(field -> {
-			Value<?> value = ReflectionHelper.getFieldValue(this.config, field);
-			if (value == null) return;
-
-			value.init(field.getName());
-			SpecterGlobals.debug("Registered config value: %s".formatted(value.translationKey(id)));
+		this.config.fields().forEach(pair -> {
+			pair.value().init(pair.field().getName());
+			SpecterGlobals.debug("Registered config value: %s".formatted(pair.value().translationKey(id)));
 		});
 
 		if (!load())
@@ -177,18 +174,20 @@ public class ConfigHolder<T extends Config<T>, F> {
 
 	@ApiStatus.Internal
 	public ConfigHolder<T, F> packetDecode(ByteBuf buf) {
-		config.getValues()
-			.filter(Value::sync)
-			.forEach(value -> value.packetDecode(buf));
+		config.fields().forEach(pair -> {
+			if (!pair.value().sync()) return;
+			pair.value().packetDecode(buf);
+		});
 
 		return this;
 	}
 
 	@ApiStatus.Internal
 	public void packetEncode(ByteBuf buf) {
-		config.getValues()
-			.filter(Value::sync)
-			.forEach(value -> value.packetEncode(buf));
+		config.fields().forEach(pair -> {
+			if (!pair.value().sync()) return;
+			pair.value().packetEncode(buf);
+		});
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.config;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NestedConfigScreen;
 import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.gui.widget.OptionsScrollableWidget;
@@ -39,11 +40,11 @@ public abstract class ConfigScreen extends Screen {
 
 		OptionsScrollableWidget scrollableWidget = new OptionsScrollableWidget(this.client, this.width, this.height - 64, 32, 25);
 
-		List<Value<?>> values = config.getValues().toList();
+		List<ReflectionHelper.FieldValuePair<Value<?>>> values = config.fields();
 
 		if (this.client.player != null && !this.client.isInSingleplayer()) {
-			for (Value<?> option : values) {
-				if (!option.sync()) continue;
+			for (ReflectionHelper.FieldValuePair<Value<?>> pair : values) {
+				if (!pair.value().sync()) continue;
 
 				this.client.player.sendMessage(MULTIPLAYER_SYNC_ERROR, false);
 				this.client.setScreen(this.parent);
@@ -54,9 +55,9 @@ public abstract class ConfigScreen extends Screen {
 
 		List<ClickableWidget> options = new ArrayList<>();
 
-		values.forEach(option -> {
-			if (option instanceof NestedConfigValue<?> nestedOption) {
-				String nestedId = "%s.%s".formatted(id, option.name());
+		values.forEach(pair -> {
+			if (pair.value() instanceof NestedConfigValue<?> nestedOption) {
+				String nestedId = "%s.%s".formatted(id, pair.value().name());
 				ConfigScreen screen = new NestedConfigScreen(nestedOption.get(), nestedId, this);
 
 				options.add(
@@ -72,20 +73,20 @@ public abstract class ConfigScreen extends Screen {
 				return;
 			}
 
-			BiFunction<Value<?>, String, ? extends ClickableWidget> factory = ConfigScreenWidgets.getWidgetFactory(option);
+			BiFunction<Value<?>, String, ? extends ClickableWidget> factory = ConfigScreenWidgets.getWidgetFactory(pair.value());
 			if (factory == null) {
-				SpecterGlobals.LOGGER.warn("No widget factory found for {}", option.defaultValue().getClass().getSimpleName());
+				SpecterGlobals.LOGGER.warn("No widget factory found for {}", pair.value().defaultValue().getClass().getSimpleName());
 				return;
 			}
 
-			ClickableWidget widget = factory.apply(option, id);
+			ClickableWidget widget = factory.apply(pair.value(), id);
 			if (widget == null)
-				throw new IllegalStateException("Widget factory returned null for %s".formatted(option.defaultValue().getClass().getSimpleName()));
+				throw new IllegalStateException("Widget factory returned null for %s".formatted(pair.value().defaultValue().getClass().getSimpleName()));
 
 			widget.setWidth(0);
 			widget.setHeight(20);
 
-			Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(option.translationKey(id)), "");
+			Text tooltip = Text.translatableWithFallback("%s.tooltip".formatted(pair.value().translationKey(id)), "");
 			if (!tooltip.getString().isEmpty()) widget.setTooltip(Tooltip.of(tooltip));
 
 			options.add(widget);

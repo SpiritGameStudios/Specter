@@ -14,47 +14,27 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 
-public record MetatagImpl<R, V>(Registry<R> registry, Identifier id, Codec<V> codec,
-								PacketCodec<RegistryByteBuf, V> packetCodec,
-								ResourceType side) implements Metatag<R, V> {
-	@Override
-	public Registry<R> getRegistry() {
-		return registry;
-	}
-
-	@Override
-	public Identifier getId() {
-		return id;
-	}
-
-	@Override
-	public Codec<V> getCodec() {
-		return codec;
-	}
-
-	@Override
-	public PacketCodec<RegistryByteBuf, V> getPacketCodec() {
-		return packetCodec;
-	}
-
-	@Override
-	public ResourceType getSide() {
-		return side;
-	}
-
+public record MetatagImpl<R, V>(
+	Registry<R> registry,
+	Identifier id,
+	Codec<V> codec,
+	PacketCodec<RegistryByteBuf, V> packetCodec,
+	ResourceType side
+) implements Metatag<R, V> {
 	@Override
 	public Optional<V> get(R entry) {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
-		return Optional.ofNullable(MetatagHolder.of(registry).specter$getMetatagValue(this, entry));
+		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry));
 	}
 
+	@NotNull
 	@Override
-	public @NotNull Iterator<Entry<R, V>> iterator() {
+	public Iterator<Entry<R, V>> iterator() {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		return this.registry.stream().map(entry -> {
-			V value = (MetatagHolder.of(registry).specter$getMetatagValue(this, entry));
+			V value = MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry);
 			return value == null ? null : new Entry<>(entry, value);
 		}).filter(Objects::nonNull).iterator();
 	}
@@ -64,6 +44,18 @@ public record MetatagImpl<R, V>(Registry<R> registry, Identifier id, Codec<V> co
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		if (this.registry.getId(entry) == null) throw new IllegalArgumentException("Entry is not in the registry");
-		MetatagHolder.of(registry).specter$putMetatagValue(this, entry, value);
+		MetatagValueHolder.getOrCreate(registry).specter$putMetatagValue(this, entry, value);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof MetatagImpl<?, ?> that)) return false;
+		return Objects.equals(id, that.id) && Objects.equals(registry.getKey(), that.registry.getKey());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(registry.getKey(), id);
 	}
 }

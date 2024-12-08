@@ -11,7 +11,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * An adapter for a hierarchical serialization format, with support for reading and writing values.<p>
+ * An adapter for a hierarchical serialization format, with support for reading and writing values.
+ * <p>
  * If you already have a {@link DynamicOps} implementation, you can use {@link #of(DynamicOps, BiConsumer, Function, String)} to create a {@link DynamicFormat} from it.
  *
  * @param <T> The type this format serializes and deserializes.

@@ -5,7 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
+import dev.spiritstudios.specter.api.core.reflect.Ignore;
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
 import dev.spiritstudios.specter.api.serialization.SpecterPacketCodecs;
 import io.netty.buffer.ByteBuf;
@@ -15,11 +16,10 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * A configuration class that can be saved and loaded from disk.
@@ -32,6 +32,8 @@ import java.util.stream.Stream;
  * @param <T> The type of the configuration class. This must be the same as the class that extends this class.
  */
 public abstract class Config<T extends Config<T>> implements Codec<T> {
+	private List<ReflectionHelper.FieldValuePair<Value<?>>> fields;
+
 	/**
 	 * Creates a new value with the given default value and codec.
 	 *
@@ -80,7 +82,6 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 			.range(0, 100)
 			.packetCodec(PacketCodecs.INTEGER);
 	}
-
 
 	/**
 	 * Creates a new float value with the given default value and a default range of 0 to 1.
@@ -145,55 +146,61 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		return new Value.NestedBuilder<>(clazz);
 	}
 
-	@Override
-	public <T1> DataResult<T1> encode(T input, DynamicOps<T1> ops, T1 prefix) {
-		RecordBuilder<T1> builder = ops.mapBuilder();
-		for (Value<?> value : getValues().toList()) builder = value.encode(ops, builder);
-		return builder.build(prefix);
-	}
+	@ApiStatus.Internal
+	public List<ReflectionHelper.FieldValuePair<Value<?>>> fields() {
+		if (fields == null) {
+			fields = Arrays.stream(this.getClass().getDeclaredFields()).map(field -> {
+				if (field.isAnnotationPresent(Ignore.class)) return null;
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
-		for (Value<?> value : getValues().toList()) {
-			if (value.decode(ops, input)) continue;
+				if (!Value.class.isAssignableFrom(field.getType()) ||
+					Modifier.isStatic(field.getModifiers()) ||
+					!Modifier.isFinal(field.getModifiers())) return null;
 
-			return DataResult.error(() -> "Failed to decode config value: %s".formatted(value.name()));
+				Value<?> value = ReflectionHelper.getFieldValue(this, field);
+				if (value == null) return null;
+
+				return new ReflectionHelper.FieldValuePair<Value<?>>(
+					field,
+					value
+				);
+			}).filter(Objects::nonNull).toList();
 		}
-
-		return DataResult.success(Pair.of((T) this, input));
-	}
-
-	@ApiStatus.Internal
-	public Stream<Field> getValueFields() {
-		return Arrays.stream(this.getClass().getDeclaredFields())
-			.filter(field ->
-				Value.class.isAssignableFrom(field.getType()) &&
-					!Modifier.isStatic(field.getModifiers()) &&
-					Modifier.isFinal(field.getModifiers())
-			);
-	}
-
-	@ApiStatus.Internal
-	public Stream<Value<?>> getValues() {
-		return getValueFields()
-			.<Value<?>>map(field -> ReflectionHelper.getFieldValue(this, field))
-			.filter(Objects::nonNull);
+		return fields;
 	}
 
 	@ApiStatus.Internal
 	@SuppressWarnings("unchecked")
 	public PacketCodec<ByteBuf, T> packetCodec() {
 		return PacketCodec.of(
-			(value, buf) -> value.getValues()
-				.filter(Value::sync)
-				.forEach(val -> val.packetEncode(buf)),
+			(value, buf) -> value.fields().forEach(pair -> {
+				if (!pair.value().sync()) return;
+				pair.value().packetEncode(buf);
+			}),
 			(buf) -> {
-				getValues()
-					.filter(Value::sync)
-					.forEach(val -> val.packetDecode(buf));
+				fields().forEach(pair -> {
+					if (!pair.value().sync()) return;
+					pair.value().packetDecode(buf);
+				});
 				return (T) this;
 			}
 		);
+	}
+
+	@Override
+	public <T1> DataResult<T1> encode(T input, DynamicOps<T1> ops, T1 prefix) {
+		RecordBuilder<T1> builder = ops.mapBuilder();
+		for (ReflectionHelper.FieldValuePair<Value<?>> value : fields()) builder = value.value().encode(ops, builder);
+		return builder.build(prefix);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
+		for (ReflectionHelper.FieldValuePair<Value<?>> value : fields()) {
+			if (value.value().decode(ops, input)) continue;
+			return DataResult.error(() -> "Failed to decode config value: %s".formatted(value.value().name()));
+		}
+
+		return DataResult.success(Pair.of((T) this, input));
 	}
 }

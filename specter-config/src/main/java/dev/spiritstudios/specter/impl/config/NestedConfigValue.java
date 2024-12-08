@@ -7,7 +7,6 @@ import com.mojang.serialization.RecordBuilder;
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.util.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.CommentedCodec;
 import io.netty.buffer.ByteBuf;
 
@@ -23,12 +22,9 @@ public class NestedConfigValue<T extends NestedConfig<T>> implements Value<T> {
 
 	public NestedConfigValue(T defaultValue, boolean sync, String comment) {
 		this.defaultValue = defaultValue;
-		this.defaultValue.getValueFields().forEach(field -> {
-			Value<?> value = ReflectionHelper.getFieldValue(this.defaultValue, field);
-			if (value == null) return;
-
-			value.init(field.getName());
-			SpecterGlobals.debug("Registered config value: %s".formatted(value.name()));
+		this.defaultValue.fields().forEach(pair -> {
+			pair.value().init(pair.field().getName());
+			SpecterGlobals.debug("Registered config value: %s".formatted(pair.value().name()));
 		});
 
 		this.sync = sync;

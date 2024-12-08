@@ -74,7 +74,7 @@ public final class MetatagCommand {
 		MetatagResource<V> resource = new MetatagResource<>(
 			false,
 			Streams.stream(metatag.iterator())
-				.map(entry -> Pair.of(metatag.getRegistry().getId(entry.key()), entry.value()))
+				.map(entry -> Pair.of(metatag.registry().getId(entry.key()), entry.value()))
 				.toList()
 		);
 

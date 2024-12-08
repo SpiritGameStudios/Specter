@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * A writer for TOML files, with added comment support.
@@ -17,11 +18,16 @@ import java.util.Map;
  * @see TomlFormat
  */
 public class TomlWriter implements AutoCloseable, Flushable {
+	private static final Pattern UNQUOTED_KEY_REGEX = Pattern.compile("[a-zA-Z0-9_-]*");
 	private final Writer writer;
 	private List<String> comments;
 	private String key;
 	private boolean noKey;
 	private int indent;
+
+	public TomlWriter(Writer writer) {
+		this.writer = writer;
+	}
 
 	/**
 	 * Writes the given {@link TomlElement} to the underlying writer.
@@ -46,7 +52,7 @@ public class TomlWriter implements AutoCloseable, Flushable {
 				}
 
 				List<Map.Entry<String, TomlElement>> sorted = table.members().entrySet().stream()
-					.sorted(Comparator.comparing(entry -> (entry.getValue() instanceof TomlTableElement || (entry.getValue() instanceof TomlArray array && getArrayType(array) == TomlTableElement.class)) ? 1 : 0))
+					.sorted(Comparator.comparing(entry -> entry.getValue() instanceof TomlTableElement || entry.getValue() instanceof TomlArray array && getArrayType(array) == TomlTableElement.class ? 1 : 0))
 					.toList();
 
 				SpecterGlobals.debug(sorted.toString());
@@ -54,7 +60,7 @@ public class TomlWriter implements AutoCloseable, Flushable {
 				for (Map.Entry<String, TomlElement> entry : sorted) {
 					key = entry.getKey();
 					key = Toml.tomlEscape(key).toString();
-					if (!key.matches("[a-zA-Z0-9_-]*")) key = "\"%s\"".formatted(key);
+					if (!UNQUOTED_KEY_REGEX.matcher(key).matches()) key = "\"%s\"".formatted(key);
 					TomlElement value = entry.getValue();
 
 					write(value, (!path.isEmpty() ? "%s.".formatted(path) : "") + Toml.tomlEscape(key));
@@ -67,10 +73,12 @@ public class TomlWriter implements AutoCloseable, Flushable {
 				writeComments();
 			}
 			case TomlPrimitive primitive -> {
-				if (primitive.value() instanceof Double d) writer.append(Double.toString(d));
-				else if (primitive.value() instanceof Long l) writer.append(Long.toString(l));
-				else if (primitive.value() instanceof Boolean bool) writer.append(bool ? "true" : "false");
-				else writer.append('"').append(primitive.toString()).append('"');
+				switch (primitive.value()) {
+					case Double d -> writer.append(Double.toString(d));
+					case Long l -> writer.append(Long.toString(l));
+					case Boolean bool -> writer.append(bool ? "true" : "false");
+					case null, default -> writer.append('"').append(primitive.toString()).append('"');
+				}
 				writer.append(' ');
 				writeComments();
 				writer.append('\n');
@@ -90,10 +98,6 @@ public class TomlWriter implements AutoCloseable, Flushable {
 		}
 	}
 
-	public TomlWriter(Writer writer) {
-		this.writer = writer;
-	}
-
 	private void writeComments() throws IOException {
 		if (comments == null) return;
 		for (int i = 0; i < comments.size(); i++) {
@@ -106,7 +110,7 @@ public class TomlWriter implements AutoCloseable, Flushable {
 	}
 
 	private void indent() throws IOException {
-		writer.append("\t".repeat(indent));
+		writer.append("    ".repeat(indent));
 	}
 
 	private Class<? extends TomlElement> getArrayType(TomlArray array) {

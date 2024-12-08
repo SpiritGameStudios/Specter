@@ -140,4 +140,3 @@ public class JsonCWriter implements Closeable, Flushable {
 		writer.flush();
 	}
 }
-

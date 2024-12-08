@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 public class SpecterConfigModMenu implements ModMenuApi {
 	@Override
 	public Map<String, ConfigScreenFactory<?>> getProvidedConfigScreenFactories() {
-		return ModMenuHelper.getConfigScreens()
-			.entrySet()
-			.stream()
+		return ModMenuHelper.getConfigScreens().entrySet().stream()
 			.collect(Collectors.toMap(
 				Map.Entry::getKey,
 				entry ->

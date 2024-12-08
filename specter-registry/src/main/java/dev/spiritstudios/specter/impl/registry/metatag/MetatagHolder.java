@@ -16,14 +16,12 @@ public interface MetatagHolder<R> {
 
 	void specter$registerMetatag(Metatag<R, ?> metatag);
 
+	Set<Map.Entry<Identifier, Metatag<R, ?>>> specter$getMetatags();
+
 	@Nullable
 	Metatag<R, ?> specter$getMetatag(Identifier id);
 
-	<V> V specter$getMetatagValue(Metatag<R, V> metatag, R entry);
+	void specter$setValueHolder(MetatagValueHolder<R> valueHolder);
 
-	Set<Map.Entry<Identifier, Metatag<R, ?>>> specter$getMetatags();
-
-	void specter$clearMetatag(Metatag<R, ?> metatag);
-
-	<T> void specter$putMetatagValue(Metatag<R, T> metatag, R entry, T value);
+	@Nullable MetatagValueHolder<R> specter$getValueHolder();
 }

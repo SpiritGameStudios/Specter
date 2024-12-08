@@ -4,11 +4,13 @@
 	"package": "dev.spiritstudios.specter.mixin.block",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"AxeItemAccessor",
 		"AxeItemMixin",
 		"BlockAccessor",
 		"FireBlockMixin",
 		"HoneycombItemMixin",
 		"OxidizableMixin",
+		"ShovelItemAccessor",
 		"ShovelItemMixin"
 	],
 	"injectors": {

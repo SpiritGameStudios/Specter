@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.block;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -26,4 +27,8 @@ public record FlammableBlockData(@Range(from = 0, to = Integer.MAX_VALUE) int bu
 		FlammableBlockData::spread,
 		FlammableBlockData::new
 	);
+
+	public static FlammableBlockData fromEntry(FlammableBlockRegistry.Entry entry) {
+		return new FlammableBlockData(entry.getBurnChance(), entry.getSpreadChance());
+	}
 }

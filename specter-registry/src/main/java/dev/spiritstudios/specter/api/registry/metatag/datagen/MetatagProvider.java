@@ -58,8 +58,8 @@ public abstract class MetatagProvider<R> implements DataProvider {
 					throw new IllegalStateException("Failed to encode metatag resource: " + error);
 				});
 		}).thenComposeAsync(encoded -> {
-			Identifier registryId = builder.metatag.getRegistry().getKey().getValue();
-			Path metatagPath = pathResolver.resolveJson(builder.metatag.getId().withPrefixedPath(registryId.getNamespace() + "/" + registryId.getPath() + "/"));
+			Identifier registryId = builder.metatag.registry().getKey().getValue();
+			Path metatagPath = pathResolver.resolveJson(builder.metatag.id().withPrefixedPath(registryId.getNamespace() + "/" + registryId.getPath() + "/"));
 
 			return DataProvider.writeToPath(writer, encoded, metatagPath);
 		});
@@ -99,7 +99,7 @@ public abstract class MetatagProvider<R> implements DataProvider {
 			return new MetatagResource<>(
 				replace,
 				values.entrySet().stream()
-					.map(entry -> Pair.of(metatag.getRegistry().getId(entry.getKey()), entry.getValue()))
+					.map(entry -> Pair.of(metatag.registry().getId(entry.getKey()), entry.getValue()))
 					.filter(pair -> Objects.nonNull(pair.getFirst()))
 					.toList()
 			);

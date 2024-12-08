@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.specter.mixin.dfu",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"DataFixTypesAccessor",
+		"DataFixTypesMixin",
+		"NbtHelperMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

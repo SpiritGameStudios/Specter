@@ -2,7 +2,7 @@ package dev.spiritstudios.specter.impl.config;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.config.NumericValue;
-import dev.spiritstudios.specter.api.core.util.Range;
+import dev.spiritstudios.specter.api.core.math.Range;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 

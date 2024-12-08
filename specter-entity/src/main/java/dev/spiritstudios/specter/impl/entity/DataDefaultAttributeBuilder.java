@@ -15,12 +15,6 @@ import java.util.Map;
 
 // Yes, this is a builder builder. I love codecs.
 public record DataDefaultAttributeBuilder(Map<RegistryEntry<EntityAttribute>, Double> attributes) {
-	public DefaultAttributeContainer build() {
-		DefaultAttributeContainer.Builder builder = DefaultAttributeContainer.builder();
-		attributes.forEach(builder::add);
-		return builder.build();
-	}
-
 	public static final Codec<DataDefaultAttributeBuilder> CODEC = Codec.unboundedMap(
 		Registries.ATTRIBUTE.getEntryCodec(),
 		Codec.DOUBLE
@@ -41,5 +35,11 @@ public record DataDefaultAttributeBuilder(Map<RegistryEntry<EntityAttribute>, Do
 		attributes.instances.forEach((attribute, value) -> newAttributes.put(attribute, value.getBaseValue()));
 		newAttributes.putAll(original.attributes);
 		return new DataDefaultAttributeBuilder(newAttributes);
+	}
+
+	public DefaultAttributeContainer build() {
+		DefaultAttributeContainer.Builder builder = DefaultAttributeContainer.builder();
+		attributes.forEach(builder::add);
+		return builder.build();
 	}
 }
