@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Mixin(RegistryKey.class)
-public class RegistryKeyMixin<R> implements MetatagHolder<R> {
+public abstract class RegistryKeyMixin<R> implements MetatagHolder<R> {
 	@Unique
 	private final Map<Identifier, Metatag<R, ?>> metatags = new Object2ObjectOpenHashMap<>();
 
