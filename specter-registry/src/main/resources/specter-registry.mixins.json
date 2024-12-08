@@ -4,7 +4,8 @@
 	"package": "dev.spiritstudios.specter.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"registry.metatag.RegistryKeyMixin"
+		"registry.metatag.RegistryKeyMixin",
+		"registry.reloadable.ReloadableRegistriesMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
