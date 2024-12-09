@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.impl.registry;
 
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
+import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistriesSyncS2CPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -39,6 +40,8 @@ public class SpecterRegistry implements ModInitializer {
 
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
+			SpecterReloadableRegistriesImpl.setRegistryManager(server.getReloadableRegistries().getRegistryManager());
+
 			ReloadableRegistriesSyncS2CPayload.clearCache();
 			ReloadableRegistriesSyncS2CPayload payload = ReloadableRegistriesSyncS2CPayload.get(server);
 
@@ -47,6 +50,7 @@ public class SpecterRegistry implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> SpecterRegistry.server = server);
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> SpecterReloadableRegistriesImpl.setRegistryManager(server.getReloadableRegistries().getRegistryManager()));
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			if (SpecterRegistry.server == server) SpecterRegistry.server = null;
 		});

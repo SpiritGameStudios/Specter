@@ -39,16 +39,14 @@ public class SpecterRegistryTestMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		RegistryHelper.registerBlocks(SpecterRegistryTestBlocks.class, MODID);
-		SpecterReloadableRegistries.registerSynced(CHOCOLATE_KEY, Chocolate.CODEC, Chocolate.PACKET_CODEC);
+		SpecterReloadableRegistries.registerSynced(CHOCOLATE_KEY, Chocolate.CODEC, Chocolate.PACKET_CODEC.cast());
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
-			server.getReloadableRegistries().getRegistryManager()
-				.getOptionalWrapper(CHOCOLATE_KEY)
-				.ifPresent(wrapperLookup -> {
-					wrapperLookup.streamEntries().forEach(entry -> {
-						SpecterGlobals.debug(entry.getIdAsString() + ": " + entry.value().toString());
-					});
+			SpecterReloadableRegistries.reloadableManager().flatMap(manager -> manager.getOptionalWrapper(CHOCOLATE_KEY)).ifPresent(wrapperLookup -> {
+				wrapperLookup.streamEntries().forEach(entry -> {
+					SpecterGlobals.debug(entry.getIdAsString() + ": " + entry.value().toString());
 				});
+			});
 		});
 	}
 }

@@ -7,9 +7,8 @@ import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistriesSyncS2CPayload;
-import dev.spiritstudios.specter.mixin.registry.client.ClientPlayNetworkHandlerAccessor;
-import dev.spiritstudios.specter.mixin.registry.client.WorldAccessor;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
@@ -18,11 +17,9 @@ import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntryInfo;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class SpecterRegistryClient implements ClientModInitializer {
 	private static final RegistryEntryInfo DEFAULT_REGISTRY_ENTRY_INFO = new RegistryEntryInfo(Optional.empty(), Lifecycle.experimental());
@@ -75,19 +72,22 @@ public class SpecterRegistryClient implements ClientModInitializer {
 			ClientPlayNetworkHandler networkHandler = context.client().getNetworkHandler();
 			Objects.requireNonNull(networkHandler);
 
-			DynamicRegistryManager.Immutable newManager = new DynamicRegistryManager.ImmutableImpl(
-				Stream.concat(
-					networkHandler.getRegistryManager().streamAllRegistries()
-						.filter(entry -> !SpecterReloadableRegistriesImpl.syncingCodecs().containsKey(entry.key())),
-					payload.entries().stream().map(SpecterRegistryClient::createRegistry)
-				)
+			DynamicRegistryManager.Immutable reloadableManager = new DynamicRegistryManager.ImmutableImpl(
+				payload.entries().stream().map(SpecterRegistryClient::createRegistry)
 			).toImmutable();
-			newManager.streamAllRegistries().forEach(entry -> entry.value().clearTags());
-			((ClientPlayNetworkHandlerAccessor) networkHandler).setCombinedDynamicRegistries(newManager);
+			reloadableManager.streamAllRegistries().forEach(entry -> entry.value().clearTags());
 
-			World world = context.client().world;
-			if (world == null) return;
-			((WorldAccessor) world).setRegistryManager(newManager);
+			SpecterReloadableRegistriesImpl.setRegistryManager(reloadableManager);
+
+//			((ClientPlayNetworkHandlerAccessor) networkHandler).setCombinedDynamicRegistries(reloadableManager);
+//
+//			World world = context.client().world;
+//			if (world == null) return;
+//			((WorldAccessor) world).setRegistryManager(reloadableManager);
 		}));
+
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			SpecterReloadableRegistriesImpl.setRegistryManager(null);
+		});
 	}
 }

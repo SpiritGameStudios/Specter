@@ -4,7 +4,7 @@ import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
@@ -21,7 +21,7 @@ public record ReloadableRegistriesSyncS2CPayload(
 	List<Entry<?>> entries
 ) implements CustomPayload {
 	public static final Id<ReloadableRegistriesSyncS2CPayload> ID = new Id<>(Identifier.of(SpecterGlobals.MODID, "reloadable_registry_sync"));
-	public static final PacketCodec<PacketByteBuf, ReloadableRegistriesSyncS2CPayload> CODEC = PacketCodec.tuple(
+	public static final PacketCodec<RegistryByteBuf, ReloadableRegistriesSyncS2CPayload> CODEC = PacketCodec.tuple(
 		Entry.PACKET_CODEC.collect(PacketCodecs.toList()),
 		ReloadableRegistriesSyncS2CPayload::entries,
 		ReloadableRegistriesSyncS2CPayload::new
@@ -60,23 +60,22 @@ public record ReloadableRegistriesSyncS2CPayload(
 	}
 
 	public record Entry<T>(RegistryKey<Registry<T>> key, Map<Identifier, T> entries) {
-		private static final PacketCodec<ByteBuf, RegistryKey<? extends Registry<?>>> REGISTRY_KEY_CODEC = Identifier.PACKET_CODEC
-			.xmap(RegistryKey::ofRegistry, RegistryKey::getValue);
+		private static final PacketCodec<ByteBuf, RegistryKey<? extends Registry<?>>> REGISTRY_KEY_CODEC =
+			Identifier.PACKET_CODEC.xmap(RegistryKey::ofRegistry, RegistryKey::getValue);
 
-		public static final PacketCodec<ByteBuf, Entry<?>> PACKET_CODEC = REGISTRY_KEY_CODEC.dispatch(
+		public static final PacketCodec<RegistryByteBuf, Entry<?>> PACKET_CODEC = REGISTRY_KEY_CODEC.<RegistryByteBuf>cast().dispatch(
 			Entry::key,
 			key -> packetCodec(SpecterReloadableRegistriesImpl.syncingCodecs().get(key))
 		);
 
-
 		@SuppressWarnings("unchecked")
-		public static <T> PacketCodec<ByteBuf, Entry<T>> packetCodec(PacketCodec<ByteBuf, T> entryCodec) {
+		public static <T> PacketCodec<RegistryByteBuf, Entry<T>> packetCodec(PacketCodec<RegistryByteBuf, T> entryCodec) {
 			return PacketCodec.tuple(
 				REGISTRY_KEY_CODEC,
 				Entry::key,
 				PacketCodecs.map(
 					Object2ObjectOpenHashMap::new,
-					Identifier.PACKET_CODEC,
+					net.minecraft.util.Identifier.PACKET_CODEC,
 					entryCodec
 				),
 				Entry::entries,

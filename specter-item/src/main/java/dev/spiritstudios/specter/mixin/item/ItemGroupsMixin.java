@@ -1,8 +1,9 @@
 package dev.spiritstudios.specter.mixin.item;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import dev.spiritstudios.specter.impl.item.DataItemGroup;
-import dev.spiritstudios.specter.impl.item.ItemGroupReloader;
+import dev.spiritstudios.specter.impl.item.SpecterItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,14 +30,17 @@ public abstract class ItemGroupsMixin {
 			.filter(ItemGroup::shouldDisplay)
 			.toList();
 
-		int offset = 0;
-		for (DataItemGroup group : ItemGroupReloader.ITEM_GROUPS) {
-			if (groups.contains(group)) continue;
+		SpecterReloadableRegistries.reloadableManager().ifPresent(manager -> {
+			int offset = 0;
 
-			group.setup(filtered, offset);
-			groups.add(group);
-			offset++;
-		}
+			for (DataItemGroup group : manager.get(SpecterItem.ITEM_GROUP_KEY)) {
+				if (groups.contains(group)) continue;
+
+				group.setup(filtered, offset);
+				groups.add(group);
+				offset++;
+			}
+		});
 
 		return groups;
 	}

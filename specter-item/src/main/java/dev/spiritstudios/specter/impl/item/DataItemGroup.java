@@ -8,7 +8,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -27,6 +31,19 @@ public class DataItemGroup extends ItemGroup implements FabricItemGroupImpl {
 			ItemStack.CODEC
 		).listOf().fieldOf("items").forGetter(DataItemGroup::getItems)
 	).apply(instance, DataItemGroup::new));
+
+	public static final PacketCodec<RegistryByteBuf, DataItemGroup> PACKET_CODEC = PacketCodec.tuple(
+		PacketCodecs.STRING,
+		DataItemGroup::getTranslationKey,
+		ItemStack.PACKET_CODEC,
+		DataItemGroup::getIcon,
+		PacketCodecs.either(
+			PacketCodecs.registryValue(RegistryKeys.ITEM),
+			ItemStack.PACKET_CODEC
+		).collect(PacketCodecs.toList()),
+		DataItemGroup::getItems,
+		DataItemGroup::new
+	);
 
 	private final String translate;
 	private final ItemStack icon;
