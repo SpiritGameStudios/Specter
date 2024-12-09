@@ -72,7 +72,8 @@ public class SpecterRegistryClient implements ClientModInitializer {
 
 		ClientPlayNetworking.registerGlobalReceiver(MetatagSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyMetatagSync(payload)));
 
-		// Credit to @MerchantPug for the idea of overriding the vanilla manager
+		// Credit to @MerchantPug for the idea of creating our own DRM
+		// https://github.com/GreenhouseModding/reloadable-datapack-registries/blob/1.20.4/common/src/main/java/dev/greenhouseteam/rdpr/impl/network/ReloadRegistriesClientboundPacket.java#L44
 		ClientPlayNetworking.registerGlobalReceiver(ReloadableRegistrySyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> {
 			ClientPlayNetworkHandler networkHandler = context.client().getNetworkHandler();
 			Objects.requireNonNull(networkHandler);
