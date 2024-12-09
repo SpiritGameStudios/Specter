@@ -7,7 +7,7 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
-import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistriesSyncS2CPayload;
+import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistrySyncS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -19,11 +19,15 @@ import net.minecraft.registry.entry.RegistryEntryInfo;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public class SpecterRegistryClient implements ClientModInitializer {
 	private static final RegistryEntryInfo DEFAULT_REGISTRY_ENTRY_INFO = new RegistryEntryInfo(Optional.empty(), Lifecycle.experimental());
+
+	private static final List<ReloadableRegistrySyncS2CPayload.Entry<?>> registrySyncEntries = new ArrayList<>();
 
 	@SuppressWarnings("unchecked")
 	private static <V> void applyMetatagSync(MetatagSyncS2CPayload<V> payload) {
@@ -48,7 +52,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 		});
 	}
 
-	private static <T> DynamicRegistryManager.Entry<T> createRegistry(ReloadableRegistriesSyncS2CPayload.Entry<T> entry) {
+	private static <T> DynamicRegistryManager.Entry<T> createRegistry(ReloadableRegistrySyncS2CPayload.Entry<T> entry) {
 		MutableRegistry<T> registry = new SimpleRegistry<>(entry.key(), Lifecycle.experimental());
 
 		entry.entries().forEach((id, element) -> {
@@ -69,14 +73,18 @@ public class SpecterRegistryClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(MetatagSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyMetatagSync(payload)));
 
 		// Credit to @MerchantPug for the idea of overriding the vanilla manager
-		ClientPlayNetworking.registerGlobalReceiver(ReloadableRegistriesSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> {
+		ClientPlayNetworking.registerGlobalReceiver(ReloadableRegistrySyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> {
 			ClientPlayNetworkHandler networkHandler = context.client().getNetworkHandler();
 			Objects.requireNonNull(networkHandler);
 
+			registrySyncEntries.add(payload.entry());
+			if (!payload.finished()) return;
+
 			DynamicRegistryManager.Immutable reloadableManager = new DynamicRegistryManager.ImmutableImpl(
-				payload.entries().stream().map(SpecterRegistryClient::createRegistry)
+				registrySyncEntries.stream().map(SpecterRegistryClient::createRegistry)
 			).toImmutable();
 			reloadableManager.streamAllRegistries().forEach(entry -> entry.value().clearTags());
+			registrySyncEntries.clear();
 
 			SpecterReloadableRegistriesImpl.setRegistryManager(reloadableManager);
 			ClientReloadableRegistryEvents.SYNC_FINISHED.invoker().onSyncFinished(context.client(), reloadableManager);
@@ -84,6 +92,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			SpecterReloadableRegistriesImpl.setRegistryManager(null);
+			registrySyncEntries.clear();
 		});
 	}
 }

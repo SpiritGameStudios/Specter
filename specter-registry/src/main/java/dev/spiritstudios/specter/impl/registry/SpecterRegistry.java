@@ -3,7 +3,7 @@ package dev.spiritstudios.specter.impl.registry;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
-import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistriesSyncS2CPayload;
+import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistrySyncS2CPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -14,6 +14,8 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.List;
 
 public class SpecterRegistry implements ModInitializer {
 	private static MinecraftServer server;
@@ -29,24 +31,25 @@ public class SpecterRegistry implements ModInitializer {
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new MetatagReloader(ResourceType.SERVER_DATA));
 
 		PayloadTypeRegistry.playS2C().register(MetatagSyncS2CPayload.ID, MetatagSyncS2CPayload.CODEC);
-		PayloadTypeRegistry.playS2C().register(ReloadableRegistriesSyncS2CPayload.ID, ReloadableRegistriesSyncS2CPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(ReloadableRegistrySyncS2CPayload.ID, ReloadableRegistrySyncS2CPayload.CODEC);
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			MetatagSyncS2CPayload.createPayloads()
 				.forEach(sender::sendPacket);
 
-			sender.sendPacket(ReloadableRegistriesSyncS2CPayload.get(server));
+			ReloadableRegistrySyncS2CPayload.get(server)
+				.forEach(sender::sendPacket);
 		});
 
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
 			SpecterReloadableRegistriesImpl.setRegistryManager(server.getReloadableRegistries().getRegistryManager());
 
-			ReloadableRegistriesSyncS2CPayload.clearCache();
-			ReloadableRegistriesSyncS2CPayload payload = ReloadableRegistriesSyncS2CPayload.get(server);
-
+			ReloadableRegistrySyncS2CPayload.clearCache();
+			
+			List<ReloadableRegistrySyncS2CPayload> payloads = ReloadableRegistrySyncS2CPayload.get(server);
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList())
-				ServerPlayNetworking.send(player, payload);
+				payloads.forEach(payload -> ServerPlayNetworking.send(player, payload));
 		});
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> SpecterRegistry.server = server);

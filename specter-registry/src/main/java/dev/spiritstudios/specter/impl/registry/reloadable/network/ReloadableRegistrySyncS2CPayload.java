@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.impl.registry.reloadable.network;
 
+import com.google.common.collect.ImmutableList;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import io.netty.buffer.ByteBuf;
@@ -12,39 +13,50 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public record ReloadableRegistriesSyncS2CPayload(
-	List<Entry<?>> entries
+public record ReloadableRegistrySyncS2CPayload(
+	Entry<?> entry,
+	boolean finished
 ) implements CustomPayload {
-	public static final Id<ReloadableRegistriesSyncS2CPayload> ID = new Id<>(Identifier.of(SpecterGlobals.MODID, "reloadable_registry_sync"));
-	public static final PacketCodec<RegistryByteBuf, ReloadableRegistriesSyncS2CPayload> CODEC = PacketCodec.tuple(
-		Entry.PACKET_CODEC.collect(PacketCodecs.toList()),
-		ReloadableRegistriesSyncS2CPayload::entries,
-		ReloadableRegistriesSyncS2CPayload::new
+	public static final Id<ReloadableRegistrySyncS2CPayload> ID = new Id<>(Identifier.of(SpecterGlobals.MODID, "reloadable_registry_sync"));
+	public static final PacketCodec<RegistryByteBuf, ReloadableRegistrySyncS2CPayload> CODEC = PacketCodec.tuple(
+		Entry.PACKET_CODEC,
+		ReloadableRegistrySyncS2CPayload::entry,
+		PacketCodecs.BOOL,
+		ReloadableRegistrySyncS2CPayload::finished,
+		ReloadableRegistrySyncS2CPayload::new
 	);
 
-	private static ReloadableRegistriesSyncS2CPayload CACHED;
+	private static List<ReloadableRegistrySyncS2CPayload> CACHE;
 
 	public static void clearCache() {
-		CACHED = null;
+		CACHE = null;
 	}
 
-	public static ReloadableRegistriesSyncS2CPayload get(MinecraftServer server) {
-		if (CACHED != null) return CACHED;
-		List<ReloadableRegistriesSyncS2CPayload.Entry<?>> entries = SpecterReloadableRegistriesImpl.syncingCodecs().keySet().stream().map(key -> createEntry(
-			key,
-			server.getReloadableRegistries().getRegistryManager().get(key)
-		)).collect(Collectors.toList());
-		CACHED = new ReloadableRegistriesSyncS2CPayload(entries);
-		return CACHED;
+	public static List<ReloadableRegistrySyncS2CPayload> get(MinecraftServer server) {
+		if (CACHE != null) return CACHE;
+		@NotNull List<ReloadableRegistrySyncS2CPayload> entries = SpecterReloadableRegistriesImpl.syncingCodecs().keySet().stream().map(key -> createEntry(
+				key,
+				server.getReloadableRegistries().getRegistryManager().get(key)
+			))
+			.map(entry -> new ReloadableRegistrySyncS2CPayload(entry, false))
+			.collect(Collectors.toList());
+
+		ReloadableRegistrySyncS2CPayload last = entries.getLast();
+		entries.removeLast();
+		entries.add(new ReloadableRegistrySyncS2CPayload(last.entry(), true));
+
+		CACHE = ImmutableList.copyOf(entries);
+		return CACHE;
 	}
 
-	private static <T> ReloadableRegistriesSyncS2CPayload.Entry<T> createEntry(RegistryKey<Registry<T>> key, Registry<T> registry) {
-		return new ReloadableRegistriesSyncS2CPayload.Entry<>(
+	private static <T> ReloadableRegistrySyncS2CPayload.Entry<T> createEntry(RegistryKey<Registry<T>> key, Registry<T> registry) {
+		return new ReloadableRegistrySyncS2CPayload.Entry<>(
 			key,
 			registry.getEntrySet()
 				.stream().collect(Collectors.toMap(
