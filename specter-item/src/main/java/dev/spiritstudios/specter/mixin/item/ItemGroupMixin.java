@@ -1,9 +1,9 @@
 package dev.spiritstudios.specter.mixin.item;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
 import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import dev.spiritstudios.specter.impl.item.DataItemGroup;
-import dev.spiritstudios.specter.impl.item.SpecterItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +25,7 @@ public abstract class ItemGroupMixin {
 
 		List<ItemStack> stacks = new ArrayList<>(original);
 		SpecterReloadableRegistries.reloadableManager().ifPresent(manager ->
-			manager.get(SpecterItem.ITEM_GROUP_KEY).stream()
+			manager.get(SpecterItemRegistryKeys.ITEM_GROUP).stream()
 				.map(DataItemGroup::getSearchTabStacks)
 				.filter(searchTabStacks -> !searchTabStacks.isEmpty())
 				.forEach(stacks::addAll));

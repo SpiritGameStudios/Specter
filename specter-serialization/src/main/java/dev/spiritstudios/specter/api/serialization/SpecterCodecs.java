@@ -1,9 +1,6 @@
 package dev.spiritstudios.specter.api.serialization;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.MapEncoder;
-import com.mojang.serialization.MapLike;
+import com.mojang.serialization.*;
 import dev.spiritstudios.specter.impl.serialization.codec.FuzzyCodec;
 import dev.spiritstudios.specter.impl.serialization.codec.KeyDispatchingCodec;
 import net.minecraft.util.Util;
@@ -25,15 +22,15 @@ public final class SpecterCodecs {
 	}
 
 	public static <T extends Enum<T>> Codec<T> enumCodec(Class<T> clazz) {
-		return Codec.stringResolver(
-			Enum::name,
+		return Codec.STRING.comapFlatMap(
 			string -> {
 				try {
-					return Enum.valueOf(clazz, string);
+					return DataResult.success(Enum.valueOf(clazz, string.toUpperCase()));
 				} catch (IllegalArgumentException | NullPointerException e) {
-					return null;
+					return DataResult.error(e::toString);
 				}
-			}
+			},
+			t -> t.name().toLowerCase()
 		);
 	}
 

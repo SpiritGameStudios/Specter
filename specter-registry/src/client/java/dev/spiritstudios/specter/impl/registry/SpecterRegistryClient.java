@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.impl.registry;
 
 import com.mojang.serialization.Lifecycle;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.api.registry.reloadable.ClientReloadableRegistryEvents;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
@@ -78,12 +79,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 			reloadableManager.streamAllRegistries().forEach(entry -> entry.value().clearTags());
 
 			SpecterReloadableRegistriesImpl.setRegistryManager(reloadableManager);
-
-//			((ClientPlayNetworkHandlerAccessor) networkHandler).setCombinedDynamicRegistries(reloadableManager);
-//
-//			World world = context.client().world;
-//			if (world == null) return;
-//			((WorldAccessor) world).setRegistryManager(reloadableManager);
+			ClientReloadableRegistryEvents.SYNC_FINISHED.invoker().onSyncFinished(context.client(), reloadableManager);
 		}));
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

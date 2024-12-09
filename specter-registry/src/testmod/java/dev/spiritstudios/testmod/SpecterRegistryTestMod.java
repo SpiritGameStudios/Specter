@@ -6,6 +6,7 @@ import dev.spiritstudios.specter.api.registry.RegistryHelper;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.block.Block;
 import net.minecraft.network.codec.PacketCodecs;
@@ -40,6 +41,10 @@ public class SpecterRegistryTestMod implements ModInitializer {
 	public void onInitialize() {
 		RegistryHelper.registerBlocks(SpecterRegistryTestBlocks.class, MODID);
 		SpecterReloadableRegistries.registerSynced(CHOCOLATE_KEY, Chocolate.CODEC, Chocolate.PACKET_CODEC.cast());
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			ChocolateCommand.register(dispatcher, registryAccess);
+		});
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
 			SpecterReloadableRegistries.reloadableManager().flatMap(manager -> manager.getOptionalWrapper(CHOCOLATE_KEY)).ifPresent(wrapperLookup -> {
