@@ -20,7 +20,11 @@
 		]
 	},
 	"mixins": [
-		"specter-registry.mixins.json"
+		"specter-registry.mixins.json",
+		{
+			"config": "specter-registry.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"accessWidener": "specter-registry.accesswidener",
 	"depends": {

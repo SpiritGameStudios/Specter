@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.serialization;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapEncoder;
 import com.mojang.serialization.MapLike;
@@ -25,15 +26,15 @@ public final class SpecterCodecs {
 	}
 
 	public static <T extends Enum<T>> Codec<T> enumCodec(Class<T> clazz) {
-		return Codec.stringResolver(
-			Enum::name,
+		return Codec.STRING.comapFlatMap(
 			string -> {
 				try {
-					return Enum.valueOf(clazz, string);
+					return DataResult.success(Enum.valueOf(clazz, string.toUpperCase()));
 				} catch (IllegalArgumentException | NullPointerException e) {
-					return null;
+					return DataResult.error(() -> "Value \"%s\" invalid for enum \"%s\"".formatted(string, clazz.getSimpleName()));
 				}
-			}
+			},
+			t -> t.name().toLowerCase()
 		);
 	}
 

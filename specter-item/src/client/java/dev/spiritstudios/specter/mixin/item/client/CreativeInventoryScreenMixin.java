@@ -1,6 +1,6 @@
 package dev.spiritstudios.specter.mixin.item.client;
 
-import dev.spiritstudios.specter.impl.item.ItemGroupReloader;
+import dev.spiritstudios.specter.impl.item.SpecterItemClient;
 import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,9 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class CreativeInventoryScreenMixin {
 	@Inject(method = "init", at = @At("RETURN"))
 	private void init(CallbackInfo ci) {
-		if (!ItemGroupReloader.RELOADED) return;
-		
+		if (!SpecterItemClient.justReloaded()) return;
 		((FabricCreativeInventoryScreen) this).switchToPage(0);
-		ItemGroupReloader.RELOADED = false;
+		SpecterItemClient.reloadDone();
 	}
 }
