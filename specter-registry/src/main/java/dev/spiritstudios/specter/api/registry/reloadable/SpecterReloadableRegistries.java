@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.registry.reloadable;
 
 import com.mojang.serialization.Codec;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -34,6 +35,9 @@ public final class SpecterReloadableRegistries {
 	 * @return The current reloadable registry manager, or, if no world is currently loaded, {@link Optional#empty()}
 	 */
 	public static Optional<DynamicRegistryManager.Immutable> reloadableManager() {
-		return SpecterReloadableRegistriesImpl.registryManager();
+		Optional<DynamicRegistryManager.Immutable> manager = SpecterReloadableRegistriesImpl.registryManager();
+		if (manager.isEmpty() && SpecterGlobals.DEBUG)
+			SpecterGlobals.LOGGER.warn("Accessed ReloadableRegistryManager while it is unset. This may be a bug.");
+		return manager;
 	}
 }
