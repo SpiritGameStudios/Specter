@@ -14,6 +14,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public record ReloadableRegistrySyncS2CPayload(
 		ReloadableRegistrySyncS2CPayload::new
 	);
 
-	private static List<ReloadableRegistrySyncS2CPayload> CACHE;
+	private static @Nullable List<ReloadableRegistrySyncS2CPayload> CACHE;
 
 	public static void clearCache() {
 		CACHE = null;

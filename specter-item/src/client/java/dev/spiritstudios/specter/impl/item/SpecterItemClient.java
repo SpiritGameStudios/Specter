@@ -4,7 +4,15 @@ import dev.spiritstudios.specter.api.registry.reloadable.ClientReloadableRegistr
 import net.fabricmc.api.ClientModInitializer;
 
 public class SpecterItemClient implements ClientModInitializer {
-	public static boolean justReloaded = false;
+	private static boolean justReloaded = false;
+
+	public static boolean justReloaded() {
+		return justReloaded;
+	}
+
+	public static void reloadDone() {
+		SpecterItemClient.justReloaded = false;
+	}
 
 	@Override
 	public void onInitializeClient() {

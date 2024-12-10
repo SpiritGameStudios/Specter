@@ -46,10 +46,11 @@ public class SpecterRegistry implements ModInitializer {
 			SpecterReloadableRegistriesImpl.setRegistryManager(server.getReloadableRegistries().getRegistryManager());
 
 			ReloadableRegistrySyncS2CPayload.clearCache();
-			
+
 			List<ReloadableRegistrySyncS2CPayload> payloads = ReloadableRegistrySyncS2CPayload.get(server);
-			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList())
+			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 				payloads.forEach(payload -> ServerPlayNetworking.send(player, payload));
+			}
 		});
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> SpecterRegistry.server = server);

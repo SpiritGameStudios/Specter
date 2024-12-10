@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class CreativeInventoryScreenMixin {
 	@Inject(method = "init", at = @At("RETURN"))
 	private void init(CallbackInfo ci) {
-		if (!SpecterItemClient.justReloaded) return;
+		if (!SpecterItemClient.justReloaded()) return;
 		((FabricCreativeInventoryScreen) this).switchToPage(0);
-		SpecterItemClient.justReloaded = false;
+		SpecterItemClient.reloadDone();
 	}
 }

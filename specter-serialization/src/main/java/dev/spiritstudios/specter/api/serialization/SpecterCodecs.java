@@ -1,6 +1,10 @@
 package dev.spiritstudios.specter.api.serialization;
 
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapEncoder;
+import com.mojang.serialization.MapLike;
 import dev.spiritstudios.specter.impl.serialization.codec.FuzzyCodec;
 import dev.spiritstudios.specter.impl.serialization.codec.KeyDispatchingCodec;
 import net.minecraft.util.Util;
@@ -27,7 +31,7 @@ public final class SpecterCodecs {
 				try {
 					return DataResult.success(Enum.valueOf(clazz, string.toUpperCase()));
 				} catch (IllegalArgumentException | NullPointerException e) {
-					return DataResult.error(e::toString);
+					return DataResult.error(() -> "Value \"%s\" invalid for enum \"%s\"".formatted(string, clazz.getSimpleName()));
 				}
 			},
 			t -> t.name().toLowerCase()

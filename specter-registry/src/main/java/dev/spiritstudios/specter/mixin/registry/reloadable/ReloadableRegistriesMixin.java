@@ -9,7 +9,13 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Lifecycle;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.registry.*;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.MutableRegistry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
+import net.minecraft.registry.ReloadableRegistries;
+import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.registry.entry.RegistryEntryInfo;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceManager;
@@ -69,8 +75,6 @@ public abstract class ReloadableRegistriesMixin {
 		JsonDataLoader.load(resourceManager, RegistryKeys.getPath(registryInfo.key()), GSON, elements);
 
 		elements.forEach((id, element) -> {
-			LOGGER.info(element.toString());
-
 			DataResult<?> dataResult = registryInfo.codec().parse(ops, element);
 			dataResult.error().ifPresent(error ->
 				LOGGER.error("Couldn't parse element {}/{} - {}", registryInfo.key().getValue(), id, error.message()));
