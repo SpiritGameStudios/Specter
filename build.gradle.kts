@@ -243,6 +243,8 @@ extensions.configure(PublishingExtension::class.java) {
 			pom.withXml {
 				val depsNode = asNode().appendNode("dependencies")
 				subprojects.forEach {
+					if (it.name == "specter-debug") return@forEach
+					
 					val depNode = depsNode.appendNode("dependency")
 					depNode.appendNode("groupId", it.group)
 					depNode.appendNode("artifactId", it.name)

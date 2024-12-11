@@ -27,6 +27,7 @@ import java.util.function.Supplier;
  *
  * @param <R> The type of registry that this metatag can be attached to.
  * @param <V> The type of data stored in a metatag entry.
+ * @see MetatagEvents
  */
 public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 	static <R, V> Builder<R, V> builder(Registry<R> registry, Identifier id, Codec<V> codec, PacketCodec<RegistryByteBuf, V> packetCodec) {

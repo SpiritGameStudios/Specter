@@ -11,7 +11,10 @@ public final class SpecterGlobals {
 	@ApiStatus.Internal
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	public static final boolean DEBUG;
+	public static final boolean DEBUG = System.getProperty("specter.debug") != null ?
+		Boolean.getBoolean("specter.debug") :
+		FabricLoader.getInstance().isDevelopmentEnvironment();
+
 	/**
 	 * Whether the game is running on Forge with Sinytra Connector
 	 * If you don't want to provide support for Connector, it's recommended to either log a warning or mark "connector" as incompatible in your fabric.mod.json
@@ -23,13 +26,6 @@ public final class SpecterGlobals {
 	 */
 	public static final boolean QUILT = FabricLoader.getInstance().isModLoaded("quilt_loader") && !FORGE; // !FORGE just in case connector ever supports Quilt
 	public static final boolean FABRIC = FabricLoader.getInstance().isModLoaded("fabricloader") && !FORGE && !QUILT;
-
-	static {
-		boolean debug = FabricLoader.getInstance().isDevelopmentEnvironment();
-		if (System.getProperty("specter.debug") != null) debug = Boolean.getBoolean("specter.debug");
-
-		DEBUG = debug;
-	}
 
 	@ApiStatus.Internal
 	public static void debug(String message) {
