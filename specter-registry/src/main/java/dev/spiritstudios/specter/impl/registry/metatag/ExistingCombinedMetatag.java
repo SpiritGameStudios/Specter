@@ -34,16 +34,22 @@ public record ExistingCombinedMetatag<R, V>(
 			.or(() -> Optional.ofNullable(existingGetter.apply(entry)));
 	}
 
+	public Iterator<Entry<R, V>> rawIterator() {
+		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
+
+		return this.registry.stream().map(entry -> {
+			V value = MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry);
+			return value == null ? null : new Entry<>(entry, value);
+		}).filter(Objects::nonNull).iterator();
+	}
+
 	@NotNull
 	@Override
 	public Iterator<Entry<R, V>> iterator() {
 		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
 
 		return Iterators.concat(
-			this.registry.stream().map(entry -> {
-				V value = MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry);
-				return value == null ? null : new Entry<>(entry, value);
-			}).filter(Objects::nonNull).iterator(),
+			rawIterator(),
 			this.existingIterator().get()
 		);
 	}

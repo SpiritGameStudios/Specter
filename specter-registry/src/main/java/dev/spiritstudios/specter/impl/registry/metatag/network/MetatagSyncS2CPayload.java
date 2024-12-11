@@ -1,9 +1,11 @@
 package dev.spiritstudios.specter.impl.registry.metatag.network;
 
+import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.util.SpecterPacketCodecs;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.registry.metatag.ExistingCombinedMetatag;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -50,13 +52,17 @@ public record MetatagSyncS2CPayload<R, V>(Metatag<R, V> metatag, List<Pair<R, V>
 	}
 
 	private static <R, V> MetatagSyncS2CPayload<R, V> createPayload(Metatag<R, V> metatag) {
-		List<Pair<R, V>> values = new ArrayList<>();
-		for (Metatag.Entry<R, V> entry : metatag)
-			values.add(Pair.of(
+		return new MetatagSyncS2CPayload<>(
+			metatag,
+			Streams.stream(
+				metatag instanceof ExistingCombinedMetatag<R, V> existingCombined ?
+					existingCombined.rawIterator() :
+					metatag.iterator()
+			).map(entry -> Pair.of(
 				entry.key(),
 				entry.value()
-			));
-		return new MetatagSyncS2CPayload<>(metatag, List.copyOf(values));
+			)).toList()
+		);
 	}
 
 	public static List<MetatagSyncS2CPayload<?, ?>> getOrCreatePayloads() {
