@@ -17,13 +17,13 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
-public class MetatagMap<R, V> {
+public class MetatagContent<R, V> {
 	private final Registry<R> registry;
 	private final Metatag<R, V> metatag;
 	private final Object2ObjectOpenHashMap<Identifier, V> values;
 	private final Codec<MetatagResource<V>> resourceCodec;
 
-	public MetatagMap(Registry<R> registry, Metatag<R, V> metatag) {
+	public MetatagContent(Registry<R> registry, Metatag<R, V> metatag) {
 		this.registry = registry;
 		this.metatag = metatag;
 		this.values = new Object2ObjectOpenHashMap<>();
@@ -46,7 +46,7 @@ public class MetatagMap<R, V> {
 		return Collections.unmodifiableMap(this.values);
 	}
 
-	public void parseResource(Identifier id, Resource resource) {
+	public void parseAndAddResource(Identifier id, Resource resource) {
 		try (InputStreamReader resourceReader = new InputStreamReader(resource.getInputStream())) {
 			JsonObject resourceJson = JsonHelper.deserialize(resourceReader);
 

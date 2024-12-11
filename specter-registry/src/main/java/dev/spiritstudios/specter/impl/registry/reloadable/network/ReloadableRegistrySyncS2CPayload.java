@@ -39,7 +39,7 @@ public record ReloadableRegistrySyncS2CPayload(
 		CACHE = null;
 	}
 
-	public static List<ReloadableRegistrySyncS2CPayload> get(MinecraftServer server) {
+	public static List<ReloadableRegistrySyncS2CPayload> getOrCreatePayloads(MinecraftServer server) {
 		if (CACHE != null) return CACHE;
 		@NotNull List<ReloadableRegistrySyncS2CPayload> entries = SpecterReloadableRegistriesImpl.syncingCodecs().keySet().stream().map(key -> createEntry(
 				key,

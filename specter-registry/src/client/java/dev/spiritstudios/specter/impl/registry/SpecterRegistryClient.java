@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.impl.registry;
 
 import com.mojang.serialization.Lifecycle;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.reloadable.ClientReloadableRegistryEvents;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
@@ -21,7 +22,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.registry.entry.RegistryEntryInfo;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,26 +33,21 @@ public class SpecterRegistryClient implements ClientModInitializer {
 
 	private static final List<ReloadableRegistrySyncS2CPayload.Entry<?>> registrySyncEntries = new ArrayList<>();
 
-	@SuppressWarnings("unchecked")
-	private static <V> void applyMetatagSync(MetatagSyncS2CPayload<V> payload) {
+	private static <R, V> void applyMetatagSync(MetatagSyncS2CPayload<R, V> payload) {
 		if (MinecraftClient.getInstance().isIntegratedServerRunning())
 			return;
 
-		Metatag<Object, V> metatag = (Metatag<Object, V>) payload.metatagPair().metatag();
-		Registry<Object> registry = metatag.registry();
-		MetatagValueHolder<Object> metatagHolder = MetatagValueHolder.getOrCreate(registry);
+		SpecterGlobals.debug("Received payload for metatag %s".formatted(payload.metatag().id()));
+
+		Metatag<R, V> metatag = payload.metatag();
+		Registry<R> registry = metatag.registry();
+		MetatagValueHolder<R> metatagHolder = MetatagValueHolder.getOrCreate(registry);
 
 		metatagHolder.specter$clearMetatag(metatag);
 
-		payload.metatagPair().entries().forEach(entry -> {
-			Identifier id = Identifier.of(payload.metatagPair().namespace(), entry.id());
-			Object object = registry.get(id);
-
-			if (object == null)
-				throw new IllegalStateException("Entry " + id + " is not in the registry");
-
-			V value = entry.value();
-			metatagHolder.specter$putMetatagValue(metatag, object, value);
+		payload.values().forEach(entry -> {
+			SpecterGlobals.debug("Put value %s".formatted(entry));
+			metatagHolder.specter$putMetatagValue(metatag, entry.getFirst(), entry.getSecond());
 		});
 	}
 

@@ -7,17 +7,17 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Map;
@@ -79,7 +79,7 @@ public final class MetatagCommand {
 		);
 
 		context.getSource().sendFeedback(() ->
-			Text.of(codec.encodeStart(JsonOps.INSTANCE, resource).getOrThrow().toString()), true);
+			NbtHelper.toPrettyPrintedText(codec.encodeStart(NbtOps.INSTANCE, resource).getOrThrow()), true);
 		return Command.SINGLE_SUCCESS;
 	}
 }

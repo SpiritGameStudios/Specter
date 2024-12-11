@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.api.serialization;
+package dev.spiritstudios.specter.api.core.util;
 
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.ByteBuf;
@@ -25,7 +25,7 @@ public final class SpecterPacketCodecs {
 		);
 	}
 
-	public static <F, S> PacketCodec<ByteBuf, Pair<F, S>> pair(PacketCodec<ByteBuf, F> first, PacketCodec<ByteBuf, S> second) {
+	public static <F, S, B> PacketCodec<B, Pair<F, S>> pair(PacketCodec<B, F> first, PacketCodec<B, S> second) {
 		return PacketCodec.tuple(
 			first,
 			Pair::getFirst,

@@ -4,6 +4,8 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.resource.ResourceManager;
 
+import java.util.List;
+
 public final class MetatagEvents {
 	/**
 	 * Returns an event that is invoked when the supplied metatag is loaded or reloaded.
@@ -12,6 +14,11 @@ public final class MetatagEvents {
 	 */
 	public static Event<MetatagLoaded> metatagLoadedEvent(Metatag<?, ?> metatag) {
 		return MetatagEventsImpl.getOrCreateLoadedEvent(metatag);
+	}
+
+	@FunctionalInterface
+	public interface MetatagsLoaded {
+		void onMetatagsLoaded(List<? extends Metatag<?, ?>> metatags, ResourceManager resourceManager);
 	}
 
 	@FunctionalInterface
