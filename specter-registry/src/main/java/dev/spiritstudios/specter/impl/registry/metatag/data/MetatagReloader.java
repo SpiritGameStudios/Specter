@@ -3,6 +3,7 @@ package dev.spiritstudios.specter.impl.registry.metatag.data;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.registry.SpecterRegistry;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
@@ -84,7 +85,11 @@ public class MetatagReloader implements SimpleResourceReloadListener<Map<Metatag
 	@Override
 	public CompletableFuture<Void> apply(Map<Metatag<?, ?>, MetatagMap<?, ?>> data, ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
-			data.forEach((metatag, map) -> loadMetatag((Metatag<Object, Object>) metatag, (MetatagMap<Object, Object>) map));
+			data.forEach((metatag, map) -> {
+				loadMetatag((Metatag<Object, Object>) metatag, (MetatagMap<Object, Object>) map);
+				MetatagEventsImpl.getLoadedEvent(metatag).ifPresent(event ->
+					event.invoker().onMetatagLoaded(manager));
+			});
 
 			if (this.side != ResourceType.SERVER_DATA) return;
 			MetatagSyncS2CPayload.clearCache();
