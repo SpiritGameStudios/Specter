@@ -26,6 +26,10 @@ public interface Value<T> {
 
 	void set(T value);
 
+	default void reset() {
+		set(defaultValue());
+	}
+
 	@ApiStatus.Internal
 	void init(String name);
 

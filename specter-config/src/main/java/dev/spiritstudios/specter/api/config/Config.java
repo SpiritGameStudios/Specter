@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.Ignore;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
@@ -196,9 +197,13 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
-		for (ReflectionHelper.FieldValuePair<Value<?>> value : fields()) {
-			if (value.value().decode(ops, input)) continue;
-			return DataResult.error(() -> "Failed to decode config value: %s".formatted(value.value().name()));
+		for (ReflectionHelper.FieldValuePair<Value<?>> pair : fields()) {
+			if (pair.value().decode(ops, input)) continue;
+			SpecterGlobals.LOGGER.error(
+				"Failed to decode config value \"{}\". Resetting to default value",
+				pair.value().name()
+			);
+			pair.value().reset();
 		}
 
 		return DataResult.success(Pair.of((T) this, input));
