@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SharedConstants.class)
-public class SharedConstantsMixin {
+public abstract class SharedConstantsMixin {
 	@Shadow
 	public static boolean isDevelopment;
 
