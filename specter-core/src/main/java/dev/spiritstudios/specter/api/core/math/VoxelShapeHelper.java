@@ -34,4 +34,37 @@ public final class VoxelShapeHelper {
 
 		return buffer[0];
 	}
+
+	public static VoxelShape mirror(VoxelShape shape, Direction.Axis axis) {
+		final VoxelShape[] newShape = new VoxelShape[]{VoxelShapes.empty()};
+
+		switch (axis) {
+			case X -> shape.forEachBox(((minX, minY, minZ, maxX, maxY, maxZ) -> newShape[0] = VoxelShapes.combine(
+				newShape[0],
+				VoxelShapes.cuboid(
+					Math.min(1 - minX, 1 - maxX), minY, minZ,
+					Math.max(1 - minX, 1 - maxX), maxY, maxZ
+				),
+				BooleanBiFunction.OR
+			)));
+			case Y -> shape.forEachBox(((minX, minY, minZ, maxX, maxY, maxZ) -> newShape[0] = VoxelShapes.combine(
+				newShape[0],
+				VoxelShapes.cuboid(
+					minX, Math.min(1 - minY, 1 - maxY), minZ,
+					maxX, Math.max(1 - minY, 1 - maxY), maxZ
+				),
+				BooleanBiFunction.OR
+			)));
+			case Z -> shape.forEachBox(((minX, minY, minZ, maxX, maxY, maxZ) -> newShape[0] = VoxelShapes.combine(
+				newShape[0],
+				VoxelShapes.cuboid(
+					minX, minY, Math.min(1 - minZ, 1 - maxZ),
+					maxX, maxY, Math.max(1 - minZ, 1 - maxZ)
+				),
+				BooleanBiFunction.OR
+			)));
+		}
+
+		return newShape[0];
+	}
 }
