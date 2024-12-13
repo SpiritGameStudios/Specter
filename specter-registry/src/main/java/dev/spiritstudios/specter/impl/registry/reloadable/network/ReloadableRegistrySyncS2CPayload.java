@@ -88,7 +88,7 @@ public record ReloadableRegistrySyncS2CPayload(
 				Entry::key,
 				PacketCodecs.map(
 					Object2ObjectOpenHashMap::new,
-					net.minecraft.util.Identifier.PACKET_CODEC,
+					Identifier.PACKET_CODEC,
 					entryCodec
 				),
 				Entry::entries,
