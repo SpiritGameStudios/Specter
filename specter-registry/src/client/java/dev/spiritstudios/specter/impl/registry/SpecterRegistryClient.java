@@ -83,15 +83,14 @@ public class SpecterRegistryClient implements ClientModInitializer {
 			DynamicRegistryManager.Immutable reloadableManager = new DynamicRegistryManager.ImmutableImpl(
 				registrySyncEntries.stream().map(SpecterRegistryClient::createRegistry)
 			).toImmutable();
-			reloadableManager.streamAllRegistries().forEach(entry -> entry.value().clearTags());
 			registrySyncEntries.clear();
 
-			SpecterReloadableRegistriesImpl.setRegistryManager(reloadableManager);
+			SpecterReloadableRegistriesImpl.setLookup(reloadableManager);
 			ClientReloadableRegistryEvents.SYNC_FINISHED.invoker().onSyncFinished(context.client(), reloadableManager);
 		}));
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			SpecterReloadableRegistriesImpl.setRegistryManager(null);
+			SpecterReloadableRegistriesImpl.setLookup(null);
 			registrySyncEntries.clear();
 		});
 	}

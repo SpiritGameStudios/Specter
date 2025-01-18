@@ -5,9 +5,9 @@ import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 
 import java.util.Optional;
 
@@ -16,11 +16,11 @@ import java.util.Optional;
  * but as the name would imply, reloadable.
  * <h2>Basic usage</h2>
  * Reloadable registries can be registered using {@link #register(RegistryKey, Codec)}. These registries will not be synced to the client.
- * You can access a reloadable registry via {@link #reloadableManager()}, provided a world is currently loaded.
+ * You can access a reloadable registry via {@link #lookup()}, provided a world is currently loaded.
  * <h2>Synchronization</h2>
  * As stated before, reloadable registries are not synced with the client by default.
  * To register a synced reloadable registry, use {@link #registerSynced(RegistryKey, Codec, PacketCodec)}.
- * Doing this will make your reloadable registry available on the client, still via {@link #reloadableManager()}.
+ * Doing this will make your reloadable registry available on the client, still via {@link #lookup()}.
  */
 public final class SpecterReloadableRegistries {
 	public static <T> void register(RegistryKey<Registry<T>> key, Codec<T> codec) {
@@ -34,10 +34,10 @@ public final class SpecterReloadableRegistries {
 	/**
 	 * @return The current reloadable registry manager, or, if no world is currently loaded, {@link Optional#empty()}
 	 */
-	public static Optional<DynamicRegistryManager.Immutable> reloadableManager() {
-		Optional<DynamicRegistryManager.Immutable> manager = SpecterReloadableRegistriesImpl.registryManager();
-		if (manager.isEmpty() && SpecterGlobals.DEBUG)
-			SpecterGlobals.LOGGER.warn("Accessed ReloadableRegistryManager while it is unset. This may be a bug.");
-		return manager;
+	public static Optional<RegistryWrapper.WrapperLookup> lookup() {
+		Optional<RegistryWrapper.WrapperLookup> lookup = SpecterReloadableRegistriesImpl.lookup();
+		if (lookup.isEmpty() && SpecterGlobals.DEBUG)
+			SpecterGlobals.LOGGER.warn("Accessed reloadable registry lookup while it is unset. This may be a bug.");
+		return lookup;
 	}
 }

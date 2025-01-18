@@ -2,7 +2,6 @@ package dev.spiritstudios.testmod;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.registry.RegistryHelper;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import net.fabricmc.api.ModInitializer;
@@ -39,7 +38,6 @@ public class SpecterRegistryTestMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		RegistryHelper.registerBlocks(SpecterRegistryTestBlocks.class, MODID);
 		SpecterReloadableRegistries.registerSynced(CHOCOLATE_KEY, Chocolate.CODEC, Chocolate.PACKET_CODEC.cast());
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -47,11 +45,13 @@ public class SpecterRegistryTestMod implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
-			SpecterReloadableRegistries.reloadableManager().flatMap(manager -> manager.getOptionalWrapper(CHOCOLATE_KEY)).ifPresent(wrapperLookup -> {
-				wrapperLookup.streamEntries().forEach(entry -> {
-					SpecterGlobals.debug(entry.getIdAsString() + ": " + entry.value().toString());
+			SpecterReloadableRegistries.lookup()
+				.map(manager -> manager.getOrThrow(CHOCOLATE_KEY))
+				.ifPresent(wrapperLookup -> {
+					wrapperLookup.streamEntries().forEach(entry -> {
+						SpecterGlobals.debug(entry.getIdAsString() + ": " + entry.value().toString());
+					});
 				});
-			});
 		});
 	}
 }

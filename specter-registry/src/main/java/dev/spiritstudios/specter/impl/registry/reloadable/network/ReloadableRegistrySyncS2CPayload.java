@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.impl.registry.reloadable.network;
 
 import com.google.common.collect.ImmutableList;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -11,6 +12,8 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +31,7 @@ public record ReloadableRegistrySyncS2CPayload(
 	public static final PacketCodec<RegistryByteBuf, ReloadableRegistrySyncS2CPayload> CODEC = PacketCodec.tuple(
 		Entry.PACKET_CODEC,
 		ReloadableRegistrySyncS2CPayload::entry,
-		PacketCodecs.BOOL,
+		PacketCodecs.BOOLEAN,
 		ReloadableRegistrySyncS2CPayload::finished,
 		ReloadableRegistrySyncS2CPayload::new
 	);
@@ -43,7 +46,7 @@ public record ReloadableRegistrySyncS2CPayload(
 		if (CACHE != null) return CACHE;
 		@NotNull List<ReloadableRegistrySyncS2CPayload> entries = SpecterReloadableRegistriesImpl.syncingCodecs().keySet().stream().map(key -> createEntry(
 				key,
-				server.getReloadableRegistries().getRegistryManager().get(key)
+				SpecterReloadableRegistries.lookup().orElseThrow().getOrThrow(key)
 			))
 			.map(entry -> new ReloadableRegistrySyncS2CPayload(entry, false))
 			.collect(Collectors.toList());
@@ -56,14 +59,13 @@ public record ReloadableRegistrySyncS2CPayload(
 		return CACHE;
 	}
 
-	private static <T> ReloadableRegistrySyncS2CPayload.Entry<T> createEntry(RegistryKey<Registry<T>> key, Registry<T> registry) {
+	private static <T> ReloadableRegistrySyncS2CPayload.Entry<T> createEntry(RegistryKey<Registry<T>> key, RegistryWrapper<T> registry) {
 		return new ReloadableRegistrySyncS2CPayload.Entry<>(
 			key,
-			registry.getEntrySet()
-				.stream().collect(Collectors.toMap(
-					e -> e.getKey().getValue(),
-					Map.Entry::getValue
-				))
+			registry.streamEntries().collect(Collectors.toMap(
+				e -> e.registryKey().getValue(),
+				RegistryEntry.Reference::value
+			))
 		);
 	}
 

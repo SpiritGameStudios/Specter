@@ -5,7 +5,6 @@ import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
 public final class ToggleableDebugRenderer implements DebugRenderer.Renderer {
-
 	private final DebugRenderer.Renderer renderer;
 	private boolean enabled;
 

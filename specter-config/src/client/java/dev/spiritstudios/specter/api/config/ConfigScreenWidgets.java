@@ -115,7 +115,7 @@ public final class ConfigScreenWidgets {
 				Identifier identifier = Identifier.tryParse(val);
 				if (identifier == null) return;
 
-				registry.getOrEmpty(identifier).ifPresent(value::set);
+				registry.getOptionalValue(identifier).ifPresent(value::set);
 			});
 			widget.setSelectionEnd(0);
 			widget.setSelectionStart(0);

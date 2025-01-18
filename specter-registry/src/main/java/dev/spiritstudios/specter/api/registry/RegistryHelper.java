@@ -14,6 +14,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 public final class RegistryHelper {
 	public static <T> void registerFields(Registry<T> registry, Class<T> toRegister, Class<?> clazz, String namespace) {
@@ -27,6 +28,11 @@ public final class RegistryHelper {
 		);
 	}
 
+	/**
+	 * Obsolete, 1.21.4 makes this impossible.
+	 */
+	@Deprecated(forRemoval = true)
+	@ApiStatus.Obsolete
 	public static void registerItems(Class<?> clazz, String namespace) {
 		registerFields(Registries.ITEM, Item.class, clazz, namespace);
 	}
@@ -39,7 +45,11 @@ public final class RegistryHelper {
 	 * Registers all blocks contained within a class
 	 * All blocks will be given a block item by default,
 	 * to override this behavior, user {@link NoBlockItem}
+	 * <p>
+	 * Obsolete, 1.21.4 makes this impossible.
 	 */
+	@Deprecated(forRemoval = true)
+	@ApiStatus.Obsolete
 	public static void registerBlocks(Class<?> clazz, String namespace) {
 		ReflectionHelper.getStaticFields(clazz, Block.class).forEach(pair -> {
 				String objectName = ReflectionHelper.getAnnotation(pair.field(), Name.class)

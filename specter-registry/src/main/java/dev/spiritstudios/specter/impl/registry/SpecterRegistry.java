@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.ApiStatus;
@@ -42,7 +43,7 @@ public class SpecterRegistry implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
-			SpecterReloadableRegistriesImpl.setRegistryManager(server.getReloadableRegistries().getRegistryManager());
+			SpecterReloadableRegistriesImpl.setLookup((RegistryWrapper.WrapperLookup) server.getReloadableRegistries().createRegistryLookup());
 
 			MetatagSyncS2CPayload.clearCache();
 			List<MetatagSyncS2CPayload<?, ?>> metatagPayloads = MetatagSyncS2CPayload.getOrCreatePayloads();
@@ -58,7 +59,7 @@ public class SpecterRegistry implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> SpecterRegistry.server = server);
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> SpecterReloadableRegistriesImpl.setRegistryManager(server.getReloadableRegistries().getRegistryManager()));
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> SpecterReloadableRegistriesImpl.setLookup((RegistryWrapper.WrapperLookup) server.getReloadableRegistries().createRegistryLookup()));
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			if (SpecterRegistry.server == server) SpecterRegistry.server = null;
 		});

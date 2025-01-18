@@ -1,18 +1,21 @@
 package dev.spiritstudios.specter.api.item.datagen;
 
-import dev.spiritstudios.specter.impl.item.ShapedRecipeJsonBuilderAccessor;
+import dev.spiritstudios.specter.mixin.item.ShapedRecipeJsonBuilderAccessor;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
-import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.recipe.CraftingRecipeJsonBuilder;
+import net.minecraft.data.recipe.RecipeExporter;
+import net.minecraft.data.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RawShapedRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.util.Identifier;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
 
 import java.util.Objects;
 
@@ -23,27 +26,27 @@ import java.util.Objects;
 public class SpecterShapedRecipeJsonBuilder extends ShapedRecipeJsonBuilder {
 	private final ItemStack output;
 
-	public SpecterShapedRecipeJsonBuilder(RecipeCategory category, ItemStack output, int count) {
-		super(category, output.getItem(), count);
+	public SpecterShapedRecipeJsonBuilder(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemStack output, int count) {
+		super(registryLookup, category, output.getItem(), count);
 		this.output = output;
 	}
 
-	public static SpecterShapedRecipeJsonBuilder create(RecipeCategory category, ItemStack output) {
-		return create(category, output, 1);
+	public static SpecterShapedRecipeJsonBuilder create(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemStack output) {
+		return create(registryLookup, category, output, 1);
 	}
 
-	public static SpecterShapedRecipeJsonBuilder create(RecipeCategory category, ItemStack output, int count) {
-		return new SpecterShapedRecipeJsonBuilder(category, output, count);
+	public static SpecterShapedRecipeJsonBuilder create(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemStack output, int count) {
+		return new SpecterShapedRecipeJsonBuilder(registryLookup, category, output, count);
 	}
 
 	@Override
-	public void offerTo(RecipeExporter exporter, Identifier recipeId) {
+	public void offerTo(RecipeExporter exporter, RegistryKey<Recipe<?>> recipeKey) {
 		ShapedRecipeJsonBuilderAccessor accessor = (ShapedRecipeJsonBuilderAccessor) this;
 
-		RawShapedRecipe rawShapedRecipe = accessor.callValidate(recipeId);
+		RawShapedRecipe rawShapedRecipe = accessor.callValidate(recipeKey);
 		Advancement.Builder builder = exporter.getAdvancementBuilder()
-			.criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
-			.rewards(AdvancementRewards.Builder.recipe(recipeId))
+			.criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeKey))
+			.rewards(AdvancementRewards.Builder.recipe(recipeKey))
 			.criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
 		accessor.getCriteria().forEach(builder::criterion);
 		ShapedRecipe shapedRecipe = new ShapedRecipe(
@@ -53,6 +56,10 @@ public class SpecterShapedRecipeJsonBuilder extends ShapedRecipeJsonBuilder {
 			this.output.copyWithCount(accessor.getCount()),
 			accessor.getShowNotification()
 		);
-		exporter.accept(recipeId, shapedRecipe, builder.build(recipeId.withPrefixedPath("recipes/" + accessor.getCategory().getName() + "/")));
+		exporter.accept(
+			recipeKey,
+			shapedRecipe,
+			builder.build(recipeKey.getValue().withPrefixedPath("recipes/" + accessor.getCategory().getName() + "/"))
+		);
 	}
 }

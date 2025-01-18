@@ -61,13 +61,13 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 
 	/**
 	 * Creates a new boolean value with the given default value.
-	 * The codec and packet codec are set to {@link Codec#BOOL} and {@link PacketCodecs#BOOL} respectively.
+	 * The codec and packet codec are set to {@link Codec#BOOL} and {@link PacketCodecs#BOOLEAN} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
 	protected static Value.Builder<Boolean> booleanValue(boolean defaultValue) {
-		return value(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOL);
+		return value(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN);
 	}
 
 	/**

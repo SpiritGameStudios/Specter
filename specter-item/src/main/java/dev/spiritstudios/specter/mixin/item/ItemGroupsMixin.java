@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @Mixin(ItemGroups.class)
@@ -30,16 +31,17 @@ public abstract class ItemGroupsMixin {
 			.filter(ItemGroup::shouldDisplay)
 			.toList();
 
-		SpecterReloadableRegistries.reloadableManager().ifPresent(manager -> {
-			int offset = 0;
+		SpecterReloadableRegistries.lookup().ifPresent(manager -> {
+			AtomicInteger offset = new AtomicInteger();
+			manager.getOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).streamEntries().forEach(r -> {
+				DataItemGroup group = r.value();
 
-			for (DataItemGroup group : manager.get(SpecterItemRegistryKeys.ITEM_GROUP)) {
-				if (groups.contains(group)) continue;
+				if (groups.contains(group)) return;
 
-				group.setup(filtered, offset);
+				group.setup(filtered, offset.get());
 				groups.add(group);
-				offset++;
-			}
+				offset.getAndIncrement();
+			});
 		});
 
 		return groups;

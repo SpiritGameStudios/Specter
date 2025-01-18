@@ -4,12 +4,12 @@
 	"package": "dev.spiritstudios.specter.mixin.item",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"AbstractFurnaceBlockEntityMixin",
 		"ComposterBlock$ComposterInventoryMixin",
 		"ComposterBlockMixin",
+		"FuelRegistryMixin",
 		"ItemGroupMixin",
 		"ItemGroupsMixin",
-		"ShapedRecipeJsonBuilderMixin"
+		"ShapedRecipeJsonBuilderAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

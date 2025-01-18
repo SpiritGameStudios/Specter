@@ -19,7 +19,21 @@ import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.s2c.custom.*;
+import net.minecraft.network.packet.s2c.custom.DebugBeeCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugBrainCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugBreezeCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugGameEventCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugGameEventListenersCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugGoalSelectorCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugHiveCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugNeighborsUpdateCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugPathCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugPoiAddedCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugPoiRemovedCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugPoiTicketCountCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugRaidsCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugStructuresCustomPayload;
+import net.minecraft.network.packet.s2c.custom.DebugVillageSectionsCustomPayload;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
@@ -47,7 +61,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -92,7 +111,7 @@ public abstract class DebugInfoSenderMixin {
 
 	@Inject(method = "sendPoi", at = @At("HEAD"))
 	private static void sendPoi(ServerWorld world, BlockPos pos, CallbackInfo ci) {
-		Registry<Structure> structures = world.getRegistryManager().get(RegistryKeys.STRUCTURE);
+		Registry<Structure> structures = world.getRegistryManager().getOrThrow(RegistryKeys.STRUCTURE);
 		ChunkSectionPos chunkSectionPos = ChunkSectionPos.from(pos);
 
 		for (RegistryEntry<Structure> entry : structures.iterateEntries(StructureTags.VILLAGE)) {

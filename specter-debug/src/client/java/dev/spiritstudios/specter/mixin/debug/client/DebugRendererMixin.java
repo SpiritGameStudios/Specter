@@ -3,8 +3,21 @@ package dev.spiritstudios.specter.mixin.debug.client;
 import dev.spiritstudios.specter.impl.core.debug.DebugRendererRegistryImpl;
 import dev.spiritstudios.specter.impl.core.debug.ToggleableDebugRenderer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.debug.*;
+import net.minecraft.client.render.debug.BeeDebugRenderer;
+import net.minecraft.client.render.debug.BreezeDebugRenderer;
+import net.minecraft.client.render.debug.ChunkDebugRenderer;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.debug.GameEventDebugRenderer;
+import net.minecraft.client.render.debug.GoalSelectorDebugRenderer;
+import net.minecraft.client.render.debug.LightDebugRenderer;
+import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
+import net.minecraft.client.render.debug.PathfindingDebugRenderer;
+import net.minecraft.client.render.debug.RaidCenterDebugRenderer;
+import net.minecraft.client.render.debug.StructureDebugRenderer;
+import net.minecraft.client.render.debug.VillageDebugRenderer;
+import net.minecraft.client.render.debug.VillageSectionsDebugRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
@@ -34,7 +47,7 @@ public class DebugRendererMixin {
 
 	@Shadow
 	@Final
-	public DebugRenderer.Renderer neighborUpdateDebugRenderer;
+	public NeighborUpdateDebugRenderer neighborUpdateDebugRenderer;
 
 	@Shadow
 	@Final
@@ -88,8 +101,12 @@ public class DebugRendererMixin {
 	@Final
 	public PathfindingDebugRenderer pathfindingDebugRenderer;
 
+	@Shadow
+	@Final
+	public ChunkDebugRenderer chunkDebugRenderer;
+
 	@Inject(method = "render", at = @At("RETURN"))
-	private void render(MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ, CallbackInfo ci) {
+	private void render(MatrixStack matrices, Frustum frustum, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ, CallbackInfo ci) {
 		DebugRendererRegistryImpl.getRenderers().values()
 			.forEach(entry -> entry.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ));
 	}
@@ -134,5 +151,7 @@ public class DebugRendererMixin {
 			Identifier.ofVanilla("breeze"),
 			new ToggleableDebugRenderer((matrices, vertexConsumers, cameraX, cameraY, cameraZ) -> breezeDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ))
 		);
+
+		DebugRendererRegistryImpl.register(Identifier.ofVanilla("chunk"), new ToggleableDebugRenderer(chunkDebugRenderer));
 	}
 }

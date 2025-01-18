@@ -9,10 +9,12 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.input.KeyCodes;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -115,29 +117,31 @@ public class SpecterSliderWidget extends ClickableWidget {
 	@Override
 	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		context.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
 
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.enableDepthTest();
 
 		context.drawGuiTexture(
+			RenderLayer::getGuiTextured,
 			this.getTexture(),
 			this.getX(),
 			this.getY(),
 			this.getWidth(),
-			this.getHeight()
+			this.getHeight(),
+			ColorHelper.fromFloats(this.alpha, 1.0F, 1.0F, 1.0F)
 		);
 
 		context.drawGuiTexture(
+			RenderLayer::getGuiTextured,
 			this.getHandleTexture(),
 			this.getX() + (int) (ZERO_ONE.map(this.value, range) * (this.getWidth() - 8)),
 			this.getY(),
 			8,
-			this.getHeight()
+			this.getHeight(),
+			ColorHelper.fromFloats(this.alpha, 1.0F, 1.0F, 1.0F)
 		);
 
-		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int color = this.active ? 0xffffff : 0xa0a0a0;
 
 		this.drawScrollableText(context, client.textRenderer, 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);

@@ -4,21 +4,13 @@ import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 
 @SuppressWarnings("unused")
 public class SpecterRegistryGameTest {
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testRegistrar(TestContext context) {
-		context.setBlockState(new BlockPos(0, 1, 0), SpecterRegistryTestBlocks.TEST_BLOCK);
-
-		context.expectBlock(SpecterRegistryTestBlocks.TEST_BLOCK, new BlockPos(0, 1, 0));
-		context.complete();
-	}
-
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
 	public void testMetatagGet(TestContext context) {
 		context.assertEquals(
@@ -54,9 +46,12 @@ public class SpecterRegistryGameTest {
 
 	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
 	public void testReloadableRegistry(TestContext context) {
-		Chocolate john = SpecterReloadableRegistries.reloadableManager().orElseThrow()
-			.get(SpecterRegistryTestMod.CHOCOLATE_KEY)
-			.get(Identifier.of(SpecterRegistryTestMod.MODID, "john"));
+		Chocolate john = SpecterReloadableRegistries.lookup().orElseThrow()
+			.getOrThrow(SpecterRegistryTestMod.CHOCOLATE_KEY)
+			.getOrThrow(RegistryKey.of(
+				SpecterRegistryTestMod.CHOCOLATE_KEY,
+				Identifier.of(SpecterRegistryTestMod.MODID, "john")
+			)).value();
 
 		context.assertEquals(
 			john,

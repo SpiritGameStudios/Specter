@@ -16,7 +16,6 @@ import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<List<Metata
 	}
 
 	@Override
-	public CompletableFuture<List<MetatagContent<?, ?>>> load(ResourceManager manager, Profiler profiler, Executor executor) {
+	public CompletableFuture<List<MetatagContent<?, ?>>> load(ResourceManager manager, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
 			Map<Metatag<?, ?>, MetatagContent<?, ?>> metatagContents = new Object2ObjectOpenHashMap<>();
 
@@ -75,7 +74,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<List<Metata
 	}
 
 	@Override
-	public CompletableFuture<Void> apply(List<MetatagContent<?, ?>> data, ResourceManager manager, Profiler profiler, Executor executor) {
+	public CompletableFuture<Void> apply(List<MetatagContent<?, ?>> data, ResourceManager manager, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
 			data.forEach((content) -> {
 				loadMetatag(content);

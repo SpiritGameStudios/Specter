@@ -7,7 +7,7 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.math.Vec3d;
 
 public final class SpecterPacketCodecs {
-	public static final PacketCodec<ByteBuf, Vec3d> VEC3D = PacketCodecs.VECTOR3F.xmap(
+	public static final PacketCodec<ByteBuf, Vec3d> VEC3D = PacketCodecs.VECTOR_3F.xmap(
 		Vec3d::new,
 		Vec3d::toVector3f
 	);

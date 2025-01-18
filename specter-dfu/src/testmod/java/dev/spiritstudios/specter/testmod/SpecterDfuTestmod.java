@@ -9,13 +9,16 @@ import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 public class SpecterDfuTestmod implements ModInitializer {
 	private static final Item TEST_ITEM = Registry.register(
 		Registries.ITEM,
 		Identifier.of("specter_dfu_testmod", "test_item"),
-		new Item(new Item.Settings())
+		new Item(new Item.Settings()
+			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of("specter_dfu_testmod", "test_item"))))
 	);
 
 	@Override

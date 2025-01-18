@@ -19,7 +19,7 @@ public class SpecterCoreTestmodClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ClientKeybindEvents.pressed(TEST_KEYBIND).register(client -> {
-			if (client.player != null) client.player.sendMessage(Text.of("Test"));
+			if (client.player != null) client.player.sendMessage(Text.of("Test"), false);
 		});
 	}
 }
