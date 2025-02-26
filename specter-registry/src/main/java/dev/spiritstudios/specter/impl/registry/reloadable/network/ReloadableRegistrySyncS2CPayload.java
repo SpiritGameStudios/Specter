@@ -51,6 +51,11 @@ public record ReloadableRegistrySyncS2CPayload(
 			.map(entry -> new ReloadableRegistrySyncS2CPayload(entry, false))
 			.collect(Collectors.toList());
 
+		if (entries.isEmpty()) {
+			CACHE = List.of();
+			return CACHE;
+		}
+
 		ReloadableRegistrySyncS2CPayload last = entries.getLast();
 		entries.removeLast();
 		entries.add(new ReloadableRegistrySyncS2CPayload(last.entry(), true));

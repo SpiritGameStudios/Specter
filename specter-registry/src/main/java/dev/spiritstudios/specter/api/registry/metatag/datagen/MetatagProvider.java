@@ -12,6 +12,8 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
@@ -28,11 +30,18 @@ public abstract class MetatagProvider<R> implements DataProvider {
 	protected final CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture;
 	protected final FabricDataOutput dataOutput;
 	protected final DataOutput.OutputType outputType;
+	protected final RegistryKey<Registry<R>> registry;
 
-	protected MetatagProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture, DataOutput.OutputType outputType) {
+	protected MetatagProvider(
+		FabricDataOutput dataOutput,
+		RegistryKey<Registry<R>> registry,
+		CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture,
+		DataOutput.OutputType outputType
+	) {
 		this.dataOutput = dataOutput;
 		this.registriesFuture = registriesFuture;
 		this.outputType = outputType;
+		this.registry = registry;
 	}
 
 	@Override
@@ -77,7 +86,7 @@ public abstract class MetatagProvider<R> implements DataProvider {
 
 	@Override
 	public String getName() {
-		return "Metatags";
+		return "Metatags for " + this.registry.getValue();
 	}
 
 	protected static final class MetatagBuilder<R, V> {
