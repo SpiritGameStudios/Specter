@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public interface NarratorMixin {
 	@Inject(method = "getNarrator", at = @At("HEAD"), cancellable = true, remap = false)
 	private static void getNarrator(CallbackInfoReturnable<Narrator> cir) {
-		if (System.getProperty("specter.disable_narrator") != null || OperatingSystem.get() == OperatingSystem.LINUX) {
+		if (System.getProperty("specter.disable_narrator") != null) {
 			cir.setReturnValue(
 				new Narrator() {
 					@Override
