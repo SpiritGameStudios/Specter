@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.mixin.core.client;
 
 import com.mojang.text2speech.Narrator;
 import com.mojang.text2speech.OperatingSystem;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public interface NarratorMixin {
 	@Inject(method = "getNarrator", at = @At("HEAD"), cancellable = true, remap = false)
 	private static void getNarrator(CallbackInfoReturnable<Narrator> cir) {
-		if (System.getProperty("specter.disable_narrator") != null || OperatingSystem.get() == OperatingSystem.LINUX) {
+		if (System.getProperty("specter.disable_narrator") != null || (OperatingSystem.get() == OperatingSystem.LINUX) && SpecterGlobals.DEBUG) {
 			cir.setReturnValue(
 				new Narrator() {
 					@Override

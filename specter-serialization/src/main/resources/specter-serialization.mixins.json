@@ -6,7 +6,8 @@
 	"mixins": [
 		"LanguageMixin",
 		"TextCodecsMixin",
-		"TranslatableTextContentMixin"
+		"TranslatableTextContentMixin",
+		"compat.SystemDelegatedLanguageMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
