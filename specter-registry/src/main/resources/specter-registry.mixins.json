@@ -1,13 +1,14 @@
 {
-	"required": true,
-	"minVersion": "0.8",
-	"package": "dev.spiritstudios.specter.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"registry.metatag.RegistryKeyMixin",
-		"registry.reloadable.ReloadableRegistriesMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.spiritstudios.specter.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "registry.metatag.RegistryKeyMixin",
+    "registry.reloadable.DataPackContentsMixin",
+    "registry.reloadable.ReloadableRegistriesMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

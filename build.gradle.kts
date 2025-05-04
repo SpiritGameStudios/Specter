@@ -142,7 +142,7 @@ tasks.javadoc {
 
 val javadocJar by tasks.registering(Jar::class) {
 	dependsOn(tasks.javadoc)
-	from(tasks.javadoc.map { it.destinationDir })
+	from(tasks.javadoc.map { it.destinationDir!! })
 
 	archiveClassifier.set("fatjavadoc")
 }
@@ -198,20 +198,22 @@ subprojects {
 	}
 }
 
-subprojects.forEach { tasks.remapJar.configure { dependsOn(":${it.name}:remapJar") } }
+subprojects.forEach { tasks.remapJar.configure { dependsOn("${it.path}:remapJar") } }
 
 dependencies {
 	afterEvaluate {
 		subprojects.forEach {
-			api(project(":${it.name}", "namedElements"))
-			"clientImplementation"(project(":${it.name}").sourceSets["client"].output)
+			api(project(it.path, "namedElements"))
+			"clientImplementation"(project("${it.path}:").sourceSets["client"].output)
 			include(project("${it.name}:"))
 
+			compileOnly(rootProject.libs.nightconfig.core)
+			"testmodImplementation"(rootProject.libs.nightconfig.core)
+			compileOnly(rootProject.libs.nightconfig.toml)
+			"testmodImplementation"(rootProject.libs.nightconfig.toml)
 
-			compileOnly(rootProject.libs.tomlj)
-			"testmodImplementation"(rootProject.libs.tomlj)
-			"testmodImplementation"(project(":${it.name}").sourceSets["testmod"].output)
-			"testmodClientImplementation"(project("${it.name}:").sourceSets["testmodClient"].output)
+			"testmodImplementation"(project("${it.path}:").sourceSets["testmod"].output)
+			"testmodClientImplementation"(project("${it.path}:").sourceSets["testmodClient"].output)
 		}
 	}
 }

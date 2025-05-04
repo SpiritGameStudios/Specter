@@ -30,8 +30,3 @@ fun Project.moduleDependencies(project: Project, vararg modules: String) {
 		}
 	}
 }
-
-
-
-
-

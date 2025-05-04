@@ -57,7 +57,8 @@ public class SpecterRegistryGameTest {
 			john,
 			new Chocolate(
 				Chocolate.Type.DARK,
-				Chocolate.NutType.DEEZ
+				Chocolate.NutType.DEEZ,
+				"none"
 			),
 			"Chocolate \"specter-registry-testmod:john\""
 		);

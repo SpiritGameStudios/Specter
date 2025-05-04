@@ -118,3 +118,6 @@ run/
 !gradle-wrapper.jar
 
 src/generated/.cache
+
+# chungus is a test file for packet splitting. it is gigantic and i dont want to make cloning slow, so it is ignored.
+specter-registry/src/testmod/resources/data/specter-registry-testmod/specter-registry-testmod/chocolate/chungus.json

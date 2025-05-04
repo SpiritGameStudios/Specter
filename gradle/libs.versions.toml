@@ -1,5 +1,5 @@
 [versions]
-fabric_loom = "1.9-SNAPSHOT"
+fabric_loom = "1.10-SNAPSHOT"
 
 minecraft = "1.21.4"
 yarn = "1.21.4+build.8"
@@ -7,7 +7,7 @@ yarn = "1.21.4+build.8"
 fabric_loader = "0.16.10"
 fabric_api = "0.114.3+1.21.4"
 
-tomlj = "1.1.1"
+nightconfig = "3.8.1"
 modmenu = "13.0.0"
 
 stapi = "2.4.0+1.21.2-rc1"
@@ -22,7 +22,9 @@ yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
 fabric_loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabric_loader" }
 fabric_api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric_api" }
 
-tomlj = { group = "org.tomlj", name = "tomlj", version.ref = "tomlj" }
+nightconfig_core = { group = "com.electronwill.night-config", name = "core", version.ref = "nightconfig" }
+nightconfig_toml = { group = "com.electronwill.night-config", name = "toml", version.ref = "nightconfig" }
+
 modmenu = { group = "com.terraformersmc", name = "modmenu", version.ref = "modmenu" }
 
 stapi = { group = "xyz.nucleoid", name = "server-translations-api", version.ref = "stapi" }

@@ -6,8 +6,11 @@ repositories {
 }
 
 dependencies {
-	implementation(rootProject.libs.tomlj)
-	include(rootProject.libs.tomlj)
+	implementation(rootProject.libs.nightconfig.core)
+	include(rootProject.libs.nightconfig.core)
+
+	implementation(rootProject.libs.nightconfig.toml)
+	include(rootProject.libs.nightconfig.toml)
 
 	modCompileOnly(rootProject.libs.stapi)
 }

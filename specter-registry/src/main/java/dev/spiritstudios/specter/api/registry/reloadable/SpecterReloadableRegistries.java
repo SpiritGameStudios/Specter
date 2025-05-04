@@ -27,7 +27,7 @@ public final class SpecterReloadableRegistries {
 		SpecterReloadableRegistriesImpl.register(key, codec);
 	}
 
-	public static <T> void registerSynced(RegistryKey<Registry<T>> key, Codec<T> codec, PacketCodec<RegistryByteBuf, T> packetCodec) {
+	public static <T> void registerSynced(RegistryKey<Registry<T>> key, Codec<T> codec, PacketCodec<? super RegistryByteBuf, T> packetCodec) {
 		SpecterReloadableRegistriesImpl.registerSynced(key, codec, packetCodec);
 	}
 
@@ -35,7 +35,8 @@ public final class SpecterReloadableRegistries {
 	 * @return The current reloadable registry manager, or, if no world is currently loaded, {@link Optional#empty()}
 	 */
 	public static Optional<RegistryWrapper.WrapperLookup> lookup() {
-		Optional<RegistryWrapper.WrapperLookup> lookup = SpecterReloadableRegistriesImpl.lookup();
+		Optional<RegistryWrapper.WrapperLookup> lookup = SpecterReloadableRegistriesImpl.manager()
+			.map(manager -> manager); // i love java
 		if (lookup.isEmpty() && SpecterGlobals.DEBUG)
 			SpecterGlobals.LOGGER.warn("Accessed reloadable registry lookup while it is unset. This may be a bug.");
 		return lookup;

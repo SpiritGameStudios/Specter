@@ -9,10 +9,11 @@ import net.minecraft.network.codec.PacketCodecs;
 /**
  * thank you pug
  */
-public record Chocolate(Type type, NutType nutType) {
+public record Chocolate(Type type, NutType nutType, String topping) {
 	public static final Codec<Chocolate> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.stringResolver(Enum::name, string -> Enum.valueOf(Type.class, string)).fieldOf("type").forGetter(Chocolate::type),
-		Codec.stringResolver(Enum::name, string -> Enum.valueOf(NutType.class, string)).fieldOf("nut_type").forGetter(Chocolate::nutType)
+		Codec.stringResolver(Enum::name, string -> Enum.valueOf(NutType.class, string)).fieldOf("nut_type").forGetter(Chocolate::nutType),
+		Codec.STRING.optionalFieldOf("topping", "none").forGetter(Chocolate::topping)
 	).apply(instance, Chocolate::new));
 
 	public static final PacketCodec<ByteBuf, Chocolate> PACKET_CODEC = PacketCodec.tuple(
@@ -20,6 +21,8 @@ public record Chocolate(Type type, NutType nutType) {
 		Chocolate::type,
 		PacketCodecs.VAR_INT.xmap(ordinal -> NutType.values()[ordinal], Enum::ordinal),
 		Chocolate::nutType,
+		PacketCodecs.string(Integer.MAX_VALUE),
+		Chocolate::topping,
 		Chocolate::new
 	);
 

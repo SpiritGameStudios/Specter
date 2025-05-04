@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.api.serialization.format;
 
 import com.mojang.serialization.DynamicOps;
-import dev.spiritstudios.specter.impl.serialization.format.WrappedDynamicFormat;
+import dev.spiritstudios.specter.impl.serialization.format.ForwardingDynamicFormat;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -19,7 +19,7 @@ import java.util.function.Function;
  */
 public interface DynamicFormat<T> extends DynamicOps<T> {
 	static <T> DynamicFormat<T> of(DynamicOps<T> ops, BiConsumer<Writer, T> write, Function<Reader, T> read, String name) {
-		return new WrappedDynamicFormat<>(ops, write, read, name);
+		return new ForwardingDynamicFormat<>(ops, write, read, name);
 	}
 
 	void write(Writer writer, T value) throws IOException;

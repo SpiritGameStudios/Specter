@@ -1,20 +1,18 @@
 package dev.spiritstudios.specter.impl.registry;
 
 import com.mojang.serialization.Lifecycle;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.reloadable.ClientReloadableRegistryEvents;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
-import dev.spiritstudios.specter.impl.registry.metatag.network.MetatagSyncS2CPayload;
+import dev.spiritstudios.specter.impl.registry.reloadable.ReloadableRegistriesS2CPayload;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
-import dev.spiritstudios.specter.impl.registry.reloadable.network.ReloadableRegistrySyncS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.MutableRegistry;
 import net.minecraft.registry.Registry;
@@ -23,75 +21,89 @@ import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.registry.entry.RegistryEntryInfo;
 import net.minecraft.resource.ResourceType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+
+import static dev.spiritstudios.specter.impl.registry.SpecterRegistry.METATAGS_SYNC;
+import static dev.spiritstudios.specter.impl.registry.SpecterRegistry.RELOADABLE_REGISTRIES_SYNC;
 
 public class SpecterRegistryClient implements ClientModInitializer {
 	private static final RegistryEntryInfo DEFAULT_REGISTRY_ENTRY_INFO = new RegistryEntryInfo(Optional.empty(), Lifecycle.experimental());
 
-	private static final List<ReloadableRegistrySyncS2CPayload.Entry<?>> registrySyncEntries = new ArrayList<>();
-
-	private static <R, V> void applyMetatagSync(MetatagSyncS2CPayload<R, V> payload) {
+	private static <R, V> void putMetatagValues(MetatagsS2CPayload.MetatagData<R, V> data) {
 		if (MinecraftClient.getInstance().isIntegratedServerRunning())
 			return;
 
-		SpecterGlobals.debug("Received payload for metatag %s".formatted(payload.metatag().id()));
-
-		Metatag<R, V> metatag = payload.metatag();
+		Metatag<R, V> metatag = data.metatag();
 		Registry<R> registry = metatag.registry();
 		MetatagValueHolder<R> metatagHolder = MetatagValueHolder.getOrCreate(registry);
 
 		metatagHolder.specter$clearMetatag(metatag);
 
-		payload.values().forEach(entry -> {
-			SpecterGlobals.debug("Put value %s".formatted(entry));
-			metatagHolder.specter$putMetatagValue(metatag, entry.getFirst(), entry.getSecond());
-		});
+		data.entries().forEach((key, value) -> metatagHolder.specter$putMetatagValue(metatag, key, value));
 	}
 
-	private static <T> DynamicRegistryManager.Entry<T> createRegistry(ReloadableRegistrySyncS2CPayload.Entry<T> entry) {
-		MutableRegistry<T> registry = new SimpleRegistry<>(entry.key(), Lifecycle.experimental());
+	private static <T> DynamicRegistryManager.Entry<T> createRegistry(ReloadableRegistriesS2CPayload.RegistryData<T> data) {
+		RegistryKey<Registry<T>> key = RegistryKey.ofRegistry(data.key());
 
-		entry.entries().forEach((id, element) -> {
+		MutableRegistry<T> registry = new SimpleRegistry<>(
+			key,
+			Lifecycle.experimental()
+		);
+
+		data.entries().forEach((id, entry) -> {
 			registry.add(
-				RegistryKey.of(entry.key(), id),
-				element,
+				RegistryKey.of(key, id),
+				entry,
 				DEFAULT_REGISTRY_ENTRY_INFO
 			);
 		});
 
-		return new DynamicRegistryManager.Entry<>(entry.key(), registry);
+		return new DynamicRegistryManager.Entry<>(key, registry);
 	}
 
 	@Override
 	public void onInitializeClient() {
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new MetatagReloader(ResourceType.CLIENT_RESOURCES));
+		ResourceManagerHelper
+			.get(ResourceType.CLIENT_RESOURCES)
+			.registerReloadListener(new MetatagReloader(ResourceType.CLIENT_RESOURCES));
 
-		ClientPlayNetworking.registerGlobalReceiver(MetatagSyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> applyMetatagSync(payload)));
+		ClientPlayNetworking.registerGlobalReceiver(
+			METATAGS_SYNC.payloadId(),
+			(payload, context) ->
+				context.client().execute(() -> METATAGS_SYNC.receive(payload, context.player().getRegistryManager()))
+		);
 
-		// Credit to @MerchantPug for the idea of creating our own DRM
+		ClientPlayNetworking.registerGlobalReceiver(
+			RELOADABLE_REGISTRIES_SYNC.payloadId(),
+			(payload, context) ->
+				context.client().execute(() -> RELOADABLE_REGISTRIES_SYNC.receive(payload, context.player().getRegistryManager()))
+		);
+
+		// Credit to @MerchantCalico for the idea of creating our own Registry Manager
 		// https://github.com/GreenhouseModding/reloadable-datapack-registries/blob/1.20.4/common/src/main/java/dev/greenhouseteam/rdpr/impl/network/ReloadRegistriesClientboundPacket.java#L44
-		ClientPlayNetworking.registerGlobalReceiver(ReloadableRegistrySyncS2CPayload.ID, (payload, context) -> context.client().execute(() -> {
-			ClientPlayNetworkHandler networkHandler = context.client().getNetworkHandler();
-			Objects.requireNonNull(networkHandler);
-
-			registrySyncEntries.add(payload.entry());
-			if (!payload.finished()) return;
-
+		RELOADABLE_REGISTRIES_SYNC.receiveCallback().register(payload -> {
 			DynamicRegistryManager.Immutable reloadableManager = new DynamicRegistryManager.ImmutableImpl(
-				registrySyncEntries.stream().map(SpecterRegistryClient::createRegistry)
+				payload.registries()
+					.stream()
+					.map(SpecterRegistryClient::createRegistry)
 			).toImmutable();
-			registrySyncEntries.clear();
 
-			SpecterReloadableRegistriesImpl.setLookup(reloadableManager);
-			ClientReloadableRegistryEvents.SYNC_FINISHED.invoker().onSyncFinished(context.client(), reloadableManager);
-		}));
+			SpecterReloadableRegistriesImpl.setManager(reloadableManager);
+
+			ClientReloadableRegistryEvents.SYNC_FINISHED.invoker().onSyncFinished(
+				MinecraftClient.getInstance(),
+				reloadableManager
+			);
+		});
+
+		METATAGS_SYNC.receiveCallback().register(payload -> {
+			for (MetatagsS2CPayload.MetatagData<?, ?> data : payload.metatags())
+				putMetatagValues(data);
+		});
+
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			SpecterReloadableRegistriesImpl.setLookup(null);
-			registrySyncEntries.clear();
+			SpecterReloadableRegistriesImpl.setManager(null);
 		});
 	}
 }

@@ -1,1 +1,1 @@
-moduleDependencies(project, "specter-core")
+moduleDependencies(project, "specter-core", "specter-serialization")

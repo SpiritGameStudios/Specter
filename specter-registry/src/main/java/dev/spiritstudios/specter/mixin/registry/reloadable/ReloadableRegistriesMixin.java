@@ -44,8 +44,8 @@ public abstract class ReloadableRegistriesMixin {
 		@Local(argsOnly = true) Executor prepareExecutor
 	) {
 		futures = new ArrayList<>(futures);
-		for (SpecterReloadableRegistriesImpl.ReloadableRegistryInfo<?> registryInfo : SpecterReloadableRegistriesImpl.reloadableRegistries()) {
-			futures.add(prepareSpecter(registryInfo, ops, resourceManager, prepareExecutor));
+		for (SpecterReloadableRegistriesImpl.ReloadableRegistryInfo<?> info : SpecterReloadableRegistriesImpl.reloadableRegistries().values()) {
+			futures.add(prepareSpecter(info, ops, resourceManager, prepareExecutor));
 		}
 
 		return original.call(futures);

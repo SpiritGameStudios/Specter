@@ -1,49 +1,54 @@
 package dev.spiritstudios.specter.impl.registry.reloadable;
 
 import com.mojang.serialization.Codec;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public final class SpecterReloadableRegistriesImpl {
-	private static final List<ReloadableRegistryInfo<?>> RELOADABLE_REGISTRIES = new ObjectArrayList<>();
-	private static final Map<RegistryKey<Registry<Object>>, PacketCodec<RegistryByteBuf, ?>> SYNCING_CODECS = new Object2ObjectOpenHashMap<>();
-	private static RegistryWrapper.WrapperLookup lookup;
+	private static final Map<Identifier, ReloadableRegistryInfo<?>> RELOADABLE_REGISTRIES = new Object2ObjectLinkedOpenHashMap<>();
+
+	private static DynamicRegistryManager manager;
 
 	public static <T> void register(RegistryKey<Registry<T>> key, Codec<T> codec) {
-		RELOADABLE_REGISTRIES.add(new ReloadableRegistryInfo<>(key, codec));
+		RELOADABLE_REGISTRIES.put(key.getValue(), new ReloadableRegistryInfo<>(key, codec, null));
 	}
 
-	public static <T> void registerSynced(RegistryKey<Registry<T>> key, Codec<T> codec, PacketCodec<RegistryByteBuf, T> packetCodec) {
-		RELOADABLE_REGISTRIES.add(new ReloadableRegistryInfo<>(key, codec));
-		SYNCING_CODECS.put(RegistryKey.ofRegistry(key.getValue()), packetCodec);
+	public static <T> void registerSynced(RegistryKey<Registry<T>> key, Codec<T> codec, PacketCodec<? super RegistryByteBuf, T> packetCodec) {
+		RELOADABLE_REGISTRIES.put(key.getValue(), new ReloadableRegistryInfo<>(key, codec, packetCodec));
 	}
 
-
-	public static List<ReloadableRegistryInfo<?>> reloadableRegistries() {
+	public static Map<Identifier, ReloadableRegistryInfo<?>> reloadableRegistries() {
 		return RELOADABLE_REGISTRIES;
 	}
 
-	public static Optional<RegistryWrapper.WrapperLookup> lookup() {
-		return Optional.ofNullable(lookup);
+	public static Optional<DynamicRegistryManager> manager() {
+		return Optional.ofNullable(manager);
 	}
 
-	public static void setLookup(RegistryWrapper.WrapperLookup lookup) {
-		SpecterReloadableRegistriesImpl.lookup = lookup;
+	public static void setManager(DynamicRegistryManager manager) {
+		SpecterReloadableRegistriesImpl.manager = manager;
+
+		if (SpecterGlobals.DEBUG) {
+			manager.streamAllRegistryKeys().forEach(key -> {
+				SpecterGlobals.debug(key.getValue().toString());
+			});
+		}
 	}
 
-	public static Map<RegistryKey<Registry<Object>>, PacketCodec<RegistryByteBuf, ?>> syncingCodecs() {
-		return SYNCING_CODECS;
-	}
-
-	public record ReloadableRegistryInfo<T>(RegistryKey<Registry<T>> key, Codec<T> codec) {
+	public record ReloadableRegistryInfo<T>(
+		RegistryKey<Registry<T>> key,
+		Codec<T> codec,
+		@Nullable PacketCodec<? super RegistryByteBuf, T> packetCodec
+	) {
 	}
 }
