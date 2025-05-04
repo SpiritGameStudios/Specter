@@ -19,4 +19,4 @@ TODO: Add usage instructions here
 To the QSL Team, for creating their REA system, which the Metatag API is heavily inspired by.
 
 To [Calico](https://github.com/MerchantPug), for creating Greenhouse Config, which was used as reference for the
-JsonCWriter (and by extension the TomlWriter, which was based on the JsonCWriter).
+JsonCWriter.
