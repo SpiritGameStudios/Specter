@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.dfu;
 
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.schemas.Schema;
+
 import dev.spiritstudios.specter.impl.dfu.SpecterDataFixerRegistryImpl;
 
 public final class SpecterDataFixRegistry {

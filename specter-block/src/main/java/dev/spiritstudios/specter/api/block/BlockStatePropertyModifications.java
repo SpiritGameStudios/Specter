@@ -1,11 +1,12 @@
 package dev.spiritstudios.specter.api.block;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.mixin.block.BlockAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Property;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.mixin.block.BlockAccessor;
 
 /**
  * Utility class for modifying {@link Block} properties.

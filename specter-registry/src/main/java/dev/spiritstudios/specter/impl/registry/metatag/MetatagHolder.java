@@ -1,12 +1,14 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Map;
 import java.util.Set;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
+
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public interface MetatagHolder<R> {
 	@SuppressWarnings("unchecked")

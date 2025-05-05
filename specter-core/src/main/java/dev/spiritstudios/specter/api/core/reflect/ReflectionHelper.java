@@ -1,7 +1,5 @@
 package dev.spiritstudios.specter.api.core.reflect;
 
-import org.objectweb.asm.tree.AnnotationNode;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -10,6 +8,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.objectweb.asm.tree.AnnotationNode;
 
 /**
  * Utilities to reduce boilerplate reflection code.
@@ -32,7 +32,7 @@ public final class ReflectionHelper {
 		try {
 			instance = clazz.getConstructor().newInstance(args);
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-				 NoSuchMethodException e) {
+				NoSuchMethodException e) {
 			throw new RuntimeException(
 				(e instanceof NoSuchMethodException ?
 					"No constructor without arguments found for class " :

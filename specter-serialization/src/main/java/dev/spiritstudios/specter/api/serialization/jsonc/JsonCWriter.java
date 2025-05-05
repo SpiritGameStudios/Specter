@@ -1,13 +1,14 @@
 package dev.spiritstudios.specter.api.serialization.jsonc;
 
-import com.google.gson.*;
-import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
-
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
+
+import com.google.gson.*;
+
+import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 
 /**
  * A JSON writer that supports comments.

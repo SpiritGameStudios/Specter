@@ -1,9 +1,12 @@
 package dev.spiritstudios.specter.impl.debug.command;
 
+import java.util.Objects;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.item.ItemStack;
@@ -13,8 +16,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-
-import java.util.Objects;
 
 public class ComponentsCommand {
 	private static final SimpleCommandExceptionType NO_COMPONENTS_EXCEPTION = new SimpleCommandExceptionType(Text.translatable("commands.components.no_components"));

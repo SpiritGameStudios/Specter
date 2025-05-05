@@ -1,5 +1,7 @@
 package dev.spiritstudios.specter.api.block.entity;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -15,7 +17,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Very similar to {@link net.minecraft.block.entity.LootableContainerBlockEntity}, but for blocks without a menu.

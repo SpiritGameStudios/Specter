@@ -1,9 +1,13 @@
 package dev.spiritstudios.specter.impl.item;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemGroup;
@@ -14,10 +18,8 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collection;
-import java.util.List;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
 
 // FabricAPI is dumb and assumes all ItemGroups implement FabricItemGroupImpl
 // Yes, I am aware that this is a bad practice, but I have no other choice

@@ -1,12 +1,14 @@
 package dev.spiritstudios.specter.api.serialization.text;
 
+import java.util.Optional;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
+
 import net.minecraft.text.*;
 
-import java.util.Optional;
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 
 /**
  * A text content that is resolved at runtime.

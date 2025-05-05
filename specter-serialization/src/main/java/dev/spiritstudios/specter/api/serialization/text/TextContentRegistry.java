@@ -1,9 +1,10 @@
 package dev.spiritstudios.specter.api.serialization.text;
 
-import dev.spiritstudios.specter.api.core.exception.UnreachableException;
-import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.text.TextContent;
+
+import dev.spiritstudios.specter.api.core.exception.UnreachableException;
+import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
 
 /**
  * Allows adding your own {@link TextContent.Type} to be encoded and decoded by {@link TextCodecs}.

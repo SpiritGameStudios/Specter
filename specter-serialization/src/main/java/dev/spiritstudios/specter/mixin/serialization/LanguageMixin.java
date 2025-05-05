@@ -1,5 +1,7 @@
 package dev.spiritstudios.specter.mixin.serialization;
 
+import java.util.function.BiConsumer;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
@@ -9,14 +11,14 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.mojang.serialization.JsonOps;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Language;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.function.BiConsumer;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
+import net.minecraft.util.Language;
+
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 
 @Mixin(Language.class)
 public class LanguageMixin {

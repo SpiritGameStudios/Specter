@@ -16,7 +16,7 @@
 			"dev.spiritstudios.specter.impl.item.SpecterItem"
 		],
 		"client": [
-			"dev.spiritstudios.specter.impl.item.SpecterItemClient"
+			"dev.spiritstudios.specter.impl.item.client.SpecterItemClient"
 		]
 	},
 	"mixins": [

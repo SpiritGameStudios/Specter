@@ -4,6 +4,7 @@
 	"package": "dev.spiritstudios.specter.mixin.entity",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"DefaultAttributeContainerAccessor",
 		"DefaultAttributeRegistryMixin"
 	],
 	"injectors": {

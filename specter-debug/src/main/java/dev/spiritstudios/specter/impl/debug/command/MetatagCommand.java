@@ -1,5 +1,8 @@
 package dev.spiritstudios.specter.impl.debug.command;
 
+import java.util.Map;
+import java.util.function.Function;
+
 import com.google.common.collect.Streams;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -7,9 +10,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.nbt.NbtHelper;
@@ -20,8 +21,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 
-import java.util.Map;
-import java.util.function.Function;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 
 public final class MetatagCommand {
 	public static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->

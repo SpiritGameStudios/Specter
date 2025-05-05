@@ -1,7 +1,12 @@
 package dev.spiritstudios.specter.mixin.debug.client;
 
-import dev.spiritstudios.specter.impl.core.debug.DebugRendererRegistryImpl;
-import dev.spiritstudios.specter.impl.core.debug.ToggleableDebugRenderer;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -20,12 +25,9 @@ import net.minecraft.client.render.debug.VillageDebugRenderer;
 import net.minecraft.client.render.debug.VillageSectionsDebugRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import dev.spiritstudios.specter.impl.core.client.debug.DebugRendererRegistryImpl;
+import dev.spiritstudios.specter.impl.core.client.debug.ToggleableDebugRenderer;
 
 @Mixin(DebugRenderer.class)
 public class DebugRendererMixin {
@@ -108,7 +110,7 @@ public class DebugRendererMixin {
 	@Inject(method = "render", at = @At("RETURN"))
 	private void render(MatrixStack matrices, Frustum frustum, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ, CallbackInfo ci) {
 		DebugRendererRegistryImpl.getRenderers().values()
-			.forEach(entry -> entry.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ));
+				.forEach(entry -> entry.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ));
 	}
 
 	@Inject(method = "<init>", at = @At("RETURN"))
@@ -148,8 +150,8 @@ public class DebugRendererMixin {
 		DebugRendererRegistryImpl.register(Identifier.ofVanilla("light"), new ToggleableDebugRenderer(lightDebugRenderer));
 
 		DebugRendererRegistryImpl.register(
-			Identifier.ofVanilla("breeze"),
-			new ToggleableDebugRenderer((matrices, vertexConsumers, cameraX, cameraY, cameraZ) -> breezeDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ))
+				Identifier.ofVanilla("breeze"),
+				new ToggleableDebugRenderer((matrices, vertexConsumers, cameraX, cameraY, cameraZ) -> breezeDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ))
 		);
 
 		DebugRendererRegistryImpl.register(Identifier.ofVanilla("chunk"), new ToggleableDebugRenderer(chunkDebugRenderer));

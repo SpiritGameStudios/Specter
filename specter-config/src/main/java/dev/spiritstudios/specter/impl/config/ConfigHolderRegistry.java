@@ -1,12 +1,14 @@
 package dev.spiritstudios.specter.impl.config;
 
-import dev.spiritstudios.specter.api.config.ConfigHolder;
-import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
 import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import net.minecraft.util.Identifier;
+
+import dev.spiritstudios.specter.api.config.ConfigHolder;
+import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 
 public final class ConfigHolderRegistry {
 	private static final Map<Identifier, ConfigHolder<?, ?>> holders = new Object2ObjectOpenHashMap<>();

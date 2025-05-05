@@ -1,16 +1,5 @@
 package dev.spiritstudios.specter.api.config;
 
-import com.mojang.serialization.DataResult;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
-import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
-import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
-import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
-import io.netty.buffer.ByteBuf;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -18,6 +7,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+
+import com.mojang.serialization.DataResult;
+import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.util.Identifier;
+
+import net.fabricmc.loader.api.FabricLoader;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
+import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
+import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
+import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
 
 /**
  * A class that holds config data and provides methods to save and load the config.

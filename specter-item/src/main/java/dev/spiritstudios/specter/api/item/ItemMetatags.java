@@ -1,12 +1,14 @@
 package dev.spiritstudios.specter.api.item;
 
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+
 import net.minecraft.item.Item;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public final class ItemMetatags {
 	public static final Metatag<Item, Float> COMPOSTING_CHANCE = Metatag.builder(

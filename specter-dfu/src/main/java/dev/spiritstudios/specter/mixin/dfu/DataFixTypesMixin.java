@@ -4,11 +4,13 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
-import dev.spiritstudios.specter.impl.dfu.SpecterDataFixerRegistryImpl;
+import org.spongepowered.asm.mixin.Mixin;
+
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
-import org.spongepowered.asm.mixin.Mixin;
+
+import dev.spiritstudios.specter.impl.dfu.SpecterDataFixerRegistryImpl;
 
 @Mixin(DataFixTypes.class)
 public abstract class DataFixTypesMixin {

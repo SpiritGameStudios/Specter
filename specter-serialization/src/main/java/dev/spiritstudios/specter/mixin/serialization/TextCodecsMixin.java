@@ -1,18 +1,20 @@
 package dev.spiritstudios.specter.mixin.serialization;
 
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.serialization.*;
-import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.text.TextContent;
-import net.minecraft.util.StringIdentifiable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import net.minecraft.text.TextCodecs;
+import net.minecraft.text.TextContent;
+import net.minecraft.util.StringIdentifiable;
+
+import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
 
 @Mixin(TextCodecs.class)
 public class TextCodecsMixin {

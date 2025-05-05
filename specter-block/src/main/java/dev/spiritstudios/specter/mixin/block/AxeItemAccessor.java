@@ -1,12 +1,14 @@
 package dev.spiritstudios.specter.mixin.block;
 
-import dev.spiritstudios.specter.api.core.exception.UnreachableException;
-import net.minecraft.block.Block;
-import net.minecraft.item.AxeItem;
+import java.util.Map;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import java.util.Map;
+import net.minecraft.block.Block;
+import net.minecraft.item.AxeItem;
+
+import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 
 @Mixin(AxeItem.class)
 public interface AxeItemAccessor {

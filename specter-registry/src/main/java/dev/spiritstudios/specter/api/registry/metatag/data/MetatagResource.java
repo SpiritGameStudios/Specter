@@ -1,12 +1,14 @@
 package dev.spiritstudios.specter.api.registry.metatag.data;
 
+import java.util.List;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+
 import net.minecraft.util.Identifier;
 
-import java.util.List;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public record MetatagResource<V>(boolean replace, List<Pair<Identifier, V>> entries) {
 	public static <V> Codec<MetatagResource<V>> resourceCodecOf(Metatag<?, V> metatag) {

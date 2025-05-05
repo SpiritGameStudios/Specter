@@ -4,8 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
-import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
+
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
@@ -16,6 +15,9 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+
+import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
+import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 
 public class DumpReloadableRegistryCommand {
 	public static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->

@@ -1,12 +1,12 @@
 package dev.spiritstudios.specter.impl.serialization.codec;
 
-import com.mojang.serialization.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import com.mojang.serialization.*;
 
 public class KeyDispatchingCodec<T> extends MapCodec<T> {
 	private final MapCodec<T> defaultCodec;

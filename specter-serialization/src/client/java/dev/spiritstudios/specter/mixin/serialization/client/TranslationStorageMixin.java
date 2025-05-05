@@ -1,16 +1,18 @@
 package dev.spiritstudios.specter.mixin.serialization.client;
 
+import java.util.Map;
+
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
-import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
-import net.minecraft.client.resource.language.TranslationStorage;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Map;
+import net.minecraft.client.resource.language.TranslationStorage;
+import net.minecraft.text.Text;
+
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
+import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 
 @Mixin(TranslationStorage.class)
 public class TranslationStorageMixin implements TextTranslationSupplier {

@@ -1,7 +1,7 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "dev.spiritstudios.specter.mixin.config.client",
+	"package": "dev.spiritstudios.specter.mixin.client.config",
 	"compatibilityLevel": "JAVA_21",
 	"injectors": {
 		"defaultRequire": 1

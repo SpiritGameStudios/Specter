@@ -2,10 +2,13 @@ package dev.spiritstudios.specter.impl.block;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+
+import net.minecraft.block.Block;
+
+import net.fabricmc.api.ModInitializer;
+
 import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.registry.metatag.MetatagEvents;
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.block.Block;
 
 public class SpecterBlock implements ModInitializer {
 	public static final BiMap<Block, Block> UNWAXED_TO_WAXED_BLOCKS = HashBiMap.create();

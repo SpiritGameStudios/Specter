@@ -18,6 +18,9 @@
 		"java": ">=21"
 	},
 	"mixins": [
-		"testmod.mixins.json"
+		{
+			"config": "specter-gui-testmod.client.mixins.json",
+			"environment": "client"
+		}
 	]
 }

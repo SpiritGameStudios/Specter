@@ -1,10 +1,11 @@
 package dev.spiritstudios.specter.api.serialization.jsonc;
 
+import java.util.List;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import dev.spiritstudios.specter.api.serialization.Commentable;
 
-import java.util.List;
+import dev.spiritstudios.specter.api.serialization.Commentable;
 
 /**
  * A {@link JsonElement} with comments.

@@ -1,18 +1,20 @@
 package dev.spiritstudios.specter.api.config;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
+import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.util.Identifier;
+
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.ValueImpl;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * A config value.

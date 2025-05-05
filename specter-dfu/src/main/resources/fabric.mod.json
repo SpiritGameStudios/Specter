@@ -14,11 +14,7 @@
 	"entrypoints": {
 	},
 	"mixins": [
-		"specter-dfu.mixins.json",
-		{
-			"config": "specter-dfu.client.mixins.json",
-			"environment": "client"
-		}
+		"specter-dfu.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",

@@ -1,13 +1,15 @@
 package dev.spiritstudios.specter.api.entity;
 
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.impl.entity.DataDefaultAttributeBuilder;
+import static dev.spiritstudios.specter.api.core.SpecterGlobals.MODID;
+
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
-import static dev.spiritstudios.specter.api.core.SpecterGlobals.MODID;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.entity.DataDefaultAttributeBuilder;
 
 public final class EntityMetatags {
 	/**

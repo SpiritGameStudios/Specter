@@ -1,16 +1,17 @@
 package dev.spiritstudios.specter.api.serialization.format;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.toml.TomlParser;
-import com.electronwill.nightconfig.toml.TomlWriter;
-import dev.spiritstudios.specter.api.serialization.nightconfig.NightConfigElement;
-import dev.spiritstudios.specter.api.serialization.nightconfig.NightConfigMap;
-import dev.spiritstudios.specter.api.serialization.nightconfig.NightConfigOps;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collections;
+
+import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.toml.TomlParser;
+import com.electronwill.nightconfig.toml.TomlWriter;
+
+import dev.spiritstudios.specter.api.serialization.nightconfig.NightConfigElement;
+import dev.spiritstudios.specter.api.serialization.nightconfig.NightConfigMap;
+import dev.spiritstudios.specter.api.serialization.nightconfig.NightConfigOps;
 
 public class TomlFormat extends NightConfigOps implements DynamicFormat<NightConfigElement> {
 	public static final TomlFormat INSTANCE = new TomlFormat();

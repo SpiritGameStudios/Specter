@@ -1,11 +1,12 @@
 package dev.spiritstudios.specter.api.serialization.nightconfig;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-import dev.spiritstudios.specter.api.serialization.Commentable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.electronwill.nightconfig.core.CommentedConfig;
+
+import dev.spiritstudios.specter.api.serialization.Commentable;
 
 public abstract class NightConfigElement implements Commentable {
 	private List<String> comments;

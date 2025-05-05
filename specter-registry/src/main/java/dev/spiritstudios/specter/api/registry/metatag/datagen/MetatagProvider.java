@@ -1,14 +1,20 @@
 package dev.spiritstudios.specter.api.registry.metatag.datagen;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
@@ -18,13 +24,10 @@ import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 
 public abstract class MetatagProvider<R> implements DataProvider {
 	protected final CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture;

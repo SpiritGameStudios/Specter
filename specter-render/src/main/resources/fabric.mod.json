@@ -16,7 +16,7 @@
 			"dev.spiritstudios.specter.impl.render.SpecterRender"
 		],
 		"client": [
-			"dev.spiritstudios.specter.impl.render.SpecterRenderClient"
+			"dev.spiritstudios.specter.impl.render.client.SpecterRenderClient"
 		]
 	},
 	"mixins": [

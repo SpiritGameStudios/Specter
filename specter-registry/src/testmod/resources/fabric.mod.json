@@ -13,10 +13,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.spiritstudios.testmod.SpecterRegistryTestMod"
+			"dev.spiritstudios.testmod.registry.SpecterRegistryTestMod"
 		],
 		"fabric-gametest": [
-			"dev.spiritstudios.testmod.SpecterRegistryGameTest"
+			"dev.spiritstudios.testmod.registry.SpecterRegistryGameTest"
 		]
 	},
 	"depends": {

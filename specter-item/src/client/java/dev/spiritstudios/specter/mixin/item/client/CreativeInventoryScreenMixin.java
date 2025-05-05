@@ -1,12 +1,15 @@
 package dev.spiritstudios.specter.mixin.item.client;
 
-import dev.spiritstudios.specter.impl.item.SpecterItemClient;
-import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+
+import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
+
+import dev.spiritstudios.specter.impl.item.client.SpecterItemClient;
 
 @Mixin(CreativeInventoryScreen.class)
 public class CreativeInventoryScreenMixin {

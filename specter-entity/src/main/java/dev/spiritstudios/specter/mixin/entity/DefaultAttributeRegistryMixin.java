@@ -1,21 +1,23 @@
 package dev.spiritstudios.specter.mixin.entity;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.api.entity.EntityMetatags;
-import dev.spiritstudios.specter.impl.entity.DataDefaultAttributeBuilder;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.DefaultAttributeRegistry;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import dev.spiritstudios.specter.api.entity.EntityMetatags;
+import dev.spiritstudios.specter.impl.entity.DataDefaultAttributeBuilder;
 
 @Mixin(DefaultAttributeRegistry.class)
 public class DefaultAttributeRegistryMixin {

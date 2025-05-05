@@ -2,10 +2,12 @@ package dev.spiritstudios.specter.impl.registry.metatag;
 
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+
 import net.minecraft.registry.Registry;
+
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public final class MetatagValueHolder<R> {
 	private final Table<Metatag<R, ?>, R, Object> values = Tables.newCustomTable(new Object2ReferenceOpenHashMap<>(), Reference2ObjectOpenHashMap::new);

@@ -16,7 +16,7 @@
 			"dev.spiritstudios.specter.impl.debug.SpecterDebug"
 		],
 		"client": [
-			"dev.spiritstudios.specter.impl.debug.SpecterDebugClient"
+			"dev.spiritstudios.specter.impl.debug.client.SpecterDebugClient"
 		]
 	},
 	"mixins": [

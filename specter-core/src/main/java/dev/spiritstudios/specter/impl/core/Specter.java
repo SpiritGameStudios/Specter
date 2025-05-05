@@ -1,7 +1,8 @@
 package dev.spiritstudios.specter.impl.core;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import net.fabricmc.api.ModInitializer;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 
 public class Specter implements ModInitializer {
 	@Override

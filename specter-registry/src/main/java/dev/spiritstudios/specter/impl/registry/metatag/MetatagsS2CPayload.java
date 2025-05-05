@@ -1,10 +1,17 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -12,13 +19,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 @ApiStatus.Internal
 public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
@@ -47,7 +49,7 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 
 		List<MetatagData<?, ?>> metatags = new ArrayList<>();
 
-		for (Registry<?> registry : Registries.ROOT) {
+		for (Registry<?> registry : Registries.REGISTRIES) {
 			MetatagHolder.of(registry).specter$getMetatags().forEach(entry -> {
 				if (entry.getValue().side() != ResourceType.SERVER_DATA) return;
 				metatags.add(createData(entry.getValue()));
@@ -65,7 +67,7 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 	public record MetatagData<R, V>(Metatag<R, V> metatag, Map<R, V> entries) {
 		private static final PacketCodec<ByteBuf, Metatag<?, ?>> METATAG_CODEC =
 			Identifier.PACKET_CODEC.<Registry<?>>xmap(
-				Registries.ROOT::get,
+				Registries.REGISTRIES::get,
 				registry -> registry.getKey().getValue()
 			).dispatch(
 				Metatag::registry,

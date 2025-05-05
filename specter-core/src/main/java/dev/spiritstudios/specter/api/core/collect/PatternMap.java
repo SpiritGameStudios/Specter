@@ -1,11 +1,11 @@
 package dev.spiritstudios.specter.api.core.collect;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A map that allows for pattern matching (instanceof) when retrieving values.

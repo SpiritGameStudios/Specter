@@ -3,14 +3,16 @@ package dev.spiritstudios.specter.mixin.block;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.api.block.BlockMetatags;
-import dev.spiritstudios.specter.api.block.FlammableBlockData;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FireBlock;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
+
+import dev.spiritstudios.specter.api.block.BlockMetatags;
+import dev.spiritstudios.specter.api.block.FlammableBlockData;
 
 @Mixin(FireBlock.class)
 public class FireBlockMixin {

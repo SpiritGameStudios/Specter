@@ -1,11 +1,11 @@
 package dev.spiritstudios.specter.api.serialization;
 
+import java.util.List;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-
-import java.util.List;
 
 /**
  * A codec with additional comments.

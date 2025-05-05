@@ -17,13 +17,8 @@
 		]
 	},
 	"mixins": [
-		"specter-entity.mixins.json",
-		{
-			"config": "specter-entity.client.mixins.json",
-			"environment": "client"
-		}
+		"specter-entity.mixins.json"
 	],
-	"accessWidener": "specter-entity.accesswidener",
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}-",

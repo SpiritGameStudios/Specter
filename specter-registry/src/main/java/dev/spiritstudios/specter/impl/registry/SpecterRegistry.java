@@ -1,10 +1,8 @@
 package dev.spiritstudios.specter.impl.registry;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.serialization.SplitPayloadHandler;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
-import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
-import dev.spiritstudios.specter.impl.registry.reloadable.ReloadableRegistriesS2CPayload;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -12,8 +10,12 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.serialization.SplitPayloadHandler;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
+import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
+import dev.spiritstudios.specter.impl.registry.reloadable.ReloadableRegistriesS2CPayload;
 
 public class SpecterRegistry implements ModInitializer {
 	public static final SplitPayloadHandler<ReloadableRegistriesS2CPayload> RELOADABLE_REGISTRIES_SYNC = new SplitPayloadHandler<>(
@@ -71,4 +73,3 @@ public class SpecterRegistry implements ModInitializer {
 		});
 	}
 }
-

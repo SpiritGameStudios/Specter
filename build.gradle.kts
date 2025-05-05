@@ -1,10 +1,15 @@
 import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
+import kotlin.io.path.createDirectories
+import kotlin.io.path.notExists
+import kotlin.io.path.writer
 
 plugins {
 	`java-library`
 	`maven-publish`
+	checkstyle
 	alias(libs.plugins.fabric.loom)
+	alias(libs.plugins.spotless)
 }
 
 class ModInfo {
@@ -19,14 +24,16 @@ allprojects {
 	group = mod.group
 	version = mod.version
 
-	apply(plugin = "maven-publish")
+	plugins.apply("maven-publish")
+	plugins.apply("java-library")
+	plugins.apply("checkstyle")
+	plugins.apply("fabric-loom")
+	plugins.apply("com.diffplug.spotless")
 
 	tasks.withType<GenerateModuleMetadata>().configureEach {
 		enabled = false
 	}
 
-	apply(plugin = "java-library")
-	apply(plugin = "fabric-loom")
 
 	tasks.withType<JavaCompile> {
 		options.encoding = "UTF-8"
@@ -80,6 +87,11 @@ allprojects {
 		}
 	}
 
+	loom.runs.configureEach {
+		vmArgs("-Dmixin.debug.verify=true")
+	}
+
+
 	allprojects.forEach {
 		loom.mods.register(it.name) {
 			sourceSet(it.sourceSets.main.get())
@@ -115,6 +127,105 @@ allprojects {
 		inputs.properties(map)
 		filesMatching("fabric.mod.json") { expand(map) }
 	}
+
+	spotless {
+		lineEndings = com.diffplug.spotless.LineEnding.UNIX
+
+		java {
+			removeUnusedImports()
+			importOrder("java", "javax", "", "net.minecraft", "net.fabricmc", "dev.spiritstudios")
+			leadingSpacesToTabs()
+			trimTrailingWhitespace()
+		}
+
+		json {
+			target("src/**/lang/*.json")
+			targetExclude("src/**/generated/**")
+			gson().indentWithSpaces(4).sortByKeys()
+		}
+	}
+
+	checkstyle {
+		configFile = rootProject.file("checkstyle.xml")
+	}
+
+	abstract class GeneratePackageInfosTask : DefaultTask() {
+		@SkipWhenEmpty
+		@InputDirectory
+		val root = project.objects.directoryProperty()
+
+		@OutputDirectory
+		val output = project.objects.directoryProperty()
+
+		@TaskAction
+		fun action() {
+			val outputPath = output.get().asFile.toPath()
+			val rootPath = root.get().asFile.toPath()
+
+			for (dir in arrayOf("impl", "mixin")) {
+				val sourceDir = rootPath.resolve("dev/spiritstudios/specter/$dir")
+				if (sourceDir.notExists()) continue
+
+				sourceDir.toFile().walk()
+					.filter { it.isDirectory }
+					.forEach {
+						val hasFiles = it.listFiles()!!
+							.filter { file -> !file.isDirectory }
+							.any { file -> file.isFile && file.name.endsWith(".java") }
+
+						if (!hasFiles || it.resolve("package-info.java").exists())
+							return@forEach
+
+						val relative = rootPath.relativize(it.toPath())
+						val target = outputPath.resolve(relative)
+						target.createDirectories()
+
+						val packageName = relative.toString().replace(File.separator, ".")
+						target.resolve("package-info.java").writer().apply {
+							write(
+								"""
+							|/**
+							| * Internal implementation classes for Specter.
+							| * Do not use these classes directly.
+							| */
+							|
+							|@ApiStatus.Internal
+							|package $packageName;
+							|
+							|import org.jetbrains.annotations.ApiStatus;
+							 """.trimMargin()
+							)
+							close()
+						}
+					}
+			}
+		}
+	}
+
+	for (sourceSet in arrayOf(sourceSets.main.get(), sourceSets["client"])) {
+		val task = tasks.register<GeneratePackageInfosTask>(sourceSet.getTaskName("generate", "PackageInfos")) {
+			group = "codegen"
+
+			root = file("src/${sourceSet.name}/java")
+			output = file("src/generated/${sourceSet.name}")
+		}
+
+		sourceSet.java.srcDir(task)
+
+		val cleanTask = tasks.register<Delete>(sourceSet.getTaskName("clean", "PackageInfos")) {
+			group = "codegen"
+			delete(file("src/generated/${sourceSet.name}"))
+		}
+
+		tasks.clean.configure { dependsOn(cleanTask) }
+	}
+}
+
+tasks.register<DefaultTask>("checkstyle") {
+	dependsOn(tasks.checkstyleMain)
+	dependsOn(tasks["checkstyleClient"])
+	dependsOn(tasks["checkstyleTestmod"])
+	dependsOn(tasks["checkstyleTestmodClient"])
 }
 
 tasks.javadoc {

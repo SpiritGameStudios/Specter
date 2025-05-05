@@ -1,8 +1,14 @@
 package dev.spiritstudios.specter.impl.registry.reloadable;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.ImmutableList;
-import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -11,12 +17,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 
 public record ReloadableRegistriesS2CPayload(List<RegistryData<?>> registries) {
 	public static final PacketCodec<RegistryByteBuf, ReloadableRegistriesS2CPayload> CODEC = RegistryData.CODEC

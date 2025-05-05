@@ -1,13 +1,15 @@
 package dev.spiritstudios.specter.impl.serialization.format;
 
-import com.mojang.serialization.DynamicOps;
-import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
-import net.minecraft.util.dynamic.ForwardingDynamicOps;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import com.mojang.serialization.DynamicOps;
+
+import net.minecraft.util.dynamic.ForwardingDynamicOps;
+
+import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
 
 public class ForwardingDynamicFormat<T> extends ForwardingDynamicOps<T> implements DynamicFormat<T> {
 	private final BiConsumer<Writer, T> write;

@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.item.datagen;
 
-import dev.spiritstudios.specter.mixin.item.ShapedRecipeJsonBuilderAccessor;
+import java.util.Objects;
+
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
@@ -17,7 +18,7 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKey;
 
-import java.util.Objects;
+import dev.spiritstudios.specter.mixin.item.ShapedRecipeJsonBuilderAccessor;
 
 /**
  * A shaped recipe builder that takes an {@link ItemStack} as output.

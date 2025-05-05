@@ -1,13 +1,15 @@
 package dev.spiritstudios.specter.impl.config;
 
+import java.util.Optional;
+
 import com.mojang.serialization.*;
+import io.netty.buffer.ByteBuf;
+
+import net.minecraft.network.codec.PacketCodec;
+
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.serialization.CommentedCodec;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-
-import java.util.Optional;
 
 public class ValueImpl<T> implements Value<T> {
 	private final T defaultValue;
@@ -22,10 +24,10 @@ public class ValueImpl<T> implements Value<T> {
 	private T value;
 
 	public ValueImpl(T defaultValue,
-					 Codec<T> codec,
-					 PacketCodec<ByteBuf, T> packetCodec,
-					 String comment,
-					 boolean sync
+					Codec<T> codec,
+					PacketCodec<ByteBuf, T> packetCodec,
+					String comment,
+					boolean sync
 	) {
 		this.defaultValue = defaultValue;
 		this.comment = comment;

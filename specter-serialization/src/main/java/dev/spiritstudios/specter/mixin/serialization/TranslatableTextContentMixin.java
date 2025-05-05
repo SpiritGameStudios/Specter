@@ -1,13 +1,10 @@
 package dev.spiritstudios.specter.mixin.serialization;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
-import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Language;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,8 +13,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-import java.util.Optional;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.util.Language;
+
+import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
+import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 
 @Mixin(TranslatableTextContent.class)
 public abstract class TranslatableTextContentMixin {

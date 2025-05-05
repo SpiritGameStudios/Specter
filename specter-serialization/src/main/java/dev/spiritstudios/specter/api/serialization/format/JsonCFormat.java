@@ -1,13 +1,5 @@
 package dev.spiritstudios.specter.api.serialization.format;
 
-import com.google.gson.*;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.*;
-import dev.spiritstudios.specter.api.serialization.jsonc.JsonCElement;
-import dev.spiritstudios.specter.api.serialization.jsonc.JsonCObject;
-import dev.spiritstudios.specter.api.serialization.jsonc.JsonCWriter;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -16,6 +8,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
+
+import com.google.gson.*;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import dev.spiritstudios.specter.api.serialization.jsonc.JsonCElement;
+import dev.spiritstudios.specter.api.serialization.jsonc.JsonCObject;
+import dev.spiritstudios.specter.api.serialization.jsonc.JsonCWriter;
 
 public class JsonCFormat implements DynamicFormat<JsonCElement> {
 	public static final JsonCFormat INSTANCE = new JsonCFormat();

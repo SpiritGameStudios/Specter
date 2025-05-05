@@ -1,10 +1,12 @@
 package dev.spiritstudios.specter.impl.config;
 
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+
+import net.minecraft.network.codec.PacketCodec;
+
 import dev.spiritstudios.specter.api.config.NumericValue;
 import dev.spiritstudios.specter.api.core.math.Range;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 
 public class NumericValueImpl<T extends Number & Comparable<T>> extends ValueImpl<T> implements NumericValue<T> {
 	private final Range<T> range;

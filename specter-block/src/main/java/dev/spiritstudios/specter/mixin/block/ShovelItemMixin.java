@@ -1,14 +1,16 @@
 package dev.spiritstudios.specter.mixin.block;
 
+import java.util.Map;
+
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.spiritstudios.specter.api.block.BlockMetatags;
-import net.minecraft.block.Block;
-import net.minecraft.item.ShovelItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Map;
+import net.minecraft.block.Block;
+import net.minecraft.item.ShovelItem;
+
+import dev.spiritstudios.specter.api.block.BlockMetatags;
 
 @Mixin(ShovelItem.class)
 public class ShovelItemMixin {

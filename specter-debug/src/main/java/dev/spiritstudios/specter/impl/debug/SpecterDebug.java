@@ -1,17 +1,19 @@
 package dev.spiritstudios.specter.impl.debug;
 
-import dev.spiritstudios.specter.impl.debug.command.ComponentsCommand;
-import dev.spiritstudios.specter.impl.debug.command.HealCommand;
-import dev.spiritstudios.specter.impl.debug.command.MetatagCommand;
-import dev.spiritstudios.specter.impl.debug.item.LootLoaderItem;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+
+import dev.spiritstudios.specter.impl.debug.command.ComponentsCommand;
+import dev.spiritstudios.specter.impl.debug.command.HealCommand;
+import dev.spiritstudios.specter.impl.debug.command.MetatagCommand;
+import dev.spiritstudios.specter.impl.debug.item.LootLoaderItem;
 
 public class SpecterDebug implements ModInitializer {
 	@Override

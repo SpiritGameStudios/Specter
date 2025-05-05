@@ -16,10 +16,10 @@
 			"dev.spiritstudios.specter.impl.config.SpecterConfig"
 		],
 		"client": [
-			"dev.spiritstudios.specter.impl.config.SpecterConfigClient"
+			"dev.spiritstudios.specter.impl.config.client.SpecterConfigClient"
 		],
 		"modmenu": [
-			"dev.spiritstudios.specter.impl.config.SpecterConfigModMenu"
+			"dev.spiritstudios.specter.impl.config.client.SpecterConfigModMenu"
 		]
 	},
 	"mixins": [

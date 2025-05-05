@@ -2,11 +2,13 @@ package dev.spiritstudios.specter.mixin.item;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.api.item.ItemMetatags;
-import net.minecraft.item.FuelRegistry;
-import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+
+import net.minecraft.item.FuelRegistry;
+import net.minecraft.item.ItemStack;
+
+import dev.spiritstudios.specter.api.item.ItemMetatags;
 
 @Mixin(FuelRegistry.class)
 public class FuelRegistryMixin {

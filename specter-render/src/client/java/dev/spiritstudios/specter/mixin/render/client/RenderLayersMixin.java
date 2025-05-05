@@ -1,16 +1,18 @@
 package dev.spiritstudios.specter.mixin.render.client;
 
+import java.util.Map;
+import java.util.Optional;
+
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.spiritstudios.specter.api.render.BlockRenderLayer;
-import dev.spiritstudios.specter.api.render.RenderMetatags;
-import net.minecraft.block.Block;
-import net.minecraft.client.render.RenderLayers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Map;
-import java.util.Optional;
+import net.minecraft.block.Block;
+import net.minecraft.client.render.RenderLayers;
+
+import dev.spiritstudios.specter.api.render.client.BlockRenderLayer;
+import dev.spiritstudios.specter.api.render.client.RenderMetatags;
 
 @Mixin(RenderLayers.class)
 public class RenderLayersMixin {

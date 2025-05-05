@@ -1,18 +1,20 @@
 package dev.spiritstudios.specter.impl.registry.reloadable;
 
+import java.util.Map;
+import java.util.Optional;
+
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Optional;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
 
 public final class SpecterReloadableRegistriesImpl {
 	private static final Map<Identifier, ReloadableRegistryInfo<?>> RELOADABLE_REGISTRIES = new Object2ObjectLinkedOpenHashMap<>();

@@ -13,7 +13,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.spiritstudios.specter.testmod.SpecterDfuTestmod"
+			"dev.spiritstudios.testmod.dfu.SpecterDfuTestMod"
 		]
 	},
 	"depends": {

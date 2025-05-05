@@ -1,13 +1,12 @@
 package dev.spiritstudios.specter.impl.registry.metatag.data;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-import net.minecraft.registry.MutableRegistry;
+
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -17,10 +16,13 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 
 public class MetatagReloader implements SimpleResourceReloadListener<List<MetatagContent<?, ?>>> {
 	private final ResourceType side;
@@ -39,7 +41,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<List<Metata
 			Map<Metatag<?, ?>, MetatagContent<?, ?>> metatagContents = new Object2ObjectOpenHashMap<>();
 
 			// For each registry
-			for (RegistryEntry<MutableRegistry<?>> entry : Registries.ROOT.getIndexedEntries()) {
+			for (RegistryEntry<? extends Registry<?>> entry : Registries.REGISTRIES.getIndexedEntries()) {
 				if (entry.getKey().isEmpty()) continue;
 
 				Identifier registryId = entry.getKey().get().getValue();
@@ -65,7 +67,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<List<Metata
 					MetatagContent<?, ?> content = metatagContents.computeIfAbsent(metatag, this::createMap);
 
 					resource.getValue()
-						.forEach(metatagResource -> content.parseAndAddResource(metatagId, metatagResource));
+							.forEach(metatagResource -> content.parseAndAddResource(metatagId, metatagResource));
 				}
 			}
 
@@ -79,7 +81,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<List<Metata
 			data.forEach((content) -> {
 				loadMetatag(content);
 				MetatagEventsImpl.getLoadedEvent(content.getMetatag())
-					.ifPresent(event -> event.invoker().onMetatagLoaded(manager));
+						.ifPresent(event -> event.invoker().onMetatagLoaded(manager));
 			});
 		}, executor);
 	}

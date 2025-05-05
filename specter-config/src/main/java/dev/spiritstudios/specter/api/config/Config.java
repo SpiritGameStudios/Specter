@@ -1,26 +1,28 @@
 package dev.spiritstudios.specter.api.config;
 
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
+import io.netty.buffer.ByteBuf;
+import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
+
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.Ignore;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.core.util.SpecterPacketCodecs;
 import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
-
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * A configuration class that can be saved and loaded from disk.

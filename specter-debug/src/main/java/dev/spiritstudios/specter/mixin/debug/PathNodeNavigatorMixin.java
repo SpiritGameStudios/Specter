@@ -1,18 +1,19 @@
 package dev.spiritstudios.specter.mixin.debug;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.ai.pathing.PathNode;
 import net.minecraft.entity.ai.pathing.PathNodeNavigator;
 import net.minecraft.entity.ai.pathing.TargetPathNode;
 import net.minecraft.util.math.BlockPos;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Mixin(PathNodeNavigator.class)
 public abstract class PathNodeNavigatorMixin {

@@ -1,16 +1,17 @@
 package dev.spiritstudios.specter.impl.config;
 
+import java.util.Optional;
+
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.RecordBuilder;
+import io.netty.buffer.ByteBuf;
+
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.serialization.CommentedCodec;
-import io.netty.buffer.ByteBuf;
-
-import java.util.Optional;
 
 public class NestedConfigValue<T extends NestedConfig<T>> implements Value<T> {
 	private final T defaultValue;

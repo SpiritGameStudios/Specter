@@ -1,8 +1,0 @@
-{
-	"required": true,
-	"package": "testmod.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-		"TitleScreenMixin"
-	]
-}

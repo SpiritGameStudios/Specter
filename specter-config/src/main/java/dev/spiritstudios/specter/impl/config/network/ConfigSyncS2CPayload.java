@@ -1,19 +1,22 @@
 package dev.spiritstudios.specter.impl.config.network;
 
-import dev.spiritstudios.specter.api.config.ConfigHolder;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
+import static dev.spiritstudios.specter.api.core.SpecterGlobals.MODID;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
-import static dev.spiritstudios.specter.api.core.SpecterGlobals.MODID;
+import dev.spiritstudios.specter.api.config.ConfigHolder;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
 
 public record ConfigSyncS2CPayload(ConfigHolder<?, ?> config) implements CustomPayload {
 	public static final Id<ConfigSyncS2CPayload> ID = new Id<>(Identifier.of(MODID, "config_sync"));

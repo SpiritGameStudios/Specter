@@ -13,13 +13,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.spiritstudios.testmod.SpecterConfigTestmod"
+			"dev.spiritstudios.testmod.config.SpecterConfigTestmod"
 		],
 		"client": [
-			"dev.spiritstudios.testmod.SpecterConfigTestmodClient"
+			"dev.spiritstudios.testmod.config.SpecterConfigTestmodClient"
 		],
 		"fabric-gametest": [
-			"dev.spiritstudios.testmod.SpecterConfigGameTest"
+			"dev.spiritstudios.testmod.config.SpecterConfigGameTest"
 		]
 	},
 	"depends": {

@@ -1,8 +1,7 @@
 package dev.spiritstudios.specter.api.registry;
 
-import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
-import dev.spiritstudios.specter.api.registry.annotations.Name;
-import dev.spiritstudios.specter.api.registry.annotations.NoBlockItem;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentType;
@@ -14,7 +13,10 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
+
+import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
+import dev.spiritstudios.specter.api.registry.annotations.Name;
+import dev.spiritstudios.specter.api.registry.annotations.NoBlockItem;
 
 public final class RegistryHelper {
 	public static <T> void registerFields(Registry<T> registry, Class<T> toRegister, Class<?> clazz, String namespace) {

@@ -1,14 +1,15 @@
 package dev.spiritstudios.specter.api.serialization.format;
 
-import com.mojang.serialization.DynamicOps;
-import dev.spiritstudios.specter.impl.serialization.format.ForwardingDynamicFormat;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import com.mojang.serialization.DynamicOps;
+
+import dev.spiritstudios.specter.impl.serialization.format.ForwardingDynamicFormat;
 
 /**
  * An adapter for a hierarchical serialization format, with support for reading and writing values.

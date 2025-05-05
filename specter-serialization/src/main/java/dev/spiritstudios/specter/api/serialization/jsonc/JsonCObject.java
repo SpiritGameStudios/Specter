@@ -1,11 +1,11 @@
 package dev.spiritstudios.specter.api.serialization.jsonc;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonObject;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonObject;
 
 /**
  * A {@link JsonObject} with comments.

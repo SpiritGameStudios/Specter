@@ -1,15 +1,17 @@
 package dev.spiritstudios.specter.mixin.serialization.compat;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
-import net.minecraft.text.Text;
-import net.minecraft.util.Language;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import xyz.nucleoid.server.translations.impl.language.SystemDelegatedLanguage;
+
+import net.minecraft.text.Text;
+import net.minecraft.util.Language;
+
+import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 
 @Pseudo
 @Mixin(SystemDelegatedLanguage.class)

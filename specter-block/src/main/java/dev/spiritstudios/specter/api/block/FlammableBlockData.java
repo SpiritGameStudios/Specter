@@ -2,17 +2,19 @@ package dev.spiritstudios.specter.api.block;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import org.jetbrains.annotations.Range;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import org.jetbrains.annotations.Range;
+
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 /**
  * The flammability data of a block.
  */
 public record FlammableBlockData(@Range(from = 0, to = Integer.MAX_VALUE) int burn,
-								 @Range(from = 0, to = Integer.MAX_VALUE) int spread) {
+								@Range(from = 0, to = Integer.MAX_VALUE) int spread) {
 	public static final Codec<FlammableBlockData> CODEC = RecordCodecBuilder.create(instance -> instance
 		.group(
 			Codec.intRange(0, Integer.MAX_VALUE).fieldOf("burn").forGetter(FlammableBlockData::burn),

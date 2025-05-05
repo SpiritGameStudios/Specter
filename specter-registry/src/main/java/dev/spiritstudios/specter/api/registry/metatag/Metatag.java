@@ -1,23 +1,26 @@
 package dev.spiritstudios.specter.api.registry.metatag;
 
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.impl.registry.metatag.ExistingCombinedMetatag;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagImpl;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.registry.metatag.ExistingCombinedMetatag;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagImpl;
 
 /**
  * Metatags are used to store additional data about a registry object.
@@ -97,7 +100,7 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 		}
 
 		public Builder<R, V> existingCombined(Function<R, V> existingGetter,
-											  Supplier<Iterator<Entry<R, V>>> existingIterator) {
+											Supplier<Iterator<Entry<R, V>>> existingIterator) {
 			this.existingGetter = existingGetter;
 			this.existingIterator = existingIterator;
 			return this;

@@ -1,7 +1,9 @@
 package dev.spiritstudios.specter.api.registry.reloadable;
 
-import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
+import java.util.function.Function;
+
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.encoding.VarInts;
 import net.minecraft.registry.Registry;
@@ -9,7 +11,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.collection.IndexedIterable;
 
-import java.util.function.Function;
+import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 
 public final class SpecterRegistryPacketCodecs {
 	public static <T> PacketCodec<ByteBuf, T> registryValue(RegistryKey<? extends Registry<T>> key) {

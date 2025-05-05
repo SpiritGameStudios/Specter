@@ -1,18 +1,20 @@
 package dev.spiritstudios.specter.mixin.registry.metatag;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
-import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.util.Map;
-import java.util.Set;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.Identifier;
+
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
+import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 
 @Mixin(RegistryKey.class)
 public abstract class RegistryKeyMixin<R> implements MetatagHolder<R> {

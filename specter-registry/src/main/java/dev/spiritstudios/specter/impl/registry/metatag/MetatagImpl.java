@@ -1,18 +1,20 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
+import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public record MetatagImpl<R, V>(
 	Registry<R> registry,

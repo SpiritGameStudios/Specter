@@ -2,11 +2,13 @@ package dev.spiritstudios.specter.mixin.item;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.spiritstudios.specter.impl.item.SpecterItem;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
-import net.minecraft.item.ItemConvertible;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+
+import net.minecraft.item.ItemConvertible;
+
+import dev.spiritstudios.specter.impl.item.SpecterItem;
 
 @Mixin(targets = "net.minecraft.block.ComposterBlock$ComposterInventory")
 public class ComposterBlock$ComposterInventoryMixin {

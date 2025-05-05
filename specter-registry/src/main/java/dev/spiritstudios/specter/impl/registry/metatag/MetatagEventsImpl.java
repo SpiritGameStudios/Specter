@@ -1,13 +1,15 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.api.registry.metatag.MetatagEvents;
+import java.util.Map;
+import java.util.Optional;
+
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
-import java.util.Map;
-import java.util.Optional;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.api.registry.metatag.MetatagEvents;
 
 public final class MetatagEventsImpl {
 	private static final Map<Metatag<?, ?>, Event<MetatagEvents.MetatagLoaded>> METATAG_LOADED_MAP = new Reference2ObjectOpenHashMap<>();

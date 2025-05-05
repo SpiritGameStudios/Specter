@@ -1,10 +1,11 @@
 package dev.spiritstudios.specter.impl.serialization.text;
 
+import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.text.TextContent;
 
-import java.util.Map;
+import net.minecraft.text.TextContent;
 
 public final class TextContentRegistryImpl {
 	private static final Map<String, Entry<?>> types = new Object2ObjectOpenHashMap<>();

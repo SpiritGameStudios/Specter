@@ -1,9 +1,9 @@
 package dev.spiritstudios.specter.api.serialization.nightconfig;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.electronwill.nightconfig.core.CommentedConfig;
 
 public class NightConfigMap extends NightConfigElement {
 	private final CommentedConfig config;

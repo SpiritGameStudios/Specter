@@ -1,6 +1,7 @@
 package dev.spiritstudios.specter.api.core.math;
 
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
+
 import net.minecraft.util.math.MathHelper;
 
 /**

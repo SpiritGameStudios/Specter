@@ -1,16 +1,18 @@
 package dev.spiritstudios.specter.mixin.block;
 
+import java.util.Optional;
+
 import com.google.common.collect.BiMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.spiritstudios.specter.impl.block.SpecterBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Oxidizable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Optional;
+import net.minecraft.block.Block;
+import net.minecraft.block.Oxidizable;
+
+import dev.spiritstudios.specter.impl.block.SpecterBlock;
 
 @Mixin(Oxidizable.class)
 public interface OxidizableMixin {
@@ -40,4 +42,3 @@ public interface OxidizableMixin {
 		return unaffectedOxidationBlock.orElseGet(() -> original.call(instance, value));
 	}
 }
-

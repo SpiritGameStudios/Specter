@@ -1,10 +1,10 @@
 package dev.spiritstudios.specter.impl.serialization.codec;
 
-import com.mojang.serialization.*;
-
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import com.mojang.serialization.*;
 
 public class FuzzyCodec<T> extends MapCodec<T> {
 	private final List<MapCodec<? extends T>> codecs;

@@ -1,16 +1,18 @@
 package dev.spiritstudios.specter.api.block;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.api.registry.metatag.Metatag;
-import dev.spiritstudios.specter.mixin.block.AxeItemAccessor;
-import dev.spiritstudios.specter.mixin.block.ShovelItemAccessor;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
+
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.mixin.block.AxeItemAccessor;
+import dev.spiritstudios.specter.mixin.block.ShovelItemAccessor;
 
 public final class BlockMetatags {
 	/**

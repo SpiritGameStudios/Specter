@@ -1,11 +1,13 @@
 package dev.spiritstudios.specter.impl.dfu;
 
+import java.util.Map;
+
 import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
-import dev.spiritstudios.specter.mixin.dfu.DataFixTypesAccessor;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import net.minecraft.SharedConstants;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.Schemas;
@@ -13,7 +15,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 
-import java.util.Map;
+import dev.spiritstudios.specter.mixin.dfu.DataFixTypesAccessor;
 
 public final class SpecterDataFixerRegistryImpl {
 	private static SpecterDataFixerRegistryImpl INSTANCE;

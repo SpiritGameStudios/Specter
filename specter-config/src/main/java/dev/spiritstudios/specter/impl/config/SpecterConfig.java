@@ -1,12 +1,13 @@
 package dev.spiritstudios.specter.impl.config;
 
-import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
+import java.util.List;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
-import java.util.List;
+import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 
 public class SpecterConfig implements ModInitializer {
 	@Override

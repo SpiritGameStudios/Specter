@@ -1,13 +1,14 @@
 package dev.spiritstudios.specter.api.dfu;
 
+import java.util.Objects;
+
 import com.mojang.datafixers.DataFixerBuilder;
 import com.mojang.datafixers.schemas.Schema;
+
 import net.minecraft.datafixer.fix.BlockNameFix;
 import net.minecraft.datafixer.fix.ItemNameFix;
 import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 import net.minecraft.util.Identifier;
-
-import java.util.Objects;
 
 public final class DataFixHelper {
 	public static void renameBlock(

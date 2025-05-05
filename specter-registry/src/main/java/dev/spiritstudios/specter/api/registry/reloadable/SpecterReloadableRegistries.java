@@ -1,15 +1,17 @@
 package dev.spiritstudios.specter.api.registry.reloadable;
 
+import java.util.Optional;
+
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
-import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
+
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 
-import java.util.Optional;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 
 /**
  * A reloadable registry is effectively a {@link net.fabricmc.fabric.api.event.registry.DynamicRegistries DynamicRegistry}

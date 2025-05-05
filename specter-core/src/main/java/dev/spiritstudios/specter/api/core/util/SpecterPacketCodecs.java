@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.core.util;
 
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.math.Vec3d;
