@@ -249,6 +249,8 @@ tasks.javadoc {
 
 	include("**/api/**")
 	isFailOnError = false
+
+	dependsOn(tasks["generatePackageInfos"], tasks["generateClientPackageInfos"])
 }
 
 val javadocJar by tasks.registering(Jar::class) {
