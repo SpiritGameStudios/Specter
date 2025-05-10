@@ -1,129 +1,36 @@
 package dev.spiritstudios.specter.api.gui.client.bridget;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 
-import org.joml.Vector2i;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import dev.spiritstudios.specter.api.gui.client.bridget.layout.HorizontalAlign;
+import dev.spiritstudios.specter.api.gui.client.bridget.layout.VerticalAlign;
 
 public class Bridget implements Drawable {
-	public boolean mayContain;
-	public boolean overrideDimensions;
-	public List<Bridget> children = new ArrayList<>();
-	public Vector2i position;
-	public Vector2i dimensions;
+	protected final MinecraftClient client = MinecraftClient.getInstance();
 
-	public Bridget(int x, int y, int width, int height, boolean overrideDimensions, boolean mayContain) {
-		this.mayContain = mayContain;
-		this.overrideDimensions = overrideDimensions;
-		this.position = new Vector2i(x, y);
-		this.dimensions = new Vector2i(width, height);
-	}
+	public int width = 0;
+	public int height = 0;
 
-	// Builder
+	protected List<Bridget> children = new ArrayList<>();
+	protected @Nullable Bridget parent;
 
-	public static class Builder {
-		public int x = 0;
-		public int y = 0;
-		public int width = 0;
-		public int height = 0;
-		public boolean overrideDimensions = false;
-		public boolean mayContainChildren = true;
-		public Bridget type;
+	protected HorizontalAlign horizontalAlign = HorizontalAlign.CENTER;
+	protected VerticalAlign verticalAlign = VerticalAlign.CENTER;
 
-		public Builder setType(Bridget type) {
-			return this;
-		}
+	private int x = 0, y = 0;
 
-		public Builder setX(int x) {
-			this.x = x;
-			return this;
-		}
-
-		public Builder setY(int y) {
-			this.y = y;
-			return this;
-		}
-
-		public Builder setWidth(int width) {
-			this.width = width;
-			return this;
-		}
-
-		public Builder setHeight(int height) {
-			this.height = height;
-			return this;
-		}
-
-		public Builder mayOverrideDimensions(boolean overrideDimensions) {
-			this.overrideDimensions = overrideDimensions;
-			return this;
-		}
-
-		public Builder mayContainChildren(boolean mayContainChildren) {
-			this.mayContainChildren = mayContainChildren;
-			return this;
-		}
-
-		public Bridget build() {
-			return new Bridget(x, y, width, height, overrideDimensions, mayContainChildren);
-		}
-	}
-
-	// Dimensions & Position
-	// Just steal this stuff by implementing/extending Widget.
-
-	public void setPosition(int x, int y) {
-		this.position.x = x;
-		this.position.y = y;
-	}
-
-	public void setX(int x) {
-		this.position.x = x;
-	}
-
-	public int getX() {
-		return this.position.x;
-	}
-
-	public void setY(int y) {
-		this.position.y = y;
-	}
-
-	public int getY() {
-		return this.position.y;
-	}
-
-	public void setDimensions(int width, int height) {
-		this.dimensions.x = width;
-		this.dimensions.y = height;
-	}
-
-	public void setWidth(int width) {
-		this.dimensions.x = width;
-	}
-
-	public int getWidth() {
-		return this.dimensions.x;
-	}
-
-	public void setHeight(int height) {
-		this.dimensions.y = height;
-	}
-
-	public int getHeight() {
-		return this.dimensions.y;
-	}
-
-	// Children
-
-	public void addChild(Bridget child) {
-		if (this.mayContain) {
-			this.children.add(child);
-		}
+	// region Children
+	public Bridget child(Bridget child) {
+		this.children.add(child);
+		child.parent = this;
+		return this;
 	}
 
 	public void removeChild(Bridget child) {
@@ -133,8 +40,73 @@ public class Bridget implements Drawable {
 	public void clearChildren() {
 		this.children.clear();
 	}
+	// endregion
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+		for (Bridget child : children) child.render(context, mouseX, mouseY, delta);
+	}
+
+	public Bridget x(int x) {
+		this.x = x;
+		return this;
+	}
+
+	public int x() {
+		return parent != null ?
+				this.x + parent.x() + horizontalAlign.align(width, parent.width) :
+				this.x;
+	}
+
+	public Bridget y(int y) {
+		this.y = y;
+		return this;
+	}
+
+	public int y() {
+		return parent != null ?
+				this.y + parent.y() + verticalAlign.align(height, parent.height) :
+				this.y;
+	}
+
+	public Bridget pos(int x, int y) {
+		this.x = x;
+		this.y = y;
+		return this;
+	}
+
+
+	public Bridget width(int width) {
+		this.width = width;
+		return this;
+	}
+
+	public Bridget height(int height) {
+		this.height = height;
+		return this;
+	}
+
+	public Bridget size(int width, int height) {
+		this.width = width;
+		this.height = height;
+		return this;
+	}
+
+	public Bridget horizontalAlign(HorizontalAlign horizontalAlign) {
+		this.horizontalAlign = horizontalAlign;
+		return this;
+	}
+
+	public HorizontalAlign horizontalAlign() {
+		return horizontalAlign;
+	}
+
+	public Bridget verticalAlign(VerticalAlign verticalAlign) {
+		this.verticalAlign = verticalAlign;
+		return this;
+	}
+
+	public VerticalAlign verticalAlign() {
+		return verticalAlign;
 	}
 }

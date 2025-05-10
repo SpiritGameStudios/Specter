@@ -8,8 +8,33 @@
 	<property name="localeLanguage" value="en"/>
 	<property name="localeCountry" value="US"/>
 	<property name="tabWidth" value="4"/>
+	
+	<module name="RegexpSingleline">
+		<property name="format" value="\s+$"/>
+		<property name="message" value="trailing whitespace"/>
+	</module>
+
+	<module name="RegexpMultiline">
+		<property name="format" value="\n[\t ]*\r?\n[\t ]*\r?\n"/>
+		<property name="message" value="adjacent blank lines"/>
+	</module>
+
+	<module name="RegexpMultiline">
+		<property name="format" value="\{[\t ]*\r?\n[\t ]*\r?\n"/>
+		<property name="message" value="blank line after '{'"/>
+	</module>
+
+	<module name="RegexpMultiline">
+		<property name="format" value="\n[\t ]*\r?\n[\t ]*\}"/>
+		<property name="message" value="blank line before '}'"/>
+	</module>
 
 	<module name="TreeWalker">
+		<module name="AvoidStarImport"/>
+		<module name="IllegalImport"/>
+		<module name="RedundantImport"/>
+		<module name="UnusedImports"/>
+
 		<module name="OuterTypeFilename"/>
 		<module name="PackageDeclaration"/>
 		<module name="PackageName">

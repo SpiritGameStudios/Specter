@@ -193,7 +193,7 @@ allprojects {
 							|package $packageName;
 							|
 							|import org.jetbrains.annotations.ApiStatus;
-							 """.trimMargin()
+							|""".trimMargin()
 							)
 							close()
 						}

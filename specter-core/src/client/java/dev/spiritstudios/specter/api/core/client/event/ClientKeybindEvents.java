@@ -1,6 +1,5 @@
 package dev.spiritstudios.specter.api.core.client.event;
 
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 

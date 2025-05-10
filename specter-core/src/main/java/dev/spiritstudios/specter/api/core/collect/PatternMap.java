@@ -1,6 +1,11 @@
 package dev.spiritstudios.specter.api.core.collect;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.mojang.datafixers.util.Pair;
@@ -19,10 +24,10 @@ public class PatternMap<V> implements Map<Class<?>, V> {
 
 	public V get(Class<?> clazz) {
 		return entries.stream().
-			filter(entry -> entry.getFirst().isAssignableFrom(clazz))
-			.findFirst()
-			.map(Pair::getSecond)
-			.orElse(null);
+				filter(entry -> entry.getFirst().isAssignableFrom(clazz))
+				.findFirst()
+				.map(Pair::getSecond)
+				.orElse(null);
 	}
 
 	@Override
@@ -86,7 +91,7 @@ public class PatternMap<V> implements Map<Class<?>, V> {
 	@Override
 	public @NotNull Set<Entry<Class<?>, V>> entrySet() {
 		return entries.stream()
-			.map(pair -> new AbstractMap.SimpleEntry<Class<?>, V>(pair.getFirst(), pair.getSecond()))
-			.collect(Collectors.toSet());
+				.map(pair -> new AbstractMap.SimpleEntry<Class<?>, V>(pair.getFirst(), pair.getSecond()))
+				.collect(Collectors.toSet());
 	}
 }
