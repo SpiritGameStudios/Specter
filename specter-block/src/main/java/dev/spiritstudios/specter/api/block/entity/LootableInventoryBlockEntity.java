@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerLootComponent;
 import net.minecraft.inventory.Inventories;
@@ -96,7 +97,7 @@ public class LootableInventoryBlockEntity extends BlockEntity implements Impleme
 	}
 
 	@Override
-	protected void readComponents(BlockEntity.ComponentsAccess components) {
+	protected void readComponents(ComponentsAccess components) {
 		super.readComponents(components);
 		ContainerLootComponent containerLootComponent = components.get(DataComponentTypes.CONTAINER_LOOT);
 		if (containerLootComponent != null) {

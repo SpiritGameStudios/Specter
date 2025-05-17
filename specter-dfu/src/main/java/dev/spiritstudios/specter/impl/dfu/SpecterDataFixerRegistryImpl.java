@@ -31,7 +31,7 @@ public final class SpecterDataFixerRegistryImpl {
 		if (INSTANCE != null) return INSTANCE;
 
 		Schema vanillaSchema = Schemas.getFixer()
-			.getSchema(DataFixUtils.makeKey(SharedConstants.getGameVersion().getSaveVersion().getId()));
+				.getSchema(DataFixUtils.makeKey(SharedConstants.getGameVersion().getSaveVersion().getId()));
 
 		INSTANCE = new SpecterDataFixerRegistryImpl(vanillaSchema);
 		return INSTANCE;
@@ -42,9 +42,9 @@ public final class SpecterDataFixerRegistryImpl {
 	}
 
 	public void register(
-		String modId,
-		int currentDataVersion,
-		DataFixer dataFixer
+			String modId,
+			int currentDataVersion,
+			DataFixer dataFixer
 	) {
 		if (dataFixers.containsKey(modId))
 			throw new IllegalArgumentException("Mod with id %s attempted to register multiple DataFixers".formatted(modId));
@@ -53,25 +53,23 @@ public final class SpecterDataFixerRegistryImpl {
 	}
 
 	public NbtCompound update(
-		DataFixTypes types,
-		NbtCompound compound
+			DataFixTypes types,
+			NbtCompound compound
 	) {
 		Dynamic<NbtElement> dynamic = new Dynamic<>(NbtOps.INSTANCE, compound);
 
-		NbtCompound specterDataVersions = compound.contains("SpecterDataVersions", NbtElement.COMPOUND_TYPE) ?
-			compound.getCompound("SpecterDataVersions") :
-			new NbtCompound();
+		NbtCompound specterDataVersions = compound.getCompound("SpecterDataVersions").orElse(new NbtCompound());
 
 		for (Map.Entry<String, VersionedDataFixer> entry : dataFixers.entrySet()) {
 			String modId = entry.getKey();
 			VersionedDataFixer value = entry.getValue();
 
-			int dataVersion = specterDataVersions.getInt(modId);
+			int dataVersion = specterDataVersions.getInt(modId, 0);
 
 			dynamic = value.dataFixer().update(
-				((DataFixTypesAccessor) (Object) types).getTypeReference(),
-				dynamic,
-				dataVersion, value.currentDataVersion()
+					((DataFixTypesAccessor) (Object) types).getTypeReference(),
+					dynamic,
+					dataVersion, value.currentDataVersion()
 			);
 		}
 

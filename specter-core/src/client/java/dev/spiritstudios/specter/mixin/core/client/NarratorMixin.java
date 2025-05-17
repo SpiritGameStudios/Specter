@@ -17,7 +17,8 @@ public interface NarratorMixin {
 			cir.setReturnValue(
 					new Narrator() {
 						@Override
-						public void say(String msg, boolean interrupt) {
+						public void say(String s, boolean b, float v) {
+
 						}
 
 						@Override

@@ -1,20 +1,19 @@
 package dev.spiritstudios.testmod.block;
 
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-
 @SuppressWarnings("unused")
 public final class SpecterBlockGameTest {
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest
 	public void testStrippableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.QUARTZ_PILLAR);
@@ -27,7 +26,7 @@ public final class SpecterBlockGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest
 	public void testFlattenableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.QUARTZ_PILLAR);
@@ -40,7 +39,7 @@ public final class SpecterBlockGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest
 	public void testWaxableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.QUARTZ_PILLAR);
@@ -53,7 +52,7 @@ public final class SpecterBlockGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest
 	public void testOxidizableMetatag(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 		context.setBlockState(pos, Blocks.DIAMOND_ORE);
@@ -76,7 +75,7 @@ public final class SpecterBlockGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest
 	public void testBlockStatePropertyModification(TestContext context) {
 		BlockPos pos = new BlockPos(0, 1, 0);
 

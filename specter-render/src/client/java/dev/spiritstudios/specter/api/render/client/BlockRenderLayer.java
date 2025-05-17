@@ -19,7 +19,7 @@ public enum BlockRenderLayer implements StringIdentifiable {
 	TRANSLUCENT(3, RenderLayer::getTranslucent, "translucent"),
 	SOLID(4, RenderLayer::getSolid, "solid");
 	public static final Codec<BlockRenderLayer> CODEC = StringIdentifiable.createCodec(BlockRenderLayer::values);
-	private static final IntFunction<BlockRenderLayer> BY_ID = ValueLists.createIdToValueFunction(BlockRenderLayer::getId, values(), ValueLists.OutOfBoundsHandling.ZERO);
+	private static final IntFunction<BlockRenderLayer> BY_ID = ValueLists.createIndexToValueFunction(BlockRenderLayer::getId, values(), ValueLists.OutOfBoundsHandling.ZERO);
 	public static final PacketCodec<ByteBuf, BlockRenderLayer> PACKET_CODEC = PacketCodecs.indexed(BY_ID, BlockRenderLayer::getId);
 
 	private final Supplier<RenderLayer> layer;

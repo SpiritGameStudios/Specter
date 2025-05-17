@@ -15,7 +15,7 @@ import dev.spiritstudios.specter.api.render.client.shake.ScreenshakeManager;
 public class GameRendererMixin {
 	@ModifyExpressionValue(method = "renderWorld", at = @At(value = "NEW", target = "net/minecraft/client/util/math/MatrixStack"))
 	private MatrixStack applyScreenshake(MatrixStack original, @Local(argsOnly = true) RenderTickCounter renderTickCounter) {
-		ScreenshakeManager.update(renderTickCounter.getTickDelta(true), original);
+		ScreenshakeManager.update(renderTickCounter.getTickProgress(true), original);
 		return original;
 	}
 }

@@ -88,15 +88,15 @@ public abstract class DebugInfoSenderMixin {
 	@Inject(method = "sendPoiAddition", at = @At("HEAD"))
 	private static void sendPoiAddition(ServerWorld world, BlockPos pos, CallbackInfo ci) {
 		world.getPointOfInterestStorage().getType(pos)
-			.map(RegistryEntry::getIdAsString)
-			.ifPresent(name -> sendToAll(
-				world,
-				new DebugPoiAddedCustomPayload(
-					pos,
-					name,
-					world.getPointOfInterestStorage().getFreeTickets(pos)
-				))
-			);
+				.map(RegistryEntry::getIdAsString)
+				.ifPresent(name -> sendToAll(
+						world,
+						new DebugPoiAddedCustomPayload(
+								pos,
+								name,
+								world.getPointOfInterestStorage().getFreeTickets(pos)
+						))
+				);
 	}
 
 	@Inject(method = "sendPoiRemoval", at = @At("HEAD"))
@@ -147,33 +147,33 @@ public abstract class DebugInfoSenderMixin {
 		if (serverWorld == null) return;
 
 		sendToAll(
-			serverWorld,
-			new DebugStructuresCustomPayload(
-				serverWorld.getRegistryKey(),
-				structureStart.getBoundingBox(),
-				structureStart.getChildren().stream()
-					.map(piece -> new DebugStructuresCustomPayload.Piece(
-						piece.getBoundingBox(),
-						piece.getChainLength() == 0)
-					).toList()
-			)
+				serverWorld,
+				new DebugStructuresCustomPayload(
+						serverWorld.getRegistryKey(),
+						structureStart.getBoundingBox(),
+						structureStart.getChildren().stream()
+								.map(piece -> new DebugStructuresCustomPayload.Piece(
+										piece.getBoundingBox(),
+										piece.getChainLength() == 0)
+								).toList()
+				)
 		);
 	}
 
 	@Inject(method = "sendGoalSelector", at = @At("HEAD"))
 	private static void sendGoalSelector(World world, MobEntity mob, GoalSelector goalSelector, CallbackInfo ci) {
 		sendToAll(
-			(ServerWorld) world,
-			new DebugGoalSelectorCustomPayload(
-				mob.getId(),
-				mob.getBlockPos(),
-				goalSelector.getGoals().stream()
-					.map(goal -> new DebugGoalSelectorCustomPayload.Goal(
-						goal.getPriority(),
-						goal.isRunning(),
-						goal.getGoal().toString()
-					)).toList()
-			)
+				(ServerWorld) world,
+				new DebugGoalSelectorCustomPayload(
+						mob.getId(),
+						mob.getBlockPos(),
+						goalSelector.getGoals().stream()
+								.map(goal -> new DebugGoalSelectorCustomPayload.Goal(
+										goal.getPriority(),
+										goal.isRunning(),
+										goal.getGoal().toString()
+								)).toList()
+				)
 		);
 	}
 
@@ -195,89 +195,89 @@ public abstract class DebugInfoSenderMixin {
 		Set<BlockPos> potentialPois = Set.of();
 
 		if (living instanceof VillagerEntity villager) {
-			profession = villager.getVillagerData().getProfession().toString();
+			profession = villager.getVillagerData().profession().toString();
 			experience = villager.getExperience();
 			wantsGolem = villager.canSummonGolem(villager.getWorld().getTime());
 
 			List<String> newGossips = new ArrayList<>();
 			villager.getGossip().getEntityReputationAssociatedGossips().forEach((key, value) -> value.forEach((villageGossipType, integer) -> newGossips.add(
-				"%s: %s: %d".formatted(NameGenerator.name(key), villageGossipType, integer)
+					"%s: %s: %d".formatted(NameGenerator.name(key), villageGossipType, integer)
 			)));
 			gossips = newGossips;
 			pois = Stream.of(MemoryModuleType.JOB_SITE, MemoryModuleType.HOME, MemoryModuleType.MEETING_POINT)
-				.map(brain::getOptionalMemory)
-				.filter(Objects::nonNull)
-				.flatMap(Optional::stream)
-				.map(GlobalPos::pos)
-				.collect(Collectors.toSet());
+					.map(brain::getOptionalMemory)
+					.filter(Objects::nonNull)
+					.flatMap(Optional::stream)
+					.map(GlobalPos::pos)
+					.collect(Collectors.toSet());
 
 			potentialPois = Optional.ofNullable(brain.getOptionalMemory(MemoryModuleType.POTENTIAL_JOB_SITE)).orElse(Optional.empty())
-				.map(site -> Set.of(site.pos())).orElse(Set.of());
+					.map(site -> Set.of(site.pos())).orElse(Set.of());
 		}
 
 		sendToAll(
-			(ServerWorld) living.getWorld(),
-			new DebugBrainCustomPayload(new DebugBrainCustomPayload.Brain(
-				living.getUuid(),
-				living.getId(),
-				living.getDisplayName() != null ? living.getDisplayName().getString() : "",
-				profession,
-				experience,
-				living.getHealth(),
-				living.getMaxHealth(),
-				living.getPos(),
-				living instanceof InventoryOwner inventoryOwner ? inventoryOwner.getInventory().toString() : "",
-				Optional.ofNullable(brain.getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty()).orElse(null),
-				wantsGolem,
-				living instanceof WardenEntity warden ? warden.getAnger() : -1,
-				brain.getPossibleActivities().stream().map(Activity::getId).toList(),
-				brain.getRunningTasks().stream().map(Task::getName).toList(),
-				listMemories(living, living.getWorld().getTime()),
-				gossips,
-				pois,
-				potentialPois
-			))
+				(ServerWorld) living.getWorld(),
+				new DebugBrainCustomPayload(new DebugBrainCustomPayload.Brain(
+						living.getUuid(),
+						living.getId(),
+						living.getDisplayName() != null ? living.getDisplayName().getString() : "",
+						profession,
+						experience,
+						living.getHealth(),
+						living.getMaxHealth(),
+						living.getPos(),
+						living instanceof InventoryOwner inventoryOwner ? inventoryOwner.getInventory().toString() : "",
+						Optional.ofNullable(brain.getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty()).orElse(null),
+						wantsGolem,
+						living instanceof WardenEntity warden ? warden.getAnger() : -1,
+						brain.getPossibleActivities().stream().map(Activity::getId).toList(),
+						brain.getRunningTasks().stream().map(Task::getName).toList(),
+						listMemories(living, living.getWorld().getTime()),
+						gossips,
+						pois,
+						potentialPois
+				))
 		);
 	}
 
 	@Inject(method = "sendBeeDebugData", at = @At("HEAD"))
 	private static void sendBeeDebugData(BeeEntity bee, CallbackInfo ci) {
 		sendToAll(
-			(ServerWorld) bee.getWorld(),
-			new DebugBeeCustomPayload(new DebugBeeCustomPayload.Bee(
-				bee.getUuid(),
-				bee.getId(),
-				bee.getPos(),
-				Optional.ofNullable(bee.getBrain().getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty()).orElse(null),
-				bee.getHivePos(),
-				bee.getFlowerPos(),
-				bee.getMoveGoalTicks(),
-				bee.getGoalSelector().getGoals().stream()
-					.map(goal -> goal.getGoal().toString())
-					.collect(Collectors.toSet()),
-				bee.getPossibleHives()
-			))
+				(ServerWorld) bee.getWorld(),
+				new DebugBeeCustomPayload(new DebugBeeCustomPayload.Bee(
+						bee.getUuid(),
+						bee.getId(),
+						bee.getPos(),
+						Optional.ofNullable(bee.getBrain().getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty()).orElse(null),
+						bee.getHivePos(),
+						bee.getFlowerPos(),
+						bee.getMoveGoalTicks(),
+						bee.getGoalSelector().getGoals().stream()
+								.map(goal -> goal.getGoal().toString())
+								.collect(Collectors.toSet()),
+						bee.getPossibleHives()
+				))
 		);
 	}
 
 	@Inject(method = "sendBreezeDebugData", at = @At("HEAD"))
 	private static void sendBreezeDebugData(BreezeEntity breeze, CallbackInfo ci) {
 		sendToAll(
-			(ServerWorld) breeze.getWorld(),
-			new DebugBreezeCustomPayload(new DebugBreezeCustomPayload.BreezeInfo(
-				breeze.getUuid(),
-				breeze.getId(),
-				Optional.ofNullable(breeze.getTarget()).map(Entity::getId).orElse(null),
-				Optional.ofNullable(breeze.getBrain().getOptionalMemory(MemoryModuleType.BREEZE_JUMP_TARGET)).orElse(Optional.empty()).orElse(null)
-			))
+				(ServerWorld) breeze.getWorld(),
+				new DebugBreezeCustomPayload(new DebugBreezeCustomPayload.BreezeInfo(
+						breeze.getUuid(),
+						breeze.getId(),
+						Optional.ofNullable(breeze.getTarget()).map(Entity::getId).orElse(null),
+						Optional.ofNullable(breeze.getBrain().getOptionalMemory(MemoryModuleType.BREEZE_JUMP_TARGET)).orElse(Optional.empty()).orElse(null)
+				))
 		);
 	}
 
 	@Inject(method = "sendGameEvent", at = @At("HEAD"))
 	private static void sendGameEvent(World world, RegistryEntry<GameEvent> event, Vec3d pos, CallbackInfo ci) {
 		event.getKey().ifPresent(key -> sendToAll(
-			(ServerWorld) world,
-			new DebugGameEventCustomPayload(key, pos)
+				(ServerWorld) world,
+				new DebugGameEventCustomPayload(key, pos)
 		));
 	}
 
@@ -289,14 +289,14 @@ public abstract class DebugInfoSenderMixin {
 	@Inject(method = "sendBeehiveDebugData", at = @At("HEAD"))
 	private static void sendBeehiveDebugData(World world, BlockPos pos, BlockState state, BeehiveBlockEntity blockEntity, CallbackInfo ci) {
 		sendToAll(
-			(ServerWorld) world,
-			new DebugHiveCustomPayload(new DebugHiveCustomPayload.HiveInfo(
-				pos,
-				Registries.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType()).toString(),
-				blockEntity.getBeeCount(),
-				state.get(BeehiveBlock.HONEY_LEVEL),
-				blockEntity.isSmoked()
-			))
+				(ServerWorld) world,
+				new DebugHiveCustomPayload(new DebugHiveCustomPayload.HiveInfo(
+						pos,
+						Registries.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType()).toString(),
+						blockEntity.getBeeCount(),
+						state.get(BeehiveBlock.HONEY_LEVEL),
+						blockEntity.isSmoked()
+				))
 		);
 	}
 }

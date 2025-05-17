@@ -3,7 +3,6 @@ package dev.spiritstudios.specter.api.gui.client.widget;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -119,10 +118,6 @@ public class SpecterSliderWidget extends ClickableWidget {
 	@Override
 	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 		MinecraftClient client = MinecraftClient.getInstance();
-
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.enableDepthTest();
 
 		context.drawGuiTexture(
 				RenderLayer::getGuiTextured,
