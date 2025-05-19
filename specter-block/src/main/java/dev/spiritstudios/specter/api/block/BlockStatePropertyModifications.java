@@ -68,10 +68,8 @@ public final class BlockStatePropertyModifications {
 	 * @param <T>          The type of the property
 	 */
 	public static <T extends Comparable<T>> void setDefault(Block block, Property<T> property, T defaultValue) {
-		if (!block.getStateManager().getProperties().contains(property)) {
-			SpecterGlobals.debug("Property " + property.getName() + " does not exist for block " + block);
-			return;
-		}
+		if (!block.getStateManager().getProperties().contains(property))
+			throw new IllegalArgumentException("Property " + property.getName() + " does not exist for block " + block);
 
 		BlockState defaultState = block.getStateManager().getDefaultState().with(property, defaultValue);
 		((BlockAccessor) block).setDefaultState(defaultState);

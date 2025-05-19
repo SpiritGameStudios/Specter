@@ -40,7 +40,7 @@ public final class SpecterReloadableRegistriesImpl {
 	public static void setManager(DynamicRegistryManager manager) {
 		SpecterReloadableRegistriesImpl.manager = manager;
 
-		if (SpecterGlobals.DEBUG) {
+		if (SpecterGlobals.DEBUG && manager != null) {
 			manager.streamAllRegistryKeys().forEach(key -> {
 				SpecterGlobals.debug(key.getValue().toString());
 			});
@@ -48,9 +48,9 @@ public final class SpecterReloadableRegistriesImpl {
 	}
 
 	public record ReloadableRegistryInfo<T>(
-		RegistryKey<Registry<T>> key,
-		Codec<T> codec,
-		@Nullable PacketCodec<? super RegistryByteBuf, T> packetCodec
+			RegistryKey<Registry<T>> key,
+			Codec<T> codec,
+			@Nullable PacketCodec<? super RegistryByteBuf, T> packetCodec
 	) {
 	}
 }

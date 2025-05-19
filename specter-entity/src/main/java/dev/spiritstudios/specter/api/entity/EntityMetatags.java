@@ -19,11 +19,10 @@ public final class EntityMetatags {
 	 * @apiNote This metatag does not include default attributes set by vanilla or other mods that use the vanilla attribute system.
 	 */
 	public static final Metatag<EntityType<?>, DataDefaultAttributeBuilder> DEFAULT_ATTRIBUTES = Metatag.builder(
-		Registries.ENTITY_TYPE,
-		Identifier.of(MODID, "default_attributes"),
-		DataDefaultAttributeBuilder.CODEC,
-		DataDefaultAttributeBuilder.PACKET_CODEC
-	).build();
+			Registries.ENTITY_TYPE,
+			Identifier.of(MODID, "default_attributes"),
+			DataDefaultAttributeBuilder.CODEC
+	).packetCodec(DataDefaultAttributeBuilder.PACKET_CODEC).build();
 
 	private EntityMetatags() {
 		throw new UnsupportedOperationException("Cannot instantiate utility class");

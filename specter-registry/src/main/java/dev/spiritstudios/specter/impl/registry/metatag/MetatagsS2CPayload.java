@@ -25,22 +25,22 @@ import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 @ApiStatus.Internal
 public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 	public static final PacketCodec<RegistryByteBuf, MetatagsS2CPayload> CODEC = MetatagsS2CPayload.MetatagData.CODEC
-		.collect(PacketCodecs.toList())
-		.xmap(MetatagsS2CPayload::new, MetatagsS2CPayload::metatags);
+			.collect(PacketCodecs.toList())
+			.xmap(MetatagsS2CPayload::new, MetatagsS2CPayload::metatags);
 
 	private static @Nullable MetatagsS2CPayload CACHE;
 
 	private static <R, V> MetatagData<R, V> createData(Metatag<R, V> metatag) {
 		return new MetatagData<>(
-			metatag,
-			Streams.stream(
-				metatag instanceof ExistingCombinedMetatag<R, V> existingCombined ?
-					existingCombined.rawIterator() :
-					metatag.iterator()
-			).collect(Collectors.toMap(
-				Metatag.Entry::key,
-				Metatag.Entry::value
-			))
+				metatag,
+				Streams.stream(
+						metatag instanceof ExistingCombinedMetatag<R, V> existingCombined ?
+								existingCombined.rawIterator() :
+								metatag.iterator()
+				).collect(Collectors.toMap(
+						Metatag.Entry::key,
+						Metatag.Entry::value
+				))
 		);
 	}
 
@@ -52,6 +52,8 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 		for (Registry<?> registry : Registries.REGISTRIES) {
 			MetatagHolder.of(registry).specter$getMetatags().forEach(entry -> {
 				if (entry.getValue().side() != ResourceType.SERVER_DATA) return;
+				if (entry.getValue().packetCodec() == null) return;
+
 				metatags.add(createData(entry.getValue()));
 			});
 		}
@@ -66,32 +68,32 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 
 	public record MetatagData<R, V>(Metatag<R, V> metatag, Map<R, V> entries) {
 		private static final PacketCodec<ByteBuf, Metatag<?, ?>> METATAG_CODEC =
-			Identifier.PACKET_CODEC.<Registry<?>>xmap(
-				Registries.REGISTRIES::get,
-				registry -> registry.getKey().getValue()
-			).dispatch(
-				Metatag::registry,
-				registry -> Identifier.PACKET_CODEC.xmap(
-					id -> MetatagHolder.of(registry).specter$getMetatag(id),
-					Metatag::id
-				)
-			);
+				Identifier.PACKET_CODEC.<Registry<?>>xmap(
+						Registries.REGISTRIES::get,
+						registry -> registry.getKey().getValue()
+				).dispatch(
+						Metatag::registry,
+						registry -> Identifier.PACKET_CODEC.xmap(
+								id -> MetatagHolder.of(registry).specter$getMetatag(id),
+								Metatag::id
+						)
+				);
 
 		public static final PacketCodec<RegistryByteBuf, MetatagData<?, ?>> CODEC = METATAG_CODEC
-			.<RegistryByteBuf>cast()
-			.dispatch(
-				MetatagData::metatag,
-				MetatagData::codec
-			);
+				.<RegistryByteBuf>cast()
+				.dispatch(
+						MetatagData::metatag,
+						MetatagData::codec
+				);
 
 		public static <R, V> PacketCodec<RegistryByteBuf, MetatagData<R, V>> codec(Metatag<R, V> metatag) {
 			return PacketCodecs.map(
-				expected -> (Map<R, V>) new Object2ObjectLinkedOpenHashMap<R, V>(expected),
-				PacketCodecs.registryValue(metatag.registry().getKey()),
-				metatag.packetCodec()
+					expected -> (Map<R, V>) new Object2ObjectLinkedOpenHashMap<R, V>(expected),
+					PacketCodecs.registryValue(metatag.registry().getKey()),
+					metatag.packetCodec()
 			).xmap(
-				map -> new MetatagData<>(metatag, map),
-				MetatagData::entries
+					map -> new MetatagData<>(metatag, map),
+					MetatagData::entries
 			);
 		}
 	}
