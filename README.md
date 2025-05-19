@@ -18,5 +18,5 @@ TODO: Add usage instructions here
 
 To the QSL Team, for creating their REA system, which the Metatag API is heavily inspired by.
 
-To [Calico](https://github.com/MerchantPug), for creating Greenhouse Config, which was used as reference for the
+To [Calico](https://github.com/MerchantCalico), for creating Greenhouse Config, which was used as reference for the
 JsonCWriter.
