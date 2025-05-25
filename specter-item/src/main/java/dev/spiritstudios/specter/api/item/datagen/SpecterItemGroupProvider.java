@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.data.DataOutput;
@@ -12,29 +14,33 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
-
+import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
 import dev.spiritstudios.specter.impl.item.DataItemGroup;
 
 
 public abstract class SpecterItemGroupProvider extends FabricCodecDataProvider<DataItemGroup> {
 	public SpecterItemGroupProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-		super(dataOutput, registriesFuture, DataOutput.OutputType.DATA_PACK, "item_group", DataItemGroup.CODEC);
+		super(
+				dataOutput,
+				registriesFuture,
+				DataOutput.OutputType.DATA_PACK,
+				SpecterItemRegistryKeys.ITEM_GROUP.getValue().getNamespace() + "/" + SpecterItemRegistryKeys.ITEM_GROUP.getValue().getPath(),
+				DataItemGroup.CODEC
+		);
 	}
 
 	@ApiStatus.Internal
 	@Override
 	protected void configure(BiConsumer<Identifier, DataItemGroup> provider, RegistryWrapper.WrapperLookup lookup) {
 		generate((id, data) -> provider.accept(
-				id,
-				new DataItemGroup(
-					id.toTranslationKey("item_group"),
-					data.icon(),
-					data.items()
-				)
-			),
-			lookup
+						id,
+						new DataItemGroup(
+								id.toTranslationKey("item_group"),
+								data.icon(),
+								data.items()
+						)
+				),
+				lookup
 		);
 	}
 
