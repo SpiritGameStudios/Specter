@@ -5,7 +5,12 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"DefaultAttributeContainerAccessor",
-		"DefaultAttributeRegistryMixin"
+		"DefaultAttributeRegistryMixin",
+		"PlayerEntityMixin",
+		"ServerChunkLoadingManagerMixin",
+		"ServerWorld$ServerEntityHandlerMixin",
+		"ServerWorldMixin",
+		"WorldMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

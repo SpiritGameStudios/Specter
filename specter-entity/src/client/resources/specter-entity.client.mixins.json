@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.specter.mixin.client.entity",
+	"compatibilityLevel": "JAVA_21",
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"client": [
+		"ClientWorld$ClientEntityHandlerMixin",
+		"EntityRendererMixin",
+		"LivingEntityRendererMixin"
+	]
+}

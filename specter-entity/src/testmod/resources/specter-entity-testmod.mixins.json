@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.testmod.entity.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"SilverfishEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

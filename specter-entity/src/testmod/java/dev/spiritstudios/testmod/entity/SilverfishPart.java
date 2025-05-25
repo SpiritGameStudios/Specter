@@ -1,0 +1,22 @@
+package dev.spiritstudios.testmod.entity;
+
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.MovementType;
+import net.minecraft.entity.mob.SilverfishEntity;
+import net.minecraft.util.math.Vec3d;
+
+import dev.spiritstudios.specter.api.entity.EntityPart;
+
+public class SilverfishPart extends EntityPart<SilverfishEntity> {
+	public SilverfishPart(SilverfishEntity owner, EntityDimensions dimensions, Vec3d offset) {
+		super(owner, dimensions);
+		this.calculateBoundingBox();
+
+		move(MovementType.SELF, offset);
+	}
+
+	@Override
+	public boolean isCollidable() {
+		return true;
+	}
+}

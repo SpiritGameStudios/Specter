@@ -20,17 +20,17 @@ import dev.spiritstudios.specter.api.entity.EntityMetatags;
 import dev.spiritstudios.specter.impl.entity.DataDefaultAttributeBuilder;
 
 @Mixin(DefaultAttributeRegistry.class)
-public class DefaultAttributeRegistryMixin {
+public abstract class DefaultAttributeRegistryMixin {
 	@ModifyReturnValue(method = "get", at = @At("RETURN"))
 	private static DefaultAttributeContainer get(DefaultAttributeContainer original, @Local(argsOnly = true) EntityType<? extends LivingEntity> type) {
 		Optional<DefaultAttributeContainer> originalAttributes = Optional.ofNullable(original);
 		return EntityMetatags.DEFAULT_ATTRIBUTES.get(type)
-			.map(builder ->
-				originalAttributes
-					.map(attributes -> DataDefaultAttributeBuilder.with(builder, attributes))
-					.orElse(builder)
-					.build()
-			).orElse(original);
+				.map(builder ->
+						originalAttributes
+								.map(attributes -> DataDefaultAttributeBuilder.with(builder, attributes))
+								.orElse(builder)
+								.build()
+				).orElse(original);
 	}
 
 	@WrapOperation(method = "hasDefinitionFor", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z"))
