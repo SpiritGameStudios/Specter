@@ -1,5 +1,7 @@
 package dev.spiritstudios.specter.api.entity;
 
+import net.minecraft.entity.EntityPose;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.Entity;
@@ -16,14 +18,15 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 public abstract class EntityPart<T extends Entity> extends Entity {
-	private final T owner;
-	private final EntityDimensions dims;
+	protected final T owner;
+	protected final EntityDimensions dimensions;
 	private Vec3d relativePos = new Vec3d(0, 0, 0);
 
 	public EntityPart(T owner, EntityDimensions dimensions) {
 		super(owner.getType(), owner.getWorld());
 		this.owner = owner;
-		this.dims = dimensions;
+		this.dimensions = dimensions;
+		this.calculateDimensions();
 	}
 
 	@Override
@@ -32,18 +35,17 @@ public abstract class EntityPart<T extends Entity> extends Entity {
 
 	@Override
 	protected void readCustomDataFromNbt(NbtCompound nbt) {
-
 	}
 
 	@Override
 	protected void writeCustomDataToNbt(NbtCompound nbt) {
-
 	}
 
 	public Vec3d getRelativePos() {
 		return relativePos;
 	}
 
+	@SuppressWarnings("unused")
 	public void setRelativePos(Vec3d relativePos) {
 		this.relativePos = relativePos;
 	}
@@ -55,7 +57,7 @@ public abstract class EntityPart<T extends Entity> extends Entity {
 
 	@Override
 	protected Box calculateDefaultBoundingBox(Vec3d pos) {
-		return this.dims == null ? super.calculateDefaultBoundingBox(pos) : this.dims.getBoxAt(pos);
+		return this.dimensions == null ? super.calculateDefaultBoundingBox(pos) : this.dimensions.getBoxAt(pos);
 	}
 
 	@Override
@@ -85,5 +87,10 @@ public abstract class EntityPart<T extends Entity> extends Entity {
 
 	public T getOwner() {
 		return owner;
+	}
+
+	@Override
+	public EntityDimensions getDimensions(EntityPose pose) {
+		return this.dimensions;
 	}
 }

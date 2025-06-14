@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,10 +26,11 @@ import dev.spiritstudios.specter.impl.entity.EntityPartWorld;
 
 @Mixin(World.class)
 public abstract class WorldMixin implements EntityPartWorld {
-	@Unique
-	private final Int2ObjectMap<EntityPart<?>> parts = new Int2ObjectOpenHashMap<>();
 
-	@Inject(method = "method_47576", at = @At("TAIL"), cancellable = true)
+	@Unique
+	protected final Int2ObjectMap<EntityPart<?>> specter$parts = new Int2ObjectOpenHashMap<>();
+
+	@Inject(method = "method_47576", at = @At("RETURN"), cancellable = true)
 	private static <T extends Entity> void collectEntitiesByTypeLambda(
 			Predicate<? super T> predicate,
 			List<? super T> result,
@@ -38,7 +40,7 @@ public abstract class WorldMixin implements EntityPartWorld {
 			CallbackInfoReturnable<LazyIterationConsumer.NextIteration> cir
 	) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.parts()) {
+			for (EntityPart<?> part : partHolder.getEntityParts()) {
 				T partCasted = filter.downcast(part);
 
 				if (partCasted != null && predicate.test(partCasted)) {
@@ -55,7 +57,7 @@ public abstract class WorldMixin implements EntityPartWorld {
 	private List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> predicate, Operation<List<Entity>> original) {
 		List<Entity> list = original.call(except, box, predicate);
 
-		for (EntityPart<?> part : this.parts.values()) {
+		for (EntityPart<?> part : this.specter$parts.values()) {
 			if (part != except && part.getOwner() != except && predicate.test(part) && box.intersects(part.getBoundingBox())) {
 				list.add(part);
 			}
@@ -65,7 +67,7 @@ public abstract class WorldMixin implements EntityPartWorld {
 	}
 
 	@Override
-	public Int2ObjectMap<EntityPart<?>> specter$parts() {
-		return parts;
+	public Int2ObjectMap<EntityPart<?>> specter$getParts() {
+		return specter$parts;
 	}
 }
