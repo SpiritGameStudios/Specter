@@ -30,7 +30,7 @@ public abstract class WorldMixin implements EntityPartWorld {
 	@Unique
 	protected final Int2ObjectMap<EntityPart<?>> specter$parts = new Int2ObjectOpenHashMap<>();
 
-	@Inject(method = "method_47576", at = @At("RETURN"), cancellable = true)
+	@Inject(method = "method_47576", at = @At("TAIL"), cancellable = true)
 	private static <T extends Entity> void collectEntitiesByTypeLambda(
 			Predicate<? super T> predicate,
 			List<? super T> result,
