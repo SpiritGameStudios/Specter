@@ -11,6 +11,7 @@ import dev.spiritstudios.specter.api.entity.EntityPart;
 
 @Mixin(ServerChunkLoadingManager.class)
 public abstract class ServerChunkLoadingManagerMixin {
+
 	@WrapMethod(method = "loadEntity")
 	private void loadEntity(Entity entity, Operation<Void> original) {
 		if (entity instanceof EntityPart<?>) return;

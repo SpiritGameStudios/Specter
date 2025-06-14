@@ -5,5 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import dev.spiritstudios.specter.api.entity.EntityPart;
 
 public interface EntityPartWorld {
-	Int2ObjectMap<EntityPart<?>> specter$parts();
+	default Int2ObjectMap<EntityPart<?>> specter$getParts() {
+		throw new UnsupportedOperationException("Injected interface should be implemented by mixin!");
+	}
 }

@@ -16,10 +16,11 @@ import dev.spiritstudios.specter.api.entity.PartHolder;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {
+
 	@Inject(method = "appendHitboxes", at = @At("HEAD"))
 	private void appendHitboxes(Entity entity, ImmutableList.Builder<EntityHitbox> builder, float tickProgress, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.parts()) {
+			for (EntityPart<?> part : partHolder.getEntityParts()) {
 				Box box = part.getBoundingBox();
 				builder.add(new EntityHitbox(
 						box.minX - entity.getX(),
