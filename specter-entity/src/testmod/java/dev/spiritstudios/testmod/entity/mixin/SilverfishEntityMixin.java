@@ -30,7 +30,7 @@ public class SilverfishEntityMixin extends HostileEntity implements PartHolder<S
 	}
 
 	@Override
-	public List<EntityPart<SilverfishEntity>> parts() {
+	public List<EntityPart<SilverfishEntity>> getEntityParts() {
 		return parts;
 	}
 
