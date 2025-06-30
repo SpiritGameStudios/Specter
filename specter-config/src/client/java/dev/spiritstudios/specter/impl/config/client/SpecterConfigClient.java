@@ -11,11 +11,12 @@ import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 public class SpecterConfigClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ConfigHolderRegistry.reload());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			ConfigHolderRegistry.clearOverrides();
+		});
 
 		ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2CPayload.ID, (payload, context) -> {
-			SpecterGlobals.debug("Received config sync packet");
-			SpecterGlobals.debug("Payload: %s".formatted(payload));
+			SpecterGlobals.debug("Received config sync packet for config \"%s\"".formatted(payload.config().id()));
 		});
 	}
 }

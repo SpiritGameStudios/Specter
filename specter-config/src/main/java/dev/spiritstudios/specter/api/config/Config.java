@@ -1,24 +1,21 @@
 package dev.spiritstudios.specter.api.config;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
-import com.mojang.datafixers.util.Pair;
+import com.google.common.collect.ImmutableMap;
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.RecordBuilder;
-import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.Ignore;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.core.util.SpecterPacketCodecs;
@@ -31,11 +28,12 @@ import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
  * You can use the provided static methods to create values of different types, or create your own with the {@link #value(Object, Codec)} method.
  * Once you have created your configuration class, you can save and load it using {@link ConfigHolder}.
  * </p>
- *
- * @param <T> The type of the configuration class. This must be the same as the class that extends this class.
  */
-public abstract class Config<T extends Config<T>> implements Codec<T> {
-	private List<ReflectionHelper.FieldValuePair<Value<?>>> fields;
+public abstract class Config {
+	private @Nullable Map<String, Either<Value<?>, SubConfig>> values = null;
+	private @Nullable Boolean shouldSync = null;
+
+	// region Value builders
 
 	/**
 	 * Creates a new value with the given default value and codec.
@@ -58,7 +56,8 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static <T extends Enum<T>> Value.Builder<T> enumValue(T defaultValue, Class<T> clazz) {
-		return value(defaultValue, SpecterCodecs.enumCodec(clazz)).packetCodec(SpecterPacketCodecs.enumCodec(clazz));
+		return value(defaultValue, SpecterCodecs.enumCodec(clazz))
+				.packetCodec(SpecterPacketCodecs.enumCodec(clazz).cast());
 	}
 
 	/**
@@ -69,49 +68,40 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static Value.Builder<Boolean> booleanValue(boolean defaultValue) {
-		return value(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN);
+		return value(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN.cast());
 	}
 
 	/**
-	 * Creates a new integer value with the given default value and a default range of 0 to 100.
+	 * Creates a new integer value with the given default value.
 	 * The codec and packet codec are set to {@link Codec#INT} and {@link PacketCodecs#INTEGER} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
-	protected static NumericValue.Builder<Integer> intValue(int defaultValue) {
-		return new NumericValue.Builder<>(defaultValue, Codec.INT)
-			.codecRange(SpecterCodecs::clampedRange)
-			.range(0, 100)
-			.packetCodec(PacketCodecs.INTEGER);
+	protected static Value.Builder<Integer> intValue(int defaultValue) {
+		return new Value.Builder<>(defaultValue, Codec.INT).packetCodec(PacketCodecs.INTEGER.cast());
 	}
 
 	/**
-	 * Creates a new float value with the given default value and a default range of 0 to 1.
+	 * Creates a new float value with the given default value.
 	 * The codec and packet codec are set to {@link Codec#FLOAT} and {@link PacketCodecs#FLOAT} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
-	protected static NumericValue.Builder<Float> floatValue(float defaultValue) {
-		return new NumericValue.Builder<>(defaultValue, Codec.FLOAT)
-			.codecRange(SpecterCodecs::clampedRange)
-			.range(0.0F, 1.0F)
-			.packetCodec(PacketCodecs.FLOAT);
+	protected static Value.Builder<Float> floatValue(float defaultValue) {
+		return new Value.Builder<>(defaultValue, Codec.FLOAT).packetCodec(PacketCodecs.FLOAT.cast());
 	}
 
 	/**
-	 * Creates a new double value with the given default value and a default range of 0 to 1.
+	 * Creates a new double value with the given default value.
 	 * The codec and packet codec are set to {@link Codec#DOUBLE} and {@link PacketCodecs#DOUBLE} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
-	protected static NumericValue.Builder<Double> doubleValue(double defaultValue) {
-		return new NumericValue.Builder<>(defaultValue, Codec.DOUBLE)
-			.codecRange(SpecterCodecs::clampedRange)
-			.range(0.0, 1.0)
-			.packetCodec(PacketCodecs.DOUBLE);
+	protected static Value.Builder<Double> doubleValue(double defaultValue) {
+		return new Value.Builder<>(defaultValue, Codec.DOUBLE).packetCodec(PacketCodecs.DOUBLE.cast());
 	}
 
 	/**
@@ -122,7 +112,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static Value.Builder<String> stringValue(String defaultValue) {
-		return new Value.Builder<>(defaultValue, Codec.STRING).packetCodec(PacketCodecs.STRING);
+		return new Value.Builder<>(defaultValue, Codec.STRING).packetCodec(PacketCodecs.STRING.cast());
 	}
 
 	/**
@@ -135,79 +125,72 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static <T> Value.Builder<T> registryValue(T defaultValue, Registry<T> registry) {
-		return value(defaultValue, registry.getCodec());
+		return value(defaultValue, registry.getCodec())
+				.packetCodec(PacketCodecs.registryValue(registry.getKey()));
+	}
+	// endregion
+
+	public boolean shouldSync() {
+		if (shouldSync == null) {
+			shouldSync = values().values()
+					.stream()
+					.anyMatch(either -> either.map(
+							Value::sync,
+							Config::shouldSync
+					));
+		}
+
+		return shouldSync;
+	}
+
+	public Map<String, Either<Value<?>, SubConfig>> values() {
+		if (this.values == null) {
+			ImmutableMap.Builder<String, Either<Value<?>, SubConfig>> builder = ImmutableMap.builder();
+
+			List<Field> fields = Arrays.stream(this.getClass().getDeclaredFields())
+					.filter(field ->
+							Value.class.isAssignableFrom(field.getType()) ||
+									SubConfig.class.isAssignableFrom(field.getType()))
+					.filter(field -> !field.isAnnotationPresent(Ignore.class))
+					.filter(field -> !Modifier.isStatic(field.getModifiers()) &&
+							Modifier.isFinal(field.getModifiers()) &&
+							!Modifier.isTransient(field.getModifiers()) &&
+							!field.isSynthetic())
+					.toList();
+
+			for (Field field : fields) {
+				Optional<Object> fieldValue = ReflectionHelper.getFieldValue(this, field);
+				if (fieldValue.isEmpty()) continue;
+
+				if (fieldValue.get() instanceof Value<?> value) {
+					builder.put(field.getName(), Either.left(value));
+				} else if (fieldValue.get() instanceof SubConfig subConfig) {
+					builder.put(field.getName(), Either.right(subConfig));
+				}
+			}
+
+			this.values = builder.build();
+		}
+
+		return values;
 	}
 
 	/**
-	 * Creates a new nested config value with the given class.
-	 *
-	 * @param clazz The class of the nested config.
-	 * @param <T>   The type of the nested config.
-	 * @return A new nested value builder.
+	 * A config that can be nested inside another config.
 	 */
-	protected static <T extends NestedConfig<T>> Value.NestedBuilder<T> nestedValue(Class<T> clazz) {
-		return new Value.NestedBuilder<>(clazz);
-	}
+	public abstract static class SubConfig extends Config {
+		private final @Nullable String comment;
 
-	@ApiStatus.Internal
-	public List<ReflectionHelper.FieldValuePair<Value<?>>> fields() {
-		if (fields == null) {
-			fields = Arrays.stream(this.getClass().getDeclaredFields()).map(field -> {
-				if (field.isAnnotationPresent(Ignore.class)) return null;
-
-				if (!Value.class.isAssignableFrom(field.getType()) ||
-					Modifier.isStatic(field.getModifiers()) ||
-					!Modifier.isFinal(field.getModifiers())) return null;
-
-				Value<?> value = ReflectionHelper.getFieldValue(this, field);
-				if (value == null) return null;
-
-				return new ReflectionHelper.FieldValuePair<Value<?>>(
-					field,
-					value
-				);
-			}).filter(Objects::nonNull).toList();
-		}
-		return fields;
-	}
-
-	@ApiStatus.Internal
-	@SuppressWarnings("unchecked")
-	public PacketCodec<ByteBuf, T> packetCodec() {
-		return PacketCodec.of(
-			(value, buf) -> value.fields().forEach(pair -> {
-				if (!pair.value().sync()) return;
-				pair.value().packetEncode(buf);
-			}),
-			(buf) -> {
-				fields().forEach(pair -> {
-					if (!pair.value().sync()) return;
-					pair.value().packetDecode(buf);
-				});
-				return (T) this;
-			}
-		);
-	}
-
-	@Override
-	public <T1> DataResult<T1> encode(T input, DynamicOps<T1> ops, T1 prefix) {
-		RecordBuilder<T1> builder = ops.mapBuilder();
-		for (ReflectionHelper.FieldValuePair<Value<?>> value : fields()) builder = value.value().encode(ops, builder);
-		return builder.build(prefix);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
-		for (ReflectionHelper.FieldValuePair<Value<?>> pair : fields()) {
-			if (pair.value().decode(ops, input)) continue;
-			SpecterGlobals.LOGGER.error(
-				"Failed to decode config value \"{}\". Resetting to default value",
-				pair.value().name()
-			);
-			pair.value().reset();
+		public SubConfig() {
+			this.comment = null;
 		}
 
-		return DataResult.success(Pair.of((T) this, input));
+		public SubConfig(@Nullable String comment) {
+			this.comment = comment;
+		}
+
+		public Optional<String> comment() {
+			return Optional.ofNullable(comment);
+		}
 	}
 }

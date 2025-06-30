@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.util.Identifier;
 
+import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 
@@ -21,6 +22,16 @@ public final class ConfigHolderRegistry {
 		return holders.get(id);
 	}
 
+	public static void clearOverrides() {
+		holders.values().forEach(holder -> clearOverrides(holder.get()));
+	}
+
+	private static void clearOverrides(Config config) {
+		config.values().values().forEach(either -> either
+				.ifLeft(value -> value.override(null))
+				.ifRight(ConfigHolderRegistry::clearOverrides));
+	}
+
 
 	public static void reload() {
 		holders.values().forEach(ConfigHolder::load);
@@ -29,7 +40,8 @@ public final class ConfigHolderRegistry {
 
 	public static List<ConfigSyncS2CPayload> createPayloads() {
 		return holders.values().stream()
-			.map(ConfigSyncS2CPayload::new)
-			.toList();
+				.filter(holder -> holder.get().shouldSync())
+				.map(ConfigSyncS2CPayload::new)
+				.toList();
 	}
 }

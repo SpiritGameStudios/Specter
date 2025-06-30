@@ -1,0 +1,19 @@
+package dev.spiritstudios.specter.impl.config;
+
+import com.mojang.serialization.DataResult;
+
+import dev.spiritstudios.specter.api.config.Constraint;
+
+public record DoubleRangeConstraint(double min, double max) implements Constraint<Double> {
+	public DoubleRangeConstraint {
+		if (min > max) throw new IllegalArgumentException("min > max");
+
+	}
+
+	@Override
+	public DataResult<Double> test(Double value) {
+		if (value >= min && value <= max) return DataResult.success(value);
+		return DataResult.error(() ->
+				"Value %s out of bounds for range of %s to %s.".formatted(value, min, max));
+	}
+}

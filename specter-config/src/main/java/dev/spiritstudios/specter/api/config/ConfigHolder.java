@@ -8,13 +8,13 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
-import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.ApiStatus;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.RecordBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.util.Identifier;
-
-import net.fabricmc.loader.api.FabricLoader;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
@@ -28,7 +28,7 @@ import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
  * @param <T> The type of the config.
  * @param <F> The type of the format used for serialization.
  */
-public class ConfigHolder<T extends Config<T>, F> {
+public class ConfigHolder<T extends Config, F> {
 	private final T config;
 	private final Identifier id;
 	private final String path;
@@ -39,8 +39,9 @@ public class ConfigHolder<T extends Config<T>, F> {
 		this.id = id;
 		this.path = path;
 
-		if (NestedConfig.class.isAssignableFrom(clazz))
+		if (Config.SubConfig.class.isAssignableFrom(clazz)) {
 			throw new IllegalArgumentException("Nested configs cannot be registered with config holders");
+		}
 
 		ConfigHolder<?, ?> existing = ConfigHolderRegistry.get(id);
 		if (existing != null) throw new IllegalStateException("Config with id %s already exists".formatted(id));
@@ -49,15 +50,11 @@ public class ConfigHolder<T extends Config<T>, F> {
 
 		this.config = ReflectionHelper.instantiate(clazz);
 
-		this.config.fields().forEach(pair -> {
-			pair.value().init(pair.field().getName());
-			SpecterGlobals.debug("Registered config value: %s".formatted(pair.value().translationKey(id)));
-		});
-
-		if (!load())
+		if (!load()) {
 			SpecterGlobals.LOGGER.error("Failed to load config file: {}, default values will be used", path());
-		else
+		} else {
 			save(); // Save the config to disk to ensure it's up to date
+		}
 	}
 
 	/**
@@ -68,7 +65,7 @@ public class ConfigHolder<T extends Config<T>, F> {
 	 * @param <T>   The type of the config.
 	 * @return A new config holder builder.
 	 */
-	public static <T extends Config<T>> Builder<T> builder(Identifier id, Class<T> clazz) {
+	public static <T extends Config> Builder<T> builder(Identifier id, Class<T> clazz) {
 		return new Builder<>(id, clazz);
 	}
 
@@ -77,7 +74,10 @@ public class ConfigHolder<T extends Config<T>, F> {
 	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public void save() {
-		DataResult<F> result = config.encodeStart(format, config);
+		RecordBuilder<F> builder = format.mapBuilder();
+		this.encodeConfig(builder, config);
+
+		DataResult<F> result = builder.build(format.empty());
 
 		if (result.error().isPresent()) {
 			SpecterGlobals.LOGGER.error("Failed to encode config: {}", id);
@@ -138,23 +138,73 @@ public class ConfigHolder<T extends Config<T>, F> {
 			return false;
 		}
 
-		DataResult<T> result = config.parse(format, element);
-		if (result.error().isPresent()) {
-			SpecterGlobals.LOGGER.error("Failed to decode config file: {}", path());
-			SpecterGlobals.LOGGER.error(result.error().toString());
-
-			return false;
-		}
+		this.decodeConfig(element, config);
 
 		return true;
 	}
 
+	private void encodeConfig(RecordBuilder<F> builder, Config config) {
+		config.values().forEach((key, either) -> {
+			either
+					.ifLeft(value -> encodeField(format, builder, key, value))
+					.ifRight(subConfig -> {
+						RecordBuilder<F> subConfigBuilder = format.mapBuilder();
+						encodeConfig(subConfigBuilder, subConfig);
+						builder.add(key, subConfigBuilder.build(format.empty()));
+					});
+		});
+	}
+
+
+	private void decodeConfig(F input, Config config) {
+		config.values().forEach((key, either) -> {
+			either
+					.ifLeft(value -> decodeField(format, input, key, value))
+					.ifRight(subConfig -> {
+						format.getMap(input)
+								.ifSuccess(map -> decodeConfig(map.get(key), subConfig))
+								.ifError(error -> {
+									SpecterGlobals.LOGGER.error(
+											"Failed to decode config value \"{}\". Something is very wrong.",
+											key
+									);
+									SpecterGlobals.LOGGER.error(error.message());
+								});
+					});
+		});
+	}
+
+	private <V, T1> void encodeField(DynamicOps<T1> ops, RecordBuilder<T1> builder, String key, Value<V> value) {
+		builder.add(key, value.codec().encodeStart(ops, value.get()));
+	}
+
+	private <V, T1> void decodeField(DynamicOps<T1> ops, T1 input, String key, Value<V> value) {
+		value.set(ops.getMap(input).flatMap(map -> value.codec().decode(ops, map.get(key)))
+				.mapOrElse(
+						Pair::getFirst,
+						error -> {
+							SpecterGlobals.LOGGER.error(
+									"Failed to decode config value \"{}\". Resetting to default value",
+									key
+							);
+							SpecterGlobals.LOGGER.error(error.message());
+
+							return value.defaultValue();
+						}
+				));
+	}
+
 	private Path path() {
 		return Paths.get(
-			FabricLoader.getInstance().getConfigDir().toString(),
-			"",
-			path
+				FabricLoader.getInstance().getConfigDir().toString(),
+				"",
+				path
 		);
+	}
+
+	@Override
+	public String toString() {
+		return "ConfigHolder[" + id.toString() + "]";
 	}
 
 	/**
@@ -175,31 +225,13 @@ public class ConfigHolder<T extends Config<T>, F> {
 		return id;
 	}
 
-	@ApiStatus.Internal
-	public ConfigHolder<T, F> packetDecode(ByteBuf buf) {
-		config.fields().forEach(pair -> {
-			if (!pair.value().sync()) return;
-			pair.value().packetDecode(buf);
-		});
-
-		return this;
-	}
-
-	@ApiStatus.Internal
-	public void packetEncode(ByteBuf buf) {
-		config.fields().forEach(pair -> {
-			if (!pair.value().sync()) return;
-			pair.value().packetEncode(buf);
-		});
-	}
-
 	/**
 	 * A builder for a new config holder.
 	 * The format will default to {@link JsonCFormat}.
 	 *
 	 * @param <T> The type of the config.
 	 */
-	public static class Builder<T extends Config<T>> {
+	public static class Builder<T extends Config> {
 		private final Identifier id;
 		private final Class<T> clazz;
 
