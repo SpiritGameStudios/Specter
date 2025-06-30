@@ -20,7 +20,7 @@ public final class SpecterConfigGameTest {
 		holder.save();
 
 		TestConfig config = holder.get();
-		
+
 		context.assertTrue(holder.load(), Text.of("Config file failed to load"));
 		context.assertTrue(Files.exists(path), Text.of("Config file does not exist"));
 
