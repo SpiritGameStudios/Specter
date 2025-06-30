@@ -48,13 +48,11 @@ public class TestConfig extends Config {
 	public final Value<Double> testDouble = doubleValue(1.0)
 			.comment("This is a test double")
 			.constrain(Constraint.range(0.0, 10.0))
-//			.step(0.05)
 			.build();
 
 	public final Value<Float> testFloat = floatValue(1.0f)
 			.comment("This is a test float")
 			.constrain(Constraint.range(0.0f, 5.0f))
-//			.step(0.5)
 			.build();
 
 	public final Value<TestEnum> testEnum = enumValue(TestEnum.TEST_1, TestEnum.class)
