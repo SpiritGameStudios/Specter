@@ -6,8 +6,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +14,9 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.registry.metatag.ExistingCombinedMetatag;
@@ -112,7 +113,7 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 		}
 
 		public Builder<R, V> existingCombined(Function<R, V> existingGetter,
-											  Supplier<Iterator<Entry<R, V>>> existingIterator) {
+											Supplier<Iterator<Entry<R, V>>> existingIterator) {
 			this.existingGetter = existingGetter;
 			this.existingIterator = existingIterator;
 			return this;

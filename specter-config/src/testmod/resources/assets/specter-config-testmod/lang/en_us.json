@@ -1,5 +1,6 @@
 {
     "config.specter-config-testmod.tomltestconfig.testBool": "Test Boolean",
+    "config.specter-config-testmod.tomltestconfig.testBool.description": "This is a test description! It's nice and long to test the text wrapping several times :3",
     "config.specter-config-testmod.tomltestconfig.testDouble": "Test Double",
     "config.specter-config-testmod.tomltestconfig.testEnum": "Test Enum",
     "config.specter-config-testmod.tomltestconfig.testEnum.test_1": "1",

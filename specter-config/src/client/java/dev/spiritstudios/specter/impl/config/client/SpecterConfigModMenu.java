@@ -8,7 +8,7 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.client.ModMenuHelper;
-import dev.spiritstudios.specter.api.config.client.RootConfigScreen;
+import dev.spiritstudios.specter.api.config.client.TabbedListConfigScreen;
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
 
 public class SpecterConfigModMenu implements ModMenuApi {
@@ -20,7 +20,7 @@ public class SpecterConfigModMenu implements ModMenuApi {
 						entry ->
 								parent -> {
 									ConfigHolder<?, ?> holder = ConfigHolderRegistry.get(entry.getValue());
-									return new RootConfigScreen(holder, parent);
+									return new TabbedListConfigScreen(holder, parent);
 								}
 				));
 	}

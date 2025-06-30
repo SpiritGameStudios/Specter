@@ -34,11 +34,11 @@ public final class ReflectionHelper {
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException |
 				NoSuchMethodException e) {
 			throw new RuntimeException(
-				(e instanceof NoSuchMethodException ?
-					"No constructor without arguments found for class " :
-					"Failed to instantiate class "
-				) + clazz.getName(),
-				e
+					(e instanceof NoSuchMethodException ?
+							"No constructor without arguments found for class " :
+							"Failed to instantiate class "
+					) + clazz.getName(),
+					e
 			);
 		}
 
@@ -56,22 +56,22 @@ public final class ReflectionHelper {
 	 */
 	public static <T, F> Stream<FieldValuePair<F>> getStaticFields(Class<T> clazz, Class<F> target) {
 		return Arrays.stream(clazz.getDeclaredFields())
-			.map(field -> {
-				if (!Modifier.isStatic(field.getModifiers())) return null;
-				if (field.isAnnotationPresent(Ignore.class)) return null;
-				F value;
-				try {
-					Object objectValue = field.get(null);
-					if (!target.isAssignableFrom(objectValue.getClass())) return null;
-					value = target.cast(objectValue);
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException("Failed to access field " + field.getName(), e);
-				} catch (ClassCastException e) {
-					return null;
-				}
+				.map(field -> {
+					if (!Modifier.isStatic(field.getModifiers())) return null;
+					if (field.isAnnotationPresent(Ignore.class)) return null;
+					F value;
+					try {
+						Object objectValue = field.get(null);
+						if (!target.isAssignableFrom(objectValue.getClass())) return null;
+						value = target.cast(objectValue);
+					} catch (IllegalAccessException e) {
+						throw new RuntimeException("Failed to access field " + field.getName(), e);
+					} catch (ClassCastException e) {
+						return null;
+					}
 
-				return new FieldValuePair<>(field, value);
-			}).filter(Objects::nonNull);
+					return new FieldValuePair<>(field, value);
+				}).filter(Objects::nonNull);
 	}
 
 	/**
@@ -83,14 +83,14 @@ public final class ReflectionHelper {
 	 * @return Value of the field
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getFieldValue(Object instance, Field field) {
+	public static <T> Optional<T> getFieldValue(Object instance, Field field) {
 		try {
 			Object value = field.get(instance);
-			if (value == null) return null;
+			if (value == null) return Optional.empty();
 
-			return (T) value;
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("Failed to access field " + field.getName(), e);
+			return Optional.of((T) value);
+		} catch (IllegalAccessException | ClassCastException e) {
+			return Optional.empty();
 		}
 	}
 
@@ -101,7 +101,7 @@ public final class ReflectionHelper {
 	 * @param <T>   Type of the field
 	 * @return Value of the field
 	 */
-	public static <T> T getFieldValue(Field field) {
+	public static <T> Optional<T> getFieldValue(Field field) {
 		return getFieldValue(null, field);
 	}
 
@@ -132,6 +132,11 @@ public final class ReflectionHelper {
 			if (annotation.values.get(i).equals(key)) return (T) annotation.values.get(i + 1);
 
 		return defaultValue;
+	}
+
+	public static <T> Optional<T> cast(Object object, Class<T> clazz) {
+		//noinspection unchecked
+		return clazz.isAssignableFrom(object.getClass()) ? Optional.of((T) object) : Optional.empty();
 	}
 
 	public record FieldValuePair<T>(Field field, T value) {

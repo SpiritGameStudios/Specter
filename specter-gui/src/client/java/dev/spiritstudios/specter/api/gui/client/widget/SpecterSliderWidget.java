@@ -1,8 +1,8 @@
 package dev.spiritstudios.specter.api.gui.client.widget;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
+import it.unimi.dsi.fastutil.doubles.Double2ObjectFunction;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -12,46 +12,150 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.input.KeyCodes;
+import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.SoundManager;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 
-import dev.spiritstudios.specter.api.core.math.Range;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class SpecterSliderWidget extends ClickableWidget {
-	private static final Identifier SLIDER = Identifier.ofVanilla("widget/slider");
-	private static final Identifier SLIDER_HIGHLIGHTED = Identifier.ofVanilla("widget/slider_highlighted");
-	private static final Identifier SLIDER_HANDLE = Identifier.ofVanilla("widget/slider_handle");
-	private static final Identifier SLIDER_HANDLE_HIGHLIGHTED = Identifier.ofVanilla("widget/slider_handle_highlighted");
+	private static final Identifier TEXTURE = Identifier.ofVanilla("widget/slider");
+	private static final Identifier HIGHLIGHTED_TEXTURE = Identifier.ofVanilla("widget/slider_highlighted");
+	private static final Identifier HANDLE_TEXTURE = Identifier.ofVanilla("widget/slider_handle");
+	private static final Identifier HANDLE_HIGHLIGHTED_TEXTURE = Identifier.ofVanilla("widget/slider_handle_highlighted");
 
-	private static final Range<Double> ZERO_ONE = new Range<>(0.0, 1.0);
-	protected final double step;
-	protected final Range<Double> range;
-	protected final Consumer<Double> valueChangedListener;
-	protected final Function<Double, Text> messageSupplier;
-	protected double value;
-	protected boolean sliderFocused;
+	private final Double2ObjectFunction<Text> valueToText;
+	private final Function<SpecterSliderWidget, MutableText> narrationMessageFactory;
 
-	protected SpecterSliderWidget(int x, int y, int width, int height, double value, double step, Range<Double> range, Consumer<Double> valueChangedListener, Function<Double, Text> messageSupplier) {
-		super(x, y, width, height, messageSupplier.apply(value));
+	private final UpdateCallback callback;
 
-		this.value = value;
+	private final boolean optionTextOmitted;
+	private final SimpleOption.TooltipFactory<Double> tooltipFactory;
+	private final Text optionText;
+	private final double min;
+	private final double max;
+	private final double step;
+	private double value;
+	private boolean sliderFocused;
+
+	protected SpecterSliderWidget(
+			int x, int y,
+			int width, int height,
+			Text message,
+			Text optionText,
+			double initialValue,
+			Double2ObjectFunction<Text> valueToText,
+			Function<SpecterSliderWidget, MutableText> narrationMessageFactory,
+			UpdateCallback callback,
+			boolean optionTextOmitted,
+			SimpleOption.TooltipFactory<Double> tooltipFactory, double min, double max, double step
+	) {
+		super(x, y, width, height, message);
+		this.valueToText = valueToText;
+		this.narrationMessageFactory = narrationMessageFactory;
+		this.callback = callback;
+		this.optionTextOmitted = optionTextOmitted;
+		this.tooltipFactory = tooltipFactory;
+		this.optionText = optionText;
+		this.value = initialValue;
+		this.min = min;
+		this.max = max;
 		this.step = step;
-		this.range = range;
-		this.valueChangedListener = valueChangedListener;
-		this.messageSupplier = messageSupplier;
 	}
 
-	public static Builder builder(double value) {
-		return new Builder(value);
+	private void refreshTooltip() {
+		this.setTooltip(this.tooltipFactory.apply(this.value));
+	}
+
+	// region Rendering
+	@Override
+	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+		MinecraftClient client = MinecraftClient.getInstance();
+
+		context.drawGuiTexture(
+				RenderLayer::getGuiTextured, this.getTexture(), this.getX(), this.getY(), this.getWidth(), this.getHeight(), ColorHelper.getWhite(this.alpha)
+		);
+
+
+		context.drawGuiTexture(
+				RenderLayer::getGuiTextured,
+				this.getHandleTexture(),
+				this.getX() + (int) MathHelper.map(this.value, min, max, 0, this.width - 8),
+				this.getY(),
+				8,
+				this.getHeight(),
+				ColorHelper.getWhite(this.alpha)
+		);
+
+		this.drawScrollableText(
+				context,
+				client.textRenderer,
+				2,
+				this.active ? 0xffffff : 0xa0a0a0 | MathHelper.ceil(this.alpha * 255.0F) << 24
+		);
+	}
+
+	private Identifier getTexture() {
+		return this.isNarratable() && this.isFocused() && !this.sliderFocused ? HIGHLIGHTED_TEXTURE : TEXTURE;
+	}
+
+	private Identifier getHandleTexture() {
+		return !this.isNarratable() || !this.hovered && !this.sliderFocused ? HANDLE_TEXTURE : HANDLE_HIGHLIGHTED_TEXTURE;
+	}
+	// endregion
+
+	public double getValue() {
+		return value;
+	}
+
+	public void setValue(double value) {
+		value = MathHelper.clamp(value, min, max);
+		Text text = this.composeText(value);
+		this.setMessage(text);
+		this.value = value;
+		this.refreshTooltip();
+		this.callback.onValueChange(this, this.value);
 	}
 
 	// region Input
 	@Override
+	public void setFocused(boolean focused) {
+		super.setFocused(focused);
+		if (!focused) {
+			this.sliderFocused = false;
+		} else {
+			GuiNavigationType guiNavigationType = MinecraftClient.getInstance().getNavigationType();
+			if (guiNavigationType == GuiNavigationType.MOUSE || guiNavigationType == GuiNavigationType.KEYBOARD_TAB) {
+				this.sliderFocused = true;
+			}
+		}
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (KeyCodes.isToggle(keyCode)) {
+			this.sliderFocused = !this.sliderFocused;
+			return true;
+		}
+
+		if (this.sliderFocused) {
+			boolean left = keyCode == GLFW.GLFW_KEY_LEFT;
+			if (left || keyCode == GLFW.GLFW_KEY_RIGHT) {
+				this.setValue(this.value + step * (left ? -1.0F : 1.0F));
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public void onClick(double mouseX, double mouseY) {
 		this.setValueFromMouse(mouseX);
 	}
@@ -62,169 +166,95 @@ public class SpecterSliderWidget extends ClickableWidget {
 		super.onDrag(mouseX, mouseY, deltaX, deltaY);
 	}
 
-	@Override
-	public void onRelease(double mouseX, double mouseY) {
-		super.playDownSound(MinecraftClient.getInstance().getSoundManager());
-	}
-
 	private void setValueFromMouse(double mouseX) {
-		setValue(range.map(MathHelper.clamp((mouseX - (double) (this.getX() + 4)) / (double) (this.getWidth() - 8), 0.0, 1.0), ZERO_ONE));
-	}
-
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (KeyCodes.isToggle(keyCode)) {
-			this.sliderFocused = !this.sliderFocused;
-			return true;
-		}
-
-		if (!this.sliderFocused) return false;
-
-		if (keyCode == GLFW.GLFW_KEY_LEFT || keyCode == GLFW.GLFW_KEY_RIGHT) {
-			float sign = keyCode == GLFW.GLFW_KEY_LEFT ? -1.0F : 1.0F;
-			this.setValue(this.value + sign * (this.step == 0.0 ? 0.01 : this.step));
-
-			return true;
-		}
-
-		return false;
-	}
-	// endregion
-
-	// region Navigation
-	@Override
-	public void setFocused(boolean focused) {
-		super.setFocused(focused);
-		if (!focused) {
-			this.sliderFocused = false;
-			return;
-		}
-
-		GuiNavigationType navigationType = MinecraftClient.getInstance().getNavigationType();
-		if (navigationType == GuiNavigationType.MOUSE || navigationType == GuiNavigationType.KEYBOARD_TAB)
-			this.sliderFocused = true;
-	}
-
-	protected void onValueChanged() {
-		this.valueChangedListener.accept(value);
-	}
-
-	@Override
-	public void playDownSound(SoundManager soundManager) {
-	}
-	// endregion
-
-	// region Rendering
-	@Override
-	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-		MinecraftClient client = MinecraftClient.getInstance();
-
-		context.drawGuiTexture(
-				RenderLayer::getGuiTextured,
-				this.getTexture(),
-				this.getX(),
-				this.getY(),
-				this.getWidth(),
-				this.getHeight(),
-				ColorHelper.fromFloats(this.alpha, 1.0F, 1.0F, 1.0F)
-		);
-
-		context.drawGuiTexture(
-				RenderLayer::getGuiTextured,
-				this.getHandleTexture(),
-				this.getX() + (int) (ZERO_ONE.map(this.value, range) * (this.getWidth() - 8)),
-				this.getY(),
-				8,
-				this.getHeight(),
-				ColorHelper.fromFloats(this.alpha, 1.0F, 1.0F, 1.0F)
-		);
-
-		int color = this.active ? 0xffffff : 0xa0a0a0;
-
-		this.drawScrollableText(context, client.textRenderer, 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
-	}
-
-	@Override
-	public Text getMessage() {
-		return this.messageSupplier.apply(value);
-	}
-
-	protected Identifier getTexture() {
-		return this.isFocused() && !this.sliderFocused ? SLIDER_HIGHLIGHTED : SLIDER;
-	}
-
-	protected Identifier getHandleTexture() {
-		return !this.hovered && !this.sliderFocused ? SLIDER_HANDLE : SLIDER_HANDLE_HIGHLIGHTED;
+		setValue(Math.clamp(min + (step * Math.round((((mouseX - (double) (this.getX() + 4)) / (double) (this.getWidth() - 8)) * (max - min)) / step)), min, max));
 	}
 	// endregion
 
 	// region Narration
 	@Override
-	protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+	public void appendClickableNarrations(NarrationMessageBuilder builder) {
 		builder.put(NarrationPart.TITLE, this.getNarrationMessage());
-		if (!this.active) return;
 
-		builder.put(
-				NarrationPart.USAGE,
-				Text.translatable(isFocused() ? "narration.slider.usage.focused" : "narration.slider.usage.hovered")
-		);
+		if (this.active) {
+			builder.put(
+					NarrationPart.USAGE,
+					this.isFocused() ?
+							Text.translatable("narration.slider.usage.focused") :
+							Text.translatable("narration.slider.usage.hovered")
+			);
+		}
+	}
+
+	private Text composeText(double value) {
+		return this.optionTextOmitted ? this.valueToText.apply(value) : this.composeGenericOptionText(value);
+	}
+
+	private MutableText composeGenericOptionText(double value) {
+		return ScreenTexts.composeGenericOptionText(this.optionText, this.valueToText.apply(value));
+	}
+
+	public MutableText getGenericNarrationMessage() {
+		return getNarrationMessage(this.optionTextOmitted ? this.composeGenericOptionText(this.value) : this.getMessage());
 	}
 
 	@Override
 	protected MutableText getNarrationMessage() {
-		return Text.translatable("gui.narrate.slider", this.getMessage());
+		return this.narrationMessageFactory.apply(this);
 	}
 	// endregion
 
-	protected void setValue(double value) {
-		double oldValue = this.value;
+	@Override
+	public void playDownSound(SoundManager soundManager) {
+	}
 
-		double newValue = value;
-		newValue = step <= 0.0 ? newValue : range.map(Math.round(ZERO_ONE.map(newValue, range) / step) * step, ZERO_ONE);
-		this.value = range.clamp(newValue);
+	@Override
+	public void onRelease(double mouseX, double mouseY) {
+		super.playDownSound(MinecraftClient.getInstance().getSoundManager());
+	}
 
-		if (oldValue != this.value) onValueChanged();
+	@Environment(EnvType.CLIENT)
+	public interface UpdateCallback {
+		void onValueChange(SpecterSliderWidget slider, double value);
 	}
 
 	public static class Builder {
-		private final double value;
-		private int x;
-		private int y;
-		private int width = 150;
-		private int height = 20;
+		private final Double2ObjectFunction<Text> valueToText;
+		private double value;
+		private SimpleOption.TooltipFactory<Double> tooltipFactory = value -> null;
+		private Function<SpecterSliderWidget, MutableText> narrationMessageFactory = SpecterSliderWidget::getGenericNarrationMessage;
+		private boolean optionTextOmitted;
+		private double min;
+		private double max;
 		private double step;
-		private Range<Double> range = new Range<>(0.0, 1.0);
-		private Consumer<Double> valueChangedListener = value -> {
-		};
-		private Function<Double, Text> messageSupplier = (value) -> Text.of(String.format("%.2f", value));
 
-		protected Builder(double value) {
+		public Builder(Double2ObjectFunction<Text> valueToText) {
+			this.valueToText = valueToText;
+		}
+
+		public Builder tooltip(SimpleOption.TooltipFactory<Double> tooltipFactory) {
+			this.tooltipFactory = tooltipFactory;
+			return this;
+		}
+
+		public Builder initially(double value) {
 			this.value = value;
-		}
-
-		public Builder position(int x, int y) {
-			this.x = x;
-			this.y = y;
 			return this;
 		}
 
-		public Builder size(int width, int height) {
-			this.width = width;
-			this.height = height;
+		public Builder narration(Function<SpecterSliderWidget, MutableText> narrationMessageFactory) {
+			this.narrationMessageFactory = narrationMessageFactory;
 			return this;
 		}
 
-		public Builder dimensions(int width, int height, int x, int y) {
-			return position(x, y).size(width, height);
-		}
-
-		public Builder message(Text message) {
-			messageSupplier = (ignored) -> message;
+		public Builder omitKeyText() {
+			this.optionTextOmitted = true;
 			return this;
 		}
 
-		public Builder message(Function<Double, Text> messageSupplier) {
-			this.messageSupplier = messageSupplier;
+		public Builder range(double min, double max) {
+			this.min = min;
+			this.max = max;
 			return this;
 		}
 
@@ -233,31 +263,33 @@ public class SpecterSliderWidget extends ClickableWidget {
 			return this;
 		}
 
-		public Builder range(Range<Double> range) {
-			this.range = range;
-			return this;
+		public SpecterSliderWidget build(Text optionText, UpdateCallback callback) {
+			return this.build(0, 0, 150, 20, optionText, callback);
 		}
 
-		public Builder range(double min, double max) {
-			return range(new Range<>(min, max));
+		public SpecterSliderWidget build(int x, int y, int width, int height, Text optionText) {
+			return this.build(x, y, width, height, optionText, (button, value) -> {
+			});
 		}
 
-		public Builder onValueChanged(Consumer<Double> valueChangedListener) {
-			this.valueChangedListener = valueChangedListener;
-			return this;
-		}
+		public SpecterSliderWidget build(int x, int y, int width, int height, Text optionText, UpdateCallback callback) {
+			Text text = this.valueToText.apply(value);
+			Text message = this.optionTextOmitted ? text : ScreenTexts.composeGenericOptionText(optionText, text);
 
-		public SpecterSliderWidget build() {
 			return new SpecterSliderWidget(
 					x,
 					y,
 					width,
 					height,
+					message,
+					optionText,
 					value,
-					step,
-					range,
-					valueChangedListener,
-					messageSupplier
+					this.valueToText,
+					this.narrationMessageFactory,
+					callback,
+					this.optionTextOmitted,
+					this.tooltipFactory,
+					min, max, step
 			);
 		}
 	}

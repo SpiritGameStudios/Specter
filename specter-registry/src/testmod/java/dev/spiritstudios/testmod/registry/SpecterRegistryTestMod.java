@@ -1,9 +1,6 @@
 package dev.spiritstudios.testmod.registry;
 
 import com.mojang.serialization.Codec;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import net.minecraft.block.Block;
 import net.minecraft.network.codec.PacketCodecs;
@@ -12,6 +9,10 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
