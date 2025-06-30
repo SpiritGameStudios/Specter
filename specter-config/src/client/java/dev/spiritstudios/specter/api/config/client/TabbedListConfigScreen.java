@@ -2,7 +2,6 @@ package dev.spiritstudios.specter.api.config.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +26,6 @@ import net.minecraft.util.Formatting;
 
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
-import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.client.gui.widget.gamerule.BooleanValueWidget;
 import dev.spiritstudios.specter.impl.config.client.gui.widget.gamerule.EnumValueWidget;
 import dev.spiritstudios.specter.impl.config.client.gui.widget.gamerule.GameruleConfigWidgetFactories;
@@ -93,6 +91,7 @@ public class TabbedListConfigScreen extends Screen {
 
 	@Override
 	public void close() {
+		assert this.client != null;
 		this.client.setScreen(parent);
 	}
 
@@ -208,9 +207,7 @@ public class TabbedListConfigScreen extends Screen {
 				TextRenderer textRenderer,
 				ValueWidgetFactory<T> factory
 		) {
-			Optional<Value<T>> casted = ReflectionHelper.cast(value);
-			if (casted.isEmpty())
-				throw new IllegalArgumentException("Passed a value of a different type to its factory to createValueWidget.");
+			@SuppressWarnings("unchecked") Value<T> casted = (Value<T>) value;
 
 			String translationPrefix = "config." + holder.id().toTranslationKey() + "." + key;
 
@@ -219,7 +216,7 @@ public class TabbedListConfigScreen extends Screen {
 
 			Text defaultValue = Text.translatable(
 					"editGamerule.default",
-					factory.toString(translationPrefix, casted.get().defaultValue())
+					factory.toString(translationPrefix, casted.defaultValue())
 			).formatted(Formatting.GRAY);
 
 			String descriptionKey = translationPrefix + ".description";
@@ -250,7 +247,7 @@ public class TabbedListConfigScreen extends Screen {
 					description,
 					narration,
 					name,
-					casted.get()
+					casted
 			);
 		}
 	}

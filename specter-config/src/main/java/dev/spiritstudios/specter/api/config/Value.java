@@ -126,13 +126,21 @@ public class Value<T> {
 	public <C extends Constraint<T>> Optional<C> constraint(Class<C> clazz) {
 		Constraint<T> constraint = constraints.get(clazz);
 		if (constraint == null) return Optional.empty();
-		return ReflectionHelper.cast(constraint);
+		return ReflectionHelper.cast(constraint, clazz);
 	}
 
 	public <H extends GuiHint<T>> Optional<H> hint(Class<H> clazz) {
 		GuiHint<T> guiHint = guiHints.get(clazz);
 		if (guiHint == null) return Optional.empty();
-		return ReflectionHelper.cast(guiHint);
+		return ReflectionHelper.cast(guiHint, clazz);
+	}
+
+	// this is checked by the isAssignableFrom, javac is just dumb
+	@SuppressWarnings("unchecked")
+	public <T1> Optional<Value<T1>> cast(Class<T1> clazz) {
+		return clazz.isAssignableFrom(defaultValue.getClass()) ?
+				Optional.of((Value<T1>) this) :
+				Optional.empty();
 	}
 
 	public static class Builder<T> {

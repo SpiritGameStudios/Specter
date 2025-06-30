@@ -20,17 +20,17 @@ public abstract class TitleScreenMixin extends Screen {
 	}
 
 	@Inject(
-		method = "init",
-		at = @At("HEAD")
+			method = "init",
+			at = @At("HEAD")
 	)
 	protected void init(CallbackInfo ci) {
 		if (this.client == null) return;
 
 		this.addDrawableChild(ButtonWidget.builder(
-				Text.of("SPECTRE GUI TEST"),
-				button -> this.client.setScreen(new SpecterGuiTestScreen()))
-			.dimensions(0, 0, 100, 20)
-			.build()
+						Text.of("SPECTRE GUI TEST"),
+						button -> this.client.setScreen(new SpecterGuiTestScreen()))
+				.dimensions(0, 10, 100, 20)
+				.build()
 		);
 	}
 }

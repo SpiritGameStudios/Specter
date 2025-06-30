@@ -134,14 +134,9 @@ public final class ReflectionHelper {
 		return defaultValue;
 	}
 
-	public static <T> Optional<T> cast(Object object) {
-		try {
-			// This is checked by the try block javac is just being funky
-			//noinspection unchecked
-			return Optional.of((T) object);
-		} catch (ClassCastException e) {
-			return Optional.empty();
-		}
+	public static <T> Optional<T> cast(Object object, Class<T> clazz) {
+		//noinspection unchecked
+		return clazz.isAssignableFrom(object.getClass()) ? Optional.of((T) object) : Optional.empty();
 	}
 
 	public record FieldValuePair<T>(Field field, T value) {
