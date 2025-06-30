@@ -1,7 +1,5 @@
 package dev.spiritstudios.testmod.block;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -10,6 +8,8 @@ import net.minecraft.test.TestContext;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
+
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
 @SuppressWarnings("unused")
 public final class SpecterBlockGameTest {

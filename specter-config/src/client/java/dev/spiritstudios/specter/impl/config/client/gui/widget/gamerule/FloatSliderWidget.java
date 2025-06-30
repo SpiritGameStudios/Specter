@@ -68,4 +68,3 @@ public class FloatSliderWidget extends TabbedListConfigScreen.ValueWidget {
 		this.value.set((float) slider.getValue());
 	}
 }
-

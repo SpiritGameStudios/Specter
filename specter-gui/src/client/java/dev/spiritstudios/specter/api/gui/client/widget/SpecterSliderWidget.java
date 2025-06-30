@@ -3,8 +3,6 @@ package dev.spiritstudios.specter.api.gui.client.widget;
 import java.util.function.Function;
 
 import it.unimi.dsi.fastutil.doubles.Double2ObjectFunction;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -23,6 +21,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class SpecterSliderWidget extends ClickableWidget {
 	private static final Identifier TEXTURE = Identifier.ofVanilla("widget/slider");

@@ -12,9 +12,10 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
-import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.loader.api.FabricLoader;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;

@@ -47,7 +47,7 @@ public class LongSliderWidget extends TabbedListConfigScreen.ValueWidget {
 						44, 20,
 						name
 				);
-		
+
 		this.children.add(this.slider);
 	}
 
@@ -65,4 +65,3 @@ public class LongSliderWidget extends TabbedListConfigScreen.ValueWidget {
 		this.slider.render(context, mouseX, mouseY, tickProgress);
 	}
 }
-

@@ -70,4 +70,3 @@ public class BooleanValueWidget extends TabbedListConfigScreen.ValueWidget {
 		this.value.set(button.getValue());
 	}
 }
-

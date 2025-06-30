@@ -68,4 +68,3 @@ public class DoubleSliderWidget extends TabbedListConfigScreen.ValueWidget {
 		this.value.set(slider.getValue());
 	}
 }
-

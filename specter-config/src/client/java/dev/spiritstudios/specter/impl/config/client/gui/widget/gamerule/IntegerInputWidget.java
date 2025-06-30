@@ -66,4 +66,3 @@ public class IntegerInputWidget extends TabbedListConfigScreen.ValueWidget {
 		this.textField.render(context, mouseX, mouseY, tickProgress);
 	}
 }
-

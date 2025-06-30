@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.data.DataOutput;
@@ -13,6 +11,9 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 
 import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
 import dev.spiritstudios.specter.impl.item.DataItemGroup;

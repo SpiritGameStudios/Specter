@@ -32,7 +32,7 @@ public final class ReflectionHelper {
 		try {
 			instance = clazz.getConstructor().newInstance(args);
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-				 NoSuchMethodException e) {
+				NoSuchMethodException e) {
 			throw new RuntimeException(
 					(e instanceof NoSuchMethodException ?
 							"No constructor without arguments found for class " :

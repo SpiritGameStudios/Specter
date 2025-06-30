@@ -76,4 +76,3 @@ public class EnumValueWidget<T extends Enum<T>> extends TabbedListConfigScreen.V
         this.value.set(button.getValue());
     }
 }
-

@@ -68,4 +68,3 @@ public class IntegerSliderWidget extends TabbedListConfigScreen.ValueWidget {
 		this.value.set((int) slider.getValue());
 	}
 }
-

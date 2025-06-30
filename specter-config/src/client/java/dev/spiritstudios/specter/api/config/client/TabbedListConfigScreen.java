@@ -103,11 +103,11 @@ public class TabbedListConfigScreen extends Screen {
 	@FunctionalInterface
 	public interface ValueWidgetFactory<T> {
 		TabbedListConfigScreen.ValueWidget create(MinecraftClient client,
-												  String translationPrefix,
-												  List<OrderedText> description,
-												  Text narration,
-												  Text name,
-												  Value<T> value);
+												String translationPrefix,
+												List<OrderedText> description,
+												Text narration,
+												Text name,
+												Value<T> value);
 
 		default Text toString(String translationPrefix, T value) {
 			return Text.literal(String.valueOf(value));

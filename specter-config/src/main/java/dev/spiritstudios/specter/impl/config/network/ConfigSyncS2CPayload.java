@@ -5,13 +5,13 @@ import static dev.spiritstudios.specter.api.core.SpecterGlobals.MODID;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
