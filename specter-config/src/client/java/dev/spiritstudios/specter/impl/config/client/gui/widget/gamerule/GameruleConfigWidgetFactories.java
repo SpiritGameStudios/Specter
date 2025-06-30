@@ -27,4 +27,6 @@ public final class GameruleConfigWidgetFactories {
 			.<TabbedListConfigScreen.ValueWidget>map(sliderHint ->
 					new DoubleSliderWidget(client, description, narration, name, value, sliderHint))
 			.orElseGet(() -> new DoubleInputWidget(client, description, narration, name, value));
+
+	public static final TabbedListConfigScreen.ValueWidgetFactory<String> STRING = StringInputWidget::new;
 }

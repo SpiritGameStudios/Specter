@@ -1,5 +1,7 @@
 package dev.spiritstudios.testmod.config;
 
+import com.mojang.serialization.DataResult;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -26,8 +28,9 @@ public class TestConfig extends Config {
 
 	public final String invalidField = "test";
 
-	public final Value<String> testString = stringValue("test")
+	public final Value<String> testString = stringValue("test@example.com")
 			.comment("This is a test string")
+			.constrain(str -> str.matches("^.*@.*$") ? DataResult.success(str) : DataResult.error(() -> "Not an email"))
 			.sync()
 			.build();
 
