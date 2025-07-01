@@ -34,7 +34,7 @@ public class FloatInputWidget extends TabbedListConfigScreen.ValueWidget {
 		this.textField = new TextFieldWidget(
 				client.textRenderer,
 				10, 5,
-				44, 20,
+				160, 20,
 				name
 		);
 
@@ -61,7 +61,7 @@ public class FloatInputWidget extends TabbedListConfigScreen.ValueWidget {
 	public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
 		super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickProgress);
 
-		this.textField.setX(x + entryWidth - 45);
+		this.textField.setX(x + entryWidth - 165);
 		this.textField.setY(y);
 		this.textField.render(context, mouseX, mouseY, tickProgress);
 	}

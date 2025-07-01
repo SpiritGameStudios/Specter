@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.api.config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,11 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+
+import dev.spiritstudios.specter.api.config.gui.GuiHint;
+
+import dev.spiritstudios.specter.api.config.gui.SubConfigHints;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.codec.PacketCodecs;
@@ -187,6 +193,10 @@ public abstract class Config {
 
 		public SubConfig(@Nullable String comment) {
 			this.comment = comment;
+		}
+
+		public List<GuiHint<SubConfig>> getGuiHints() {
+			return new ArrayList<>();
 		}
 
 		public Optional<String> comment() {

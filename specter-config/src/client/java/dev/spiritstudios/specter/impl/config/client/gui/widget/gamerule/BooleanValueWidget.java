@@ -49,7 +49,7 @@ public class BooleanValueWidget extends TabbedListConfigScreen.ValueWidget {
 						button.getGenericNarrationMessage().append("\n").append(narration))
 				.build(
 						10, 5,
-						44, 20,
+						160, 20,
 						name
 				);
 
@@ -60,7 +60,7 @@ public class BooleanValueWidget extends TabbedListConfigScreen.ValueWidget {
 	public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
 		super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickProgress);
 
-		this.button.setX(x + entryWidth - 45);
+		this.button.setX(x + entryWidth - 165);
 		this.button.setY(y);
 		this.button.render(context, mouseX, mouseY, tickProgress);
 	}

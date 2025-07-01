@@ -31,7 +31,7 @@ import dev.spiritstudios.specter.impl.config.client.gui.widget.gamerule.EnumValu
 import dev.spiritstudios.specter.impl.config.client.gui.widget.gamerule.GameruleConfigWidgetFactories;
 
 /**
- * A simple config screen, meant to look very similar to the game rule editing screen.
+ * A simple config screen, meant to look consistent with other 'key-value' style configuration screens in the game.
  */
 public class TabbedListConfigScreen extends Screen {
 	protected final ConfigHolder<?, ?> holder;
@@ -190,6 +190,11 @@ public class TabbedListConfigScreen extends Screen {
 			});
 
 			this.valueWidgets = builder.build();
+		}
+
+		@Override
+		public int getRowWidth() {
+			return 320;
 		}
 
 		@Override
