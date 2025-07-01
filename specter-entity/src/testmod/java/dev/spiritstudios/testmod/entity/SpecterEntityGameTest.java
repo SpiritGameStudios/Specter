@@ -1,11 +1,11 @@
 package dev.spiritstudios.testmod.entity;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
+
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
 public class SpecterEntityGameTest {
 	@GameTest

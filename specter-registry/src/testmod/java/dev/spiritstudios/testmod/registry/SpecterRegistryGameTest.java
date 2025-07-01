@@ -1,12 +1,12 @@
 package dev.spiritstudios.testmod.registry;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
 import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;

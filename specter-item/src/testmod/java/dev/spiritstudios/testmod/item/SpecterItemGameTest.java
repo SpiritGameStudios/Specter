@@ -1,7 +1,5 @@
 package dev.spiritstudios.testmod.item;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.HopperBlock;
@@ -16,6 +14,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
 @SuppressWarnings("unused")
 public class SpecterItemGameTest {

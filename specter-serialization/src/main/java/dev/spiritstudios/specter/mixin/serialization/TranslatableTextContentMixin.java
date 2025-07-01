@@ -31,11 +31,11 @@ public abstract class TranslatableTextContentMixin {
 	private List<StringVisitable> translations;
 
 	@Inject(
-		method = {
-			"visit(Lnet/minecraft/text/StringVisitable$StyledVisitor;Lnet/minecraft/text/Style;)Ljava/util/Optional;",
-			"visit(Lnet/minecraft/text/StringVisitable$Visitor;)Ljava/util/Optional;"
-		},
-		at = @At("HEAD")
+			method = {
+					"visit(Lnet/minecraft/text/StringVisitable$StyledVisitor;Lnet/minecraft/text/Style;)Ljava/util/Optional;",
+					"visit(Lnet/minecraft/text/StringVisitable$Visitor;)Ljava/util/Optional;"
+			},
+			at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;")
 	)
 	private <T> void push(CallbackInfoReturnable<Optional<T>> cir) {
 		if (SpecterSerialization.CURRENT_TRANSLATABLE.get().contains((TranslatableTextContent) (Object) this))
@@ -46,11 +46,11 @@ public abstract class TranslatableTextContentMixin {
 
 
 	@Inject(
-		method = {
-			"visit(Lnet/minecraft/text/StringVisitable$StyledVisitor;Lnet/minecraft/text/Style;)Ljava/util/Optional;",
-			"visit(Lnet/minecraft/text/StringVisitable$Visitor;)Ljava/util/Optional;"
-		},
-		at = @At("RETURN")
+			method = {
+					"visit(Lnet/minecraft/text/StringVisitable$StyledVisitor;Lnet/minecraft/text/Style;)Ljava/util/Optional;",
+					"visit(Lnet/minecraft/text/StringVisitable$Visitor;)Ljava/util/Optional;"
+			},
+			at = @At("RETURN")
 	)
 	private <T> void pop(CallbackInfoReturnable<Optional<T>> cir) {
 		SpecterSerialization.CURRENT_TRANSLATABLE.get().pop();
@@ -61,12 +61,12 @@ public abstract class TranslatableTextContentMixin {
 
 
 	@Inject(
-		method = "updateTranslations",
-		at = {
-			@At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;)Ljava/lang/String;"),
-			@At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;")
-		},
-		cancellable = true
+			method = "updateTranslations",
+			at = {
+					@At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;)Ljava/lang/String;"),
+					@At(value = "INVOKE", target = "Lnet/minecraft/util/Language;get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;")
+			},
+			cancellable = true
 	)
 	private void updateTranslations(CallbackInfo ci, @Local Language language) {
 		if (!(language instanceof TextTranslationSupplier supplier))

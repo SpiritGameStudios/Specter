@@ -5,11 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.fabricmc.loader.api.FabricLoader;
-
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
+
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import net.fabricmc.loader.api.FabricLoader;
 
 @SuppressWarnings("unused")
 public final class SpecterConfigGameTest {
