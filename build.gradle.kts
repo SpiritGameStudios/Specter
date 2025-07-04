@@ -9,7 +9,6 @@ plugins {
 	`maven-publish`
 	checkstyle
 	alias(libs.plugins.fabric.loom)
-	alias(libs.plugins.spotless)
 }
 
 class ModInfo {
@@ -28,7 +27,6 @@ allprojects {
 	plugins.apply("java-library")
 	plugins.apply("checkstyle")
 	plugins.apply("fabric-loom")
-	plugins.apply("com.diffplug.spotless")
 
 	tasks.withType<GenerateModuleMetadata>().configureEach {
 		enabled = false
@@ -126,23 +124,6 @@ allprojects {
 
 		inputs.properties(map)
 		filesMatching("fabric.mod.json") { expand(map) }
-	}
-
-	spotless {
-		lineEndings = com.diffplug.spotless.LineEnding.UNIX
-
-		java {
-			removeUnusedImports()
-			importOrder("java", "javax", "", "net.minecraft", "net.fabricmc", "dev.spiritstudios")
-			leadingSpacesToTabs()
-			trimTrailingWhitespace()
-		}
-
-		json {
-			target("src/**/lang/*.json")
-			targetExclude("src/**/generated/**")
-			gson().indentWithSpaces(4).sortByKeys()
-		}
 	}
 
 	checkstyle {

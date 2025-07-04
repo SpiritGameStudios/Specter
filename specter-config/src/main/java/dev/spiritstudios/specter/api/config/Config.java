@@ -2,8 +2,8 @@ package dev.spiritstudios.specter.api.config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,17 +11,13 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-
-import dev.spiritstudios.specter.api.config.gui.GuiHint;
-
-import dev.spiritstudios.specter.api.config.gui.SubConfigHints;
-
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
+import dev.spiritstudios.specter.api.config.gui.GuiHint;
 import dev.spiritstudios.specter.api.core.reflect.Ignore;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.core.util.SpecterPacketCodecs;
@@ -185,22 +181,39 @@ public abstract class Config {
 	 * A config that can be nested inside another config.
 	 */
 	public abstract static class SubConfig extends Config {
+		private final Map<Class<?>, GuiHint<SubConfig>> guiHints;
 		private final @Nullable String comment;
 
-		public SubConfig() {
-			this.comment = null;
-		}
-
 		public SubConfig(@Nullable String comment) {
+			this.guiHints = Collections.emptyMap();
 			this.comment = comment;
 		}
 
-		public List<GuiHint<SubConfig>> getGuiHints() {
-			return new ArrayList<>();
+		@SafeVarargs
+		public SubConfig(@Nullable String comment, GuiHint<SubConfig>... guiHints) {
+			if (guiHints.length == 0) {
+				this.guiHints = Collections.emptyMap();
+			} else {
+				ImmutableMap.Builder<Class<?>, GuiHint<SubConfig>> builder = ImmutableMap.builder();
+
+				for (GuiHint<SubConfig> guiHint : guiHints) {
+					builder.put(guiHint.getClass(), guiHint);
+				}
+
+				this.guiHints = builder.build();
+			}
+
+			this.comment = comment;
 		}
 
 		public Optional<String> comment() {
 			return Optional.ofNullable(comment);
+		}
+
+		public <H extends GuiHint<SubConfig>> Optional<H> hint(Class<H> clazz) {
+			GuiHint<SubConfig> guiHint = guiHints.get(clazz);
+			if (guiHint == null) return Optional.empty();
+			return ReflectionHelper.cast(guiHint, clazz);
 		}
 	}
 }
