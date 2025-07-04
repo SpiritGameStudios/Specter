@@ -49,8 +49,8 @@ public class Value<T> {
 		this.comment = comment;
 		this.sync = sync;
 		this.packetCodec = packetCodec;
-		this.constraints = Collections.unmodifiableMap(constraints);
-		this.guiHints = Collections.unmodifiableMap(guiHints);
+		this.constraints = constraints.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(constraints);
+		this.guiHints = guiHints.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(guiHints);
 
 		this.codec = new CommentedCodec<>(codec, comment);
 		this.value = defaultValue;
