@@ -190,6 +190,11 @@ public abstract class Config {
 		}
 
 		@SafeVarargs
+		public SubConfig(GuiHint<SubConfig>... guiHints) {
+			this(null, guiHints);
+		}
+
+		@SafeVarargs
 		public SubConfig(@Nullable String comment, GuiHint<SubConfig>... guiHints) {
 			if (guiHints.length == 0) {
 				this.guiHints = Collections.emptyMap();

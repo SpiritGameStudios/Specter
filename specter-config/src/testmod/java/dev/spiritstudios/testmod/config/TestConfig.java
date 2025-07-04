@@ -2,8 +2,6 @@ package dev.spiritstudios.testmod.config;
 
 import com.mojang.serialization.DataResult;
 
-import dev.spiritstudios.specter.api.config.gui.SubConfigHints;
-
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -14,11 +12,9 @@ import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Constraint;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.config.gui.GuiHint;
+import dev.spiritstudios.specter.api.config.gui.SubConfigHints;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.api.serialization.format.TomlFormat;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TestConfig extends Config {
 	public static final ConfigHolder<TestConfig, ?> JSON_HOLDER = ConfigHolder
@@ -77,11 +73,6 @@ public class TestConfig extends Config {
 	}
 
 	public static class SubTestConfig extends SubConfig {
-		@Override
-		public List<GuiHint<SubConfig>> getGuiHints() {
-			return List.of(new SubConfigHints.SectionHint());
-		}
-
 		public final Value<String> nestedString = stringValue("nested")
 				.comment("This is a nested string")
 				.sync()
@@ -115,7 +106,7 @@ public class TestConfig extends Config {
 		public final NestedSubTestConfig nestedNestedConfig = new NestedSubTestConfig();
 
 		public SubTestConfig() {
-			super(null);
+			super(new SubConfigHints.SectionHint());
 		}
 
 		public static class NestedSubTestConfig extends SubConfig {
@@ -148,10 +139,6 @@ public class TestConfig extends Config {
 					.comment("This is a nested nested enum")
 					.sync()
 					.build();
-
-			public NestedSubTestConfig() {
-				super(null);
-			}
 		}
 	}
 }
