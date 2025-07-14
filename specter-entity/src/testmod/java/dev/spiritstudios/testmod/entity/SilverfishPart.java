@@ -10,9 +10,9 @@ import dev.spiritstudios.specter.api.entity.EntityPart;
 public class SilverfishPart extends EntityPart<SilverfishEntity> {
 	public SilverfishPart(SilverfishEntity owner, EntityDimensions dimensions, Vec3d offset) {
 		super(owner, dimensions);
-		this.calculateBoundingBox();
 
-		move(MovementType.SELF, offset);
+		setRelativePos(offset);
+		this.calculateBoundingBox();
 	}
 
 	@Override

@@ -19,7 +19,7 @@ import dev.spiritstudios.testmod.entity.SilverfishPart;
 @Mixin(SilverfishEntity.class)
 public class SilverfishEntityMixin extends HostileEntity implements PartHolder<SilverfishEntity> {
 	@Unique
-	private final List<EntityPart<SilverfishEntity>> parts = List.of(new SilverfishPart(
+	private final List<SilverfishPart> parts = List.of(new SilverfishPart(
 			(SilverfishEntity) (Object) this,
 			EntityDimensions.changing(2f, 1f),
 			new Vec3d(0, 1, 0)
@@ -30,7 +30,7 @@ public class SilverfishEntityMixin extends HostileEntity implements PartHolder<S
 	}
 
 	@Override
-	public List<EntityPart<SilverfishEntity>> getEntityParts() {
+	public List<? extends SilverfishPart> getSpecterEntityParts() {
 		return parts;
 	}
 
