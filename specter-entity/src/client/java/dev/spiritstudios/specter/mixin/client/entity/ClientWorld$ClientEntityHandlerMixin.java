@@ -24,7 +24,7 @@ public abstract class ClientWorld$ClientEntityHandlerMixin {
 	@Inject(method = "startTracking(Lnet/minecraft/entity/Entity;)V", at = @At("RETURN"))
 	private void startTracking(Entity entity, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.getEntityParts()) {
+			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
 				this.field_27735.specter$getParts().put(part.getId(), part);
 			}
 		}
@@ -33,7 +33,7 @@ public abstract class ClientWorld$ClientEntityHandlerMixin {
 	@Inject(method = "stopTracking(Lnet/minecraft/entity/Entity;)V", at = @At("RETURN"))
 	private void stopTracking(Entity entity, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.getEntityParts()) {
+			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
 				this.field_27735.specter$getParts().remove(part.getId(), part);
 			}
 		}

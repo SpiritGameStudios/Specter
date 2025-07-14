@@ -20,7 +20,7 @@ public abstract class LivingEntityRendererMixin {
 	@Inject(method = "appendHitboxes(Lnet/minecraft/entity/LivingEntity;Lcom/google/common/collect/ImmutableList$Builder;F)V", at = @At("HEAD"))
 	private void appendHitboxes(LivingEntity entity, ImmutableList.Builder<EntityHitbox> builder, float tickProgress, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.getEntityParts()) {
+			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
 				Box box = part.getBoundingBox();
 				builder.add(new EntityHitbox(
 						box.minX - entity.getX(),
