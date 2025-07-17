@@ -29,7 +29,8 @@ public final class ConfigHolderRegistry {
 
 	public static List<ConfigSyncS2CPayload> createPayloads() {
 		return holders.values().stream()
-			.map(ConfigSyncS2CPayload::new)
-			.toList();
+				.filter(holder -> holder.get().shouldSync())
+				.map(ConfigSyncS2CPayload::new)
+				.toList();
 	}
 }

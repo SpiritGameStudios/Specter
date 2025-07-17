@@ -12,6 +12,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -35,6 +36,7 @@ import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
  * @param <T> The type of the configuration class. This must be the same as the class that extends this class.
  */
 public abstract class Config<T extends Config<T>> implements Codec<T> {
+	private @Nullable Boolean shouldSync;
 	private List<ReflectionHelper.FieldValuePair<Value<?>>> fields;
 
 	/**
@@ -81,9 +83,9 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static NumericValue.Builder<Integer> intValue(int defaultValue) {
 		return new NumericValue.Builder<>(defaultValue, Codec.INT)
-			.codecRange(SpecterCodecs::clampedRange)
-			.range(0, 100)
-			.packetCodec(PacketCodecs.INTEGER);
+				.codecRange(SpecterCodecs::clampedRange)
+				.range(0, 100)
+				.packetCodec(PacketCodecs.INTEGER);
 	}
 
 	/**
@@ -95,9 +97,9 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static NumericValue.Builder<Float> floatValue(float defaultValue) {
 		return new NumericValue.Builder<>(defaultValue, Codec.FLOAT)
-			.codecRange(SpecterCodecs::clampedRange)
-			.range(0.0F, 1.0F)
-			.packetCodec(PacketCodecs.FLOAT);
+				.codecRange(SpecterCodecs::clampedRange)
+				.range(0.0F, 1.0F)
+				.packetCodec(PacketCodecs.FLOAT);
 	}
 
 	/**
@@ -109,9 +111,9 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 */
 	protected static NumericValue.Builder<Double> doubleValue(double defaultValue) {
 		return new NumericValue.Builder<>(defaultValue, Codec.DOUBLE)
-			.codecRange(SpecterCodecs::clampedRange)
-			.range(0.0, 1.0)
-			.packetCodec(PacketCodecs.DOUBLE);
+				.codecRange(SpecterCodecs::clampedRange)
+				.range(0.0, 1.0)
+				.packetCodec(PacketCodecs.DOUBLE);
 	}
 
 	/**
@@ -156,36 +158,46 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 				if (field.isAnnotationPresent(Ignore.class)) return null;
 
 				if (!Value.class.isAssignableFrom(field.getType()) ||
-					Modifier.isStatic(field.getModifiers()) ||
-					!Modifier.isFinal(field.getModifiers())) return null;
+						Modifier.isStatic(field.getModifiers()) ||
+						!Modifier.isFinal(field.getModifiers())) return null;
 
 				Value<?> value = ReflectionHelper.getFieldValue(this, field);
 				if (value == null) return null;
 
 				return new ReflectionHelper.FieldValuePair<Value<?>>(
-					field,
-					value
+						field,
+						value
 				);
 			}).filter(Objects::nonNull).toList();
 		}
 		return fields;
 	}
 
+	public boolean shouldSync() {
+		if (shouldSync == null) {
+			shouldSync = fields()
+					.stream()
+					.anyMatch(pair -> pair.value().sync());
+		}
+
+		return shouldSync;
+	}
+
 	@ApiStatus.Internal
 	@SuppressWarnings("unchecked")
 	public PacketCodec<ByteBuf, T> packetCodec() {
 		return PacketCodec.of(
-			(value, buf) -> value.fields().forEach(pair -> {
-				if (!pair.value().sync()) return;
-				pair.value().packetEncode(buf);
-			}),
-			(buf) -> {
-				fields().forEach(pair -> {
+				(value, buf) -> value.fields().forEach(pair -> {
 					if (!pair.value().sync()) return;
-					pair.value().packetDecode(buf);
-				});
-				return (T) this;
-			}
+					pair.value().packetEncode(buf);
+				}),
+				(buf) -> {
+					fields().forEach(pair -> {
+						if (!pair.value().sync()) return;
+						pair.value().packetDecode(buf);
+					});
+					return (T) this;
+				}
 		);
 	}
 
@@ -202,8 +214,8 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		for (ReflectionHelper.FieldValuePair<Value<?>> pair : fields()) {
 			if (pair.value().decode(ops, input)) continue;
 			SpecterGlobals.LOGGER.error(
-				"Failed to decode config value \"{}\". Resetting to default value",
-				pair.value().name()
+					"Failed to decode config value \"{}\". Resetting to default value",
+					pair.value().name()
 			);
 			pair.value().reset();
 		}
