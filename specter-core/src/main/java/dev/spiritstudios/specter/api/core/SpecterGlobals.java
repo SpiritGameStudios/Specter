@@ -1,10 +1,11 @@
 package dev.spiritstudios.specter.api.core;
 
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.Identifier;
 
 public final class SpecterGlobals {
 	@ApiStatus.Internal
@@ -13,8 +14,8 @@ public final class SpecterGlobals {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	public static final boolean DEBUG = System.getProperty("specter.debug") != null ?
-		Boolean.getBoolean("specter.debug") :
-		FabricLoader.getInstance().isDevelopmentEnvironment();
+			Boolean.getBoolean("specter.debug") :
+			FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	/**
 	 * Whether the game is running on Forge with Sinytra Connector
@@ -27,6 +28,11 @@ public final class SpecterGlobals {
 	 */
 	public static final boolean QUILT = FabricLoader.getInstance().isModLoaded("quilt_loader") && !FORGE; // !FORGE just in case connector ever supports Quilt
 	public static final boolean FABRIC = FabricLoader.getInstance().isModLoaded("fabricloader") && !FORGE && !QUILT;
+
+	@ApiStatus.Internal
+	public static Identifier id(String path) {
+		return Identifier.of(MODID, path);
+	}
 
 	@ApiStatus.Internal
 	public static void debug(String message) {

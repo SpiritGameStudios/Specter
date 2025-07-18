@@ -2,15 +2,18 @@ package dev.spiritstudios.specter.impl.debug.client;
 
 import java.util.List;
 
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-
 import dev.spiritstudios.specter.api.block.BlockMetatags;
+import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.api.core.client.debug.DebugRendererRegistry;
 import dev.spiritstudios.specter.api.item.ItemMetatags;
 import dev.spiritstudios.specter.api.render.client.RenderMetatags;
 
@@ -42,5 +45,13 @@ public class SpecterDebugClient implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			DebugRenderCommand.register(dispatcher);
 		});
+
+		SoundInstanceDebugRenderer soundInstanceDebugRenderer = new SoundInstanceDebugRenderer();
+
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+			client.getSoundManager().registerListener(soundInstanceDebugRenderer);
+		});
+
+		DebugRendererRegistry.register(SpecterGlobals.id("sound_instance"), soundInstanceDebugRenderer);
 	}
 }
