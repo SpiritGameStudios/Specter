@@ -30,7 +30,7 @@ import dev.spiritstudios.specter.impl.core.client.debug.DebugRendererRegistryImp
 import dev.spiritstudios.specter.impl.core.client.debug.ToggleableDebugRenderer;
 
 @Mixin(DebugRenderer.class)
-public class DebugRendererMixin {
+public abstract class DebugRendererMixin {
 	@Shadow
 	@Final
 	public DebugRenderer.Renderer waterDebugRenderer;
@@ -135,7 +135,7 @@ public class DebugRendererMixin {
 
 		DebugRendererRegistryImpl.register(Identifier.ofVanilla("chunk_loading"), new ToggleableDebugRenderer(chunkLoadingDebugRenderer));
 
-		DebugRendererRegistryImpl.register(Identifier.ofVanilla("village"), new ToggleableDebugRenderer(villageDebugRenderer));
+		DebugRendererRegistryImpl.register(Identifier.ofVanilla("brain"), new ToggleableDebugRenderer(villageDebugRenderer));
 
 		DebugRendererRegistryImpl.register(Identifier.ofVanilla("village_sections"), new ToggleableDebugRenderer(villageSectionsDebugRenderer));
 

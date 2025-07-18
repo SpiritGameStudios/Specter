@@ -57,7 +57,6 @@ import net.minecraft.registry.tag.StructureTags;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
-import net.minecraft.util.NameGenerator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.GlobalPos;
@@ -81,6 +80,11 @@ public abstract class DebugInfoSenderMixin {
 
 	@Shadow
 	private static void sendToAll(ServerWorld world, CustomPayload payload) {
+		throw new UnreachableException();
+	}
+
+	@Shadow
+	private static String format(ServerWorld world, @Nullable Object object) {
 		throw new UnreachableException();
 	}
 
@@ -186,6 +190,7 @@ public abstract class DebugInfoSenderMixin {
 	@Inject(method = "sendBrainDebugData", at = @At("HEAD"))
 	private static void sendBrainDebugData(LivingEntity living, CallbackInfo ci) {
 		Brain<?> brain = living.getBrain();
+		ServerWorld world = (ServerWorld) living.getWorld();
 
 		String profession = "";
 		int experience = 0;
@@ -195,15 +200,16 @@ public abstract class DebugInfoSenderMixin {
 		Set<BlockPos> potentialPois = Set.of();
 
 		if (living instanceof VillagerEntity villager) {
-			profession = villager.getVillagerData().profession().toString();
+			profession = villager.getVillagerData().profession().value().id().getString();
 			experience = villager.getExperience();
 			wantsGolem = villager.canSummonGolem(villager.getWorld().getTime());
 
 			List<String> newGossips = new ArrayList<>();
 			villager.getGossip().getEntityReputationAssociatedGossips().forEach((key, value) -> value.forEach((villageGossipType, integer) -> newGossips.add(
-					"%s: %s: %d".formatted(NameGenerator.name(key), villageGossipType, integer)
+					"%s: %s: %d".formatted(format(world, key), villageGossipType, integer)
 			)));
 			gossips = newGossips;
+
 			pois = Stream.of(MemoryModuleType.JOB_SITE, MemoryModuleType.HOME, MemoryModuleType.MEETING_POINT)
 					.map(brain::getOptionalMemory)
 					.filter(Objects::nonNull)
@@ -216,22 +222,28 @@ public abstract class DebugInfoSenderMixin {
 		}
 
 		sendToAll(
-				(ServerWorld) living.getWorld(),
+				world,
 				new DebugBrainCustomPayload(new DebugBrainCustomPayload.Brain(
 						living.getUuid(),
 						living.getId(),
-						living.getDisplayName() != null ? living.getDisplayName().getString() : "",
+						format(world, living),
 						profession,
 						experience,
 						living.getHealth(),
 						living.getMaxHealth(),
 						living.getPos(),
-						living instanceof InventoryOwner inventoryOwner ? inventoryOwner.getInventory().toString() : "",
+						living instanceof InventoryOwner inventoryOwner ?
+								format(world, inventoryOwner.getInventory()) :
+								"",
 						Optional.ofNullable(brain.getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty()).orElse(null),
 						wantsGolem,
 						living instanceof WardenEntity warden ? warden.getAnger() : -1,
-						brain.getPossibleActivities().stream().map(Activity::getId).toList(),
-						brain.getRunningTasks().stream().map(Task::getName).toList(),
+						brain.getPossibleActivities().stream()
+								.map(Activity::getId)
+								.toList(),
+						brain.getRunningTasks().stream()
+								.map(Task::getName)
+								.toList(),
 						listMemories(living, living.getWorld().getTime()),
 						gossips,
 						pois,
@@ -248,7 +260,8 @@ public abstract class DebugInfoSenderMixin {
 						bee.getUuid(),
 						bee.getId(),
 						bee.getPos(),
-						Optional.ofNullable(bee.getBrain().getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty()).orElse(null),
+						Optional.ofNullable(bee.getBrain().getOptionalMemory(MemoryModuleType.PATH)).orElse(Optional.empty())
+								.orElse(null),
 						bee.getHivePos(),
 						bee.getFlowerPos(),
 						bee.getMoveGoalTicks(),
@@ -267,8 +280,11 @@ public abstract class DebugInfoSenderMixin {
 				new DebugBreezeCustomPayload(new DebugBreezeCustomPayload.BreezeInfo(
 						breeze.getUuid(),
 						breeze.getId(),
-						Optional.ofNullable(breeze.getTarget()).map(Entity::getId).orElse(null),
-						Optional.ofNullable(breeze.getBrain().getOptionalMemory(MemoryModuleType.BREEZE_JUMP_TARGET)).orElse(Optional.empty()).orElse(null)
+						Optional.ofNullable(breeze.getTarget())
+								.map(Entity::getId)
+								.orElse(null),
+						Optional.ofNullable(breeze.getBrain().getOptionalMemory(MemoryModuleType.BREEZE_JUMP_TARGET))
+								.orElse(Optional.empty()).orElse(null)
 				))
 		);
 	}

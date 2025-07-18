@@ -28,9 +28,9 @@ public abstract class PathNodeNavigatorMixin {
 		}
 
 		original.setDebugInfo(
-			unvisited.toArray(new PathNode[0]),
-			visited.toArray(new PathNode[0]),
-			map.keySet()
+				unvisited.toArray(PathNode[]::new),
+				visited.toArray(PathNode[]::new),
+				map.keySet()
 		);
 
 		return original;
