@@ -5,5 +5,5 @@ import java.util.List;
 import net.minecraft.entity.Entity;
 
 public interface PartHolder<T extends Entity> {
-	List<EntityPart<T>> getEntityParts();
+	List<? extends EntityPart<T>> getSpecterEntityParts();
 }

@@ -40,7 +40,7 @@ public abstract class WorldMixin implements EntityPartWorld {
 			CallbackInfoReturnable<LazyIterationConsumer.NextIteration> cir
 	) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.getEntityParts()) {
+			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
 				T partCasted = filter.downcast(part);
 
 				if (partCasted != null && predicate.test(partCasted)) {

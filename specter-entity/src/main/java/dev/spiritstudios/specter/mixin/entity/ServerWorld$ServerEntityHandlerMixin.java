@@ -23,7 +23,7 @@ public abstract class ServerWorld$ServerEntityHandlerMixin {
 	@Inject(method = "startTracking(Lnet/minecraft/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;updateEventHandler(Ljava/util/function/BiConsumer;)V"))
 	private void startTracking(Entity entity, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.getEntityParts()) {
+			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
 				this.field_26936.specter$getParts().put(part.getId(), part);
 			}
 		}
@@ -32,7 +32,7 @@ public abstract class ServerWorld$ServerEntityHandlerMixin {
 	@Inject(method = "stopTracking(Lnet/minecraft/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;updateEventHandler(Ljava/util/function/BiConsumer;)V"))
 	private void stopTracking(Entity entity, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
-			for (EntityPart<?> part : partHolder.getEntityParts()) {
+			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
 				this.field_26936.specter$getParts().remove(part.getId(), part);
 			}
 		}
