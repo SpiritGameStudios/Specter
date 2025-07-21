@@ -5,7 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Property;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.mixin.block.BlockAccessor;
 
 /**
@@ -24,7 +24,7 @@ public final class BlockStatePropertyModifications {
 	 */
 	public static <T extends Comparable<T>> void add(Block block, Property<T> property, T defaultValue) {
 		if (block.getStateManager().getProperties().contains(property)) {
-			SpecterGlobals.debug("Property " + property.getName() + " already exists for block " + block);
+			Specter.debug("Property " + property.getName() + " already exists for block " + block);
 			return;
 		}
 
@@ -47,7 +47,7 @@ public final class BlockStatePropertyModifications {
 	 */
 	public static <T extends Comparable<T>> void remove(Block block, Property<T> property) {
 		if (!block.getStateManager().getProperties().contains(property)) {
-			SpecterGlobals.debug("Property " + property.getName() + " does not exist for block " + block);
+			Specter.debug("Property " + property.getName() + " does not exist for block " + block);
 			return;
 		}
 

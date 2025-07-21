@@ -15,11 +15,11 @@ import net.minecraft.text.Text;
 
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.Value;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.client.NestedConfigScreen;
 import dev.spiritstudios.specter.impl.config.client.gui.widget.OptionsScrollableWidget;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 public abstract class ConfigScreen extends Screen {
 	private static final Text MULTIPLAYER_SYNC_ERROR = Text.translatable("screen.specter.config.multiplayer_sync_error");
@@ -78,7 +78,7 @@ public abstract class ConfigScreen extends Screen {
 
 			BiFunction<Value<?>, String, ? extends ClickableWidget> factory = ConfigScreenWidgets.getWidgetFactory(pair.value());
 			if (factory == null) {
-				SpecterGlobals.LOGGER.warn("No widget factory found for {}", pair.value().defaultValue().getClass().getSimpleName());
+				Specter.LOGGER.warn("No widget factory found for {}", pair.value().defaultValue().getClass().getSimpleName());
 				return;
 			}
 

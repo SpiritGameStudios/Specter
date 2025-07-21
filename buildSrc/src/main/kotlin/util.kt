@@ -6,12 +6,12 @@ import org.gradle.kotlin.dsl.project
 
 fun Project.moduleDependencies(project: Project, vararg modules: String) {
 	val depList: MutableList<ProjectDependency> = mutableListOf()
-	modules.forEach { depList.add(project.dependencies.project(":$it", "namedElements")) }
+	modules.forEach { it -> depList.add(project.dependencies.project(":$it", "namedElements")) }
 
 	val clientOutputs = mutableListOf<SourceSetOutput?>()
-	modules.forEach {
-		clientOutputs.add(findProject(":$it")?.extensions?.findByName("sourceSets")?.let {
-			it as org.gradle.api.tasks.SourceSetContainer
+	modules.forEach { it ->
+		clientOutputs.add(findProject(":$it")?.extensions?.findByName("sourceSets")?.let { it2 ->
+			it2 as org.gradle.api.tasks.SourceSetContainer
 		}?.getByName("client")?.output)
 	}
 

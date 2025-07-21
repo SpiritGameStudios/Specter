@@ -2,10 +2,9 @@ package dev.spiritstudios.specter.impl.item;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.item.ItemConvertible;
-
-import net.fabricmc.api.ModInitializer;
 
 import dev.spiritstudios.specter.api.item.ItemMetatags;
 import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
@@ -20,14 +19,14 @@ public class SpecterItem implements ModInitializer {
 		ItemMetatags.init();
 
 		SpecterReloadableRegistries.registerSynced(
-			SpecterItemRegistryKeys.ITEM_GROUP,
-			DataItemGroup.CODEC,
-			DataItemGroup.PACKET_CODEC
+				SpecterItemRegistryKeys.ITEM_GROUP,
+				DataItemGroup.CODEC,
+				DataItemGroup.PACKET_CODEC
 		);
 
 		MetatagEvents.metatagLoadedEvent(ItemMetatags.COMPOSTING_CHANCE).register(resourceManager -> {
 			ITEM_TO_LEVEL_INCREASE_CHANCE.clear();
-			ItemMetatags.COMPOSTING_CHANCE.forEach((entry) -> ITEM_TO_LEVEL_INCREASE_CHANCE.put(entry.key(), entry.value().floatValue()));
+			ItemMetatags.COMPOSTING_CHANCE.forEach((entry) -> ITEM_TO_LEVEL_INCREASE_CHANCE.put(entry.getKey(), entry.getValue().floatValue()));
 		});
 	}
 }

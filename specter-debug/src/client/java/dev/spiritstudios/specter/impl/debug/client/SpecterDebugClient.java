@@ -12,10 +12,9 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 
 import dev.spiritstudios.specter.api.block.BlockMetatags;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.client.debug.DebugRendererRegistry;
 import dev.spiritstudios.specter.api.item.ItemMetatags;
-import dev.spiritstudios.specter.api.render.client.RenderMetatags;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 public class SpecterDebugClient implements ClientModInitializer {
 	private static void addMetatagLine(List<Text> lines, String key, Object... values) {
@@ -38,8 +37,6 @@ public class SpecterDebugClient implements ClientModInitializer {
 			BlockMetatags.OXIDIZABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "oxidizable", entry.getName()));
 			BlockMetatags.STRIPPABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "strippable", entry.getName()));
 			BlockMetatags.WAXABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "waxable", entry.getName()));
-
-			RenderMetatags.RENDER_LAYER.get(block).ifPresent(entry -> addMetatagLine(lines, "render_layer", entry.asString()));
 		});
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -52,6 +49,6 @@ public class SpecterDebugClient implements ClientModInitializer {
 			client.getSoundManager().registerListener(soundInstanceDebugRenderer);
 		});
 
-		DebugRendererRegistry.register(SpecterGlobals.id("sound_instance"), soundInstanceDebugRenderer);
+		DebugRendererRegistry.register(Specter.id("sound_instance"), soundInstanceDebugRenderer);
 	}
 }

@@ -1,63 +1,47 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import com.mojang.serialization.Codec;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
-import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public record MetatagImpl<R, V>(
-	Registry<R> registry,
-	Identifier id,
-	Codec<V> codec,
-	PacketCodec<RegistryByteBuf, V> packetCodec,
-	ResourceType side
+		RegistryKey<Registry<R>> registryKey,
+		Identifier id,
+		Codec<V> codec,
+		PacketCodec<RegistryByteBuf, V> packetCodec
 ) implements Metatag<R, V> {
 	@Override
 	public Optional<V> get(R entry) {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
-
-		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry));
+		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValue(this, entry));
 	}
 
-	@NotNull
+	@Unmodifiable
 	@Override
-	public Iterator<Entry<R, V>> iterator() {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
-
-		return this.registry.stream().map(entry -> {
-			V value = MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry);
-			return value == null ? null : new Entry<>(entry, value);
-		}).filter(Objects::nonNull).iterator();
-	}
-
-	@Override
-	public void put(R entry, V value) {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
-
-		if (this.registry.getId(entry) == null) throw new IllegalArgumentException("Entry is not in the registry");
-		MetatagValueHolder.getOrCreate(registry).specter$putMetatagValue(this, entry, value);
+	public Map<R, V> values() {
+		return Collections.unmodifiableMap(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValues(this));
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof MetatagImpl<?, ?> that)) return false;
-		return Objects.equals(id, that.id) && Objects.equals(registry.getKey(), that.registry.getKey());
+		return Objects.equals(id, that.id) && Objects.equals(registryKey, that.registryKey);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(registry.getKey(), id);
+		return Objects.hash(registryKey, id);
 	}
 }

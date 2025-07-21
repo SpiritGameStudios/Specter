@@ -10,17 +10,16 @@ import java.util.List;
 
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.loader.api.FabricLoader;
-
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 /**
  * A class that holds config data and provides methods to save and load the config.
@@ -51,11 +50,11 @@ public class ConfigHolder<T extends Config<T>, F> {
 
 		this.config.fields().forEach(pair -> {
 			pair.value().init(pair.field().getName());
-			SpecterGlobals.debug("Registered config value: %s".formatted(pair.value().translationKey(id)));
+			Specter.debug("Registered config value: %s".formatted(pair.value().translationKey(id)));
 		});
 
 		if (!load())
-			SpecterGlobals.LOGGER.error("Failed to load config file: {}, default values will be used", path());
+			Specter.LOGGER.error("Failed to load config file: {}, default values will be used", path());
 		else
 			save(); // Save the config to disk to ensure it's up to date
 	}
@@ -80,8 +79,8 @@ public class ConfigHolder<T extends Config<T>, F> {
 		DataResult<F> result = config.encodeStart(format, config);
 
 		if (result.error().isPresent()) {
-			SpecterGlobals.LOGGER.error("Failed to encode config: {}", id);
-			SpecterGlobals.LOGGER.error(result.error().toString());
+			Specter.LOGGER.error("Failed to encode config: {}", id);
+			Specter.LOGGER.error(result.error().toString());
 			return;
 		}
 
@@ -92,8 +91,8 @@ public class ConfigHolder<T extends Config<T>, F> {
 		try {
 			format.write(writer, element);
 		} catch (Exception e) {
-			SpecterGlobals.LOGGER.error("Failed to write config: {}", id);
-			SpecterGlobals.LOGGER.error(e.toString());
+			Specter.LOGGER.error("Failed to write config: {}", id);
+			Specter.LOGGER.error(e.toString());
 			return;
 		}
 
@@ -105,7 +104,7 @@ public class ConfigHolder<T extends Config<T>, F> {
 		try {
 			Files.write(path, lines);
 		} catch (IOException e) {
-			SpecterGlobals.LOGGER.error("Failed to save config file: {}", path, e);
+			Specter.LOGGER.error("Failed to save config file: {}", path, e);
 		}
 	}
 
@@ -125,7 +124,7 @@ public class ConfigHolder<T extends Config<T>, F> {
 		try {
 			lines = Files.readAllLines(path());
 		} catch (IOException e) {
-			SpecterGlobals.LOGGER.error("Failed to load config file {}. Default values will be used instead.", path());
+			Specter.LOGGER.error("Failed to load config file {}. Default values will be used instead.", path());
 			return false;
 		}
 
@@ -133,15 +132,15 @@ public class ConfigHolder<T extends Config<T>, F> {
 		try {
 			element = format.read(String.join("\n", lines));
 		} catch (Exception e) {
-			SpecterGlobals.LOGGER.error("Failed to parse config file: {}", path());
-			SpecterGlobals.LOGGER.error(e.toString());
+			Specter.LOGGER.error("Failed to parse config file: {}", path());
+			Specter.LOGGER.error(e.toString());
 			return false;
 		}
 
 		DataResult<T> result = config.parse(format, element);
 		if (result.error().isPresent()) {
-			SpecterGlobals.LOGGER.error("Failed to decode config file: {}", path());
-			SpecterGlobals.LOGGER.error(result.error().toString());
+			Specter.LOGGER.error("Failed to decode config file: {}", path());
+			Specter.LOGGER.error(result.error().toString());
 
 			return false;
 		}
@@ -151,9 +150,9 @@ public class ConfigHolder<T extends Config<T>, F> {
 
 	private Path path() {
 		return Paths.get(
-			FabricLoader.getInstance().getConfigDir().toString(),
-			"",
-			path
+				FabricLoader.getInstance().getConfigDir().toString(),
+				"",
+				path
 		);
 	}
 

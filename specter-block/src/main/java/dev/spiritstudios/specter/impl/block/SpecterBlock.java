@@ -2,10 +2,9 @@ package dev.spiritstudios.specter.impl.block;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.block.Block;
-
-import net.fabricmc.api.ModInitializer;
 
 import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.registry.metatag.MetatagEvents;
@@ -27,8 +26,8 @@ public class SpecterBlock implements ModInitializer {
 			WAXED_TO_UNWAXED_BLOCKS.clear();
 
 			BlockMetatags.WAXABLE.forEach((entry) -> {
-				UNWAXED_TO_WAXED_BLOCKS.put(entry.key(), entry.value());
-				WAXED_TO_UNWAXED_BLOCKS.put(entry.value(), entry.key());
+				UNWAXED_TO_WAXED_BLOCKS.put(entry.getKey(), entry.getValue());
+				WAXED_TO_UNWAXED_BLOCKS.put(entry.getValue(), entry.getKey());
 			});
 		});
 
@@ -37,8 +36,8 @@ public class SpecterBlock implements ModInitializer {
 			OXIDATION_LEVEL_DECREASES.clear();
 
 			BlockMetatags.OXIDIZABLE.forEach((entry) -> {
-				OXIDATION_LEVEL_INCREASES.put(entry.key(), entry.value());
-				OXIDATION_LEVEL_DECREASES.put(entry.value(), entry.key());
+				OXIDATION_LEVEL_INCREASES.put(entry.getKey(), entry.getValue());
+				OXIDATION_LEVEL_DECREASES.put(entry.getValue(), entry.getKey());
 			});
 		});
 	}

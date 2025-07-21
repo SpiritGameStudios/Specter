@@ -11,6 +11,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 
 /**
@@ -38,9 +39,9 @@ public final class SpecterReloadableRegistries {
 	 */
 	public static Optional<RegistryWrapper.WrapperLookup> lookup() {
 		Optional<RegistryWrapper.WrapperLookup> lookup = SpecterReloadableRegistriesImpl.manager()
-			.map(manager -> manager); // i love java
+				.map(manager -> manager); // i love java
 		if (lookup.isEmpty() && SpecterGlobals.DEBUG)
-			SpecterGlobals.LOGGER.warn("Accessed reloadable registry lookup while it is unset. This may be a bug.");
+			Specter.LOGGER.warn("Accessed reloadable registry lookup while it is unset. This may be a bug.");
 		return lookup;
 	}
 }

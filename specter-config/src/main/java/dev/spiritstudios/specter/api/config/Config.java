@@ -19,11 +19,11 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.core.reflect.Ignore;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.core.util.SpecterPacketCodecs;
 import dev.spiritstudios.specter.api.serialization.SpecterCodecs;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 /**
  * A configuration class that can be saved and loaded from disk.
@@ -213,7 +213,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
 		for (ReflectionHelper.FieldValuePair<Value<?>> pair : fields()) {
 			if (pair.value().decode(ops, input)) continue;
-			SpecterGlobals.LOGGER.error(
+			Specter.LOGGER.error(
 					"Failed to decode config value \"{}\". Resetting to default value",
 					pair.value().name()
 			);

@@ -3,10 +3,8 @@ package dev.spiritstudios.specter.impl.registry.metatag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
@@ -15,9 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
@@ -33,30 +30,24 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 	private static <R, V> MetatagData<R, V> createData(Metatag<R, V> metatag) {
 		return new MetatagData<>(
 				metatag,
-				Streams.stream(
-						metatag instanceof ExistingCombinedMetatag<R, V> existingCombined ?
-								existingCombined.rawIterator() :
-								metatag.iterator()
-				).collect(Collectors.toMap(
-						Metatag.Entry::key,
-						Metatag.Entry::value
-				))
+				metatag instanceof ExistingCombinedMetatag<R, V> existingCombined ?
+						existingCombined.rawValues() :
+						metatag.values()
 		);
 	}
 
-	public static MetatagsS2CPayload getOrCreatePayload() {
+	public static MetatagsS2CPayload getOrCreatePayload(RegistryWrapper.WrapperLookup wrapperLookup) {
 		if (CACHE != null) return CACHE;
 
 		List<MetatagData<?, ?>> metatags = new ArrayList<>();
 
-		for (Registry<?> registry : Registries.REGISTRIES) {
-			MetatagHolder.of(registry).specter$getMetatags().forEach(entry -> {
-				if (entry.getValue().side() != ResourceType.SERVER_DATA) return;
+		wrapperLookup.streamAllRegistryKeys().forEach(key -> {
+			MetatagHolder.ofAny(key).specter$getMetatags().forEach(entry -> {
 				if (entry.getValue().packetCodec() == null) return;
 
 				metatags.add(createData(entry.getValue()));
 			});
-		}
+		});
 
 		CACHE = new MetatagsS2CPayload(ImmutableList.copyOf(metatags));
 		return CACHE;
@@ -68,13 +59,11 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 
 	public record MetatagData<R, V>(Metatag<R, V> metatag, Map<R, V> entries) {
 		private static final PacketCodec<ByteBuf, Metatag<?, ?>> METATAG_CODEC =
-				Identifier.PACKET_CODEC.<Registry<?>>xmap(
-						Registries.REGISTRIES::get,
-						registry -> registry.getKey().getValue()
-				).dispatch(
-						Metatag::registry,
-						registry -> Identifier.PACKET_CODEC.xmap(
-								id -> MetatagHolder.of(registry).specter$getMetatag(id),
+				Identifier.PACKET_CODEC.dispatch(
+						metatag -> metatag.registryKey().getValue(),
+						key -> Identifier.PACKET_CODEC.xmap(
+								id -> MetatagHolder.ofAny(RegistryKey.ofRegistry(key))
+										.specter$getMetatag(id),
 								Metatag::id
 						)
 				);
@@ -89,7 +78,7 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 		public static <R, V> PacketCodec<RegistryByteBuf, MetatagData<R, V>> codec(Metatag<R, V> metatag) {
 			return PacketCodecs.map(
 					expected -> (Map<R, V>) new Object2ObjectLinkedOpenHashMap<R, V>(expected),
-					PacketCodecs.registryValue(metatag.registry().getKey()),
+					PacketCodecs.registryValue(metatag.registryKey()),
 					metatag.packetCodec()
 			).xmap(
 					map -> new MetatagData<>(metatag, map),

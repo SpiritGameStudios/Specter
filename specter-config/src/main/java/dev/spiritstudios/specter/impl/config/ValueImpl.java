@@ -2,14 +2,18 @@ package dev.spiritstudios.specter.impl.config;
 
 import java.util.Optional;
 
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.RecordBuilder;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.network.codec.PacketCodec;
 
 import dev.spiritstudios.specter.api.config.Value;
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.serialization.CommentedCodec;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 public class ValueImpl<T> implements Value<T> {
 	private final T defaultValue;
@@ -24,10 +28,10 @@ public class ValueImpl<T> implements Value<T> {
 	private T value;
 
 	public ValueImpl(T defaultValue,
-					Codec<T> codec,
-					PacketCodec<ByteBuf, T> packetCodec,
-					String comment,
-					boolean sync
+					 Codec<T> codec,
+					 PacketCodec<ByteBuf, T> packetCodec,
+					 String comment,
+					 boolean sync
 	) {
 		this.defaultValue = defaultValue;
 		this.comment = comment;
@@ -62,7 +66,7 @@ public class ValueImpl<T> implements Value<T> {
 	@Override
 	public <T1> RecordBuilder<T1> encode(DynamicOps<T1> ops, RecordBuilder<T1> builder) {
 		if (mapCodec == null) {
-			SpecterGlobals.LOGGER.error("Value not initialized, cannot encode");
+			Specter.LOGGER.error("Value not initialized, cannot encode");
 			return builder;
 		}
 
@@ -72,13 +76,13 @@ public class ValueImpl<T> implements Value<T> {
 	@Override
 	public <T1> boolean decode(DynamicOps<T1> ops, T1 input) {
 		if (mapCodec == null) {
-			SpecterGlobals.LOGGER.error("Value not initialized, cannot decode");
+			Specter.LOGGER.error("Value not initialized, cannot decode");
 			return false;
 		}
 
 		DataResult<T> result = mapCodec.decoder().parse(ops, input);
 		if (result.error().isPresent()) {
-			SpecterGlobals.LOGGER.error("Failed to decode value: {}", result.error().get());
+			Specter.LOGGER.error("Failed to decode value: {}", result.error().get());
 			return false;
 		}
 

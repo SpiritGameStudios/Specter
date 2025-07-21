@@ -1,5 +1,5 @@
 [versions]
-fabric_loom = "1.10-SNAPSHOT"
+fabric_loom = "1.11-SNAPSHOT"
 spotless = "7.0.3"
 
 minecraft = "1.21.5"

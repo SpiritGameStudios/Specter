@@ -17,6 +17,7 @@ import net.minecraft.client.RunArgs;
 import net.minecraft.client.session.Session;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 @Mixin(RunArgs.Network.class)
 public class RunArgsNetworkMixin {
@@ -30,14 +31,14 @@ public class RunArgsNetworkMixin {
 		if (!SpecterGlobals.DEBUG) return;
 
 		if (!System.getProperties().containsKey("specter.development.username") || !System.getProperties().containsKey("specter.development.uuid")) {
-			SpecterGlobals.LOGGER.info("Development account not set, skipping...");
+			Specter.LOGGER.info("Development account not set, skipping...");
 			return;
 		}
 
 		String username = System.getProperty("specter.development.username");
 		UUID uuid = UndashedUuid.fromString(System.getProperty("specter.development.uuid").replace("-", ""));
 
-		SpecterGlobals.LOGGER.info("Using development account {} ({})", username, uuid);
+		Specter.LOGGER.info("Using development account {} ({})", username, uuid);
 		this.session = new Session(
 				username,
 				uuid,

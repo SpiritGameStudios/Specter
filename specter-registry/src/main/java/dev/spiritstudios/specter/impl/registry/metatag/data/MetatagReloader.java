@@ -1,82 +1,82 @@
 package dev.spiritstudios.specter.impl.registry.metatag.data;
 
+import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 
-public class MetatagReloader implements SimpleResourceReloadListener<List<MetatagContent<?, ?>>> {
-	private final ResourceType side;
+public class MetatagReloader implements SimpleResourceReloadListener<Collection<MetatagContent<?, ?>>> {
+	public static final Identifier ID = Specter.id("metatags_data");
 
-	public MetatagReloader(ResourceType side) {
-		this.side = side;
+	private final RegistryWrapper.WrapperLookup wrapperLookup;
+
+	public MetatagReloader(RegistryWrapper.WrapperLookup wrapperLookup) {
+		this.wrapperLookup = wrapperLookup;
 	}
 
 	private <R, V> MetatagContent<R, V> createMap(Metatag<R, V> metatag) {
-		return new MetatagContent<>(metatag.registry(), metatag);
+		return new MetatagContent<>(metatag.registryKey(), metatag);
 	}
 
 	@Override
-	public CompletableFuture<List<MetatagContent<?, ?>>> load(ResourceManager manager, Executor executor) {
+	public CompletableFuture<Collection<MetatagContent<?, ?>>> load(ResourceManager manager, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
-			Map<Metatag<?, ?>, MetatagContent<?, ?>> metatagContents = new Object2ObjectOpenHashMap<>();
+			Map<Metatag<?, ?>, MetatagContent<?, ?>> metatagContents = new IdentityHashMap<>();
 
-			// For each registry
-			for (RegistryEntry<? extends Registry<?>> entry : Registries.REGISTRIES.getIndexedEntries()) {
-				if (entry.getKey().isEmpty()) continue;
-
-				Identifier registryId = entry.getKey().get().getValue();
+			wrapperLookup.streamAllRegistryKeys().forEach(key -> {
+				Identifier registryId = key.getValue();
 				String metatagPath = registryId.getNamespace() + "/" + registryId.getPath();
 
-				Map<Identifier, List<Resource>> resources = ResourceFinder.json("metatags/" + metatagPath).findAllResources(manager);
+				Map<Identifier, List<Resource>> resources = ResourceFinder
+						.json("metatags/" + metatagPath)
+						.findAllResources(manager);
 
-				if (resources.isEmpty()) continue;
+				if (resources.isEmpty()) return;
 
-				Registry<?> registry = entry.value();
 				for (Map.Entry<Identifier, List<Resource>> resource : resources.entrySet()) {
-					Identifier metatagResourceId = resource.getKey();
+					Identifier resourceId = resource.getKey();
 
 					// Transform the path into the Metatag ID (e.g. specter:metatags/minecraft/block/strippable.json -> specter:strippable)
-					String path = metatagResourceId.getPath();
+					String path = resourceId.getPath();
 					path = path.substring(path.lastIndexOf('/') + 1);
 					path = path.substring(0, path.lastIndexOf('.'));
-					Identifier metatagId = Identifier.of(metatagResourceId.getNamespace(), path);
+					Identifier metatagId = Identifier.of(resourceId.getNamespace(), path);
 
-					Metatag<?, ?> metatag = MetatagHolder.of(registry).specter$getMetatag(metatagId);
-					if (metatag == null || metatag.side() != this.side) continue;
+					Metatag<?, ?> metatag = MetatagHolder.ofAny(key).specter$getMetatag(metatagId);
+					if (metatag == null) continue;
 
 					MetatagContent<?, ?> content = metatagContents.computeIfAbsent(metatag, this::createMap);
 
-					resource.getValue()
-							.forEach(metatagResource -> content.parseAndAddResource(metatagId, metatagResource));
+					for (Resource metatagResource : resource.getValue()) {
+						content.parseAndAddResource(wrapperLookup, metatagId, metatagResource);
+					}
 				}
-			}
+			});
 
-			return List.copyOf(metatagContents.values());
+			return metatagContents.values();
 		}, executor);
 	}
 
 	@Override
-	public CompletableFuture<Void> apply(List<MetatagContent<?, ?>> data, ResourceManager manager, Executor executor) {
+	public CompletableFuture<Void> apply(Collection<MetatagContent<?, ?>> data, ResourceManager manager, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
 			data.forEach((content) -> {
 				loadMetatag(content);
@@ -88,17 +88,18 @@ public class MetatagReloader implements SimpleResourceReloadListener<List<Metata
 
 	private <R, V> void loadMetatag(MetatagContent<R, V> content) {
 		Metatag<R, V> metatag = content.getMetatag();
-		Registry<R> registry = metatag.registry();
+		RegistryKey<Registry<R>> registryKey = metatag.registryKey();
+		MetatagValueHolder<R> holder = MetatagValueHolder.getOrCreate(registryKey);
 
-		MetatagValueHolder<R> holder = MetatagValueHolder.getOrCreate(registry);
-		if (metatag.side() == this.side)
-			holder.specter$clearMetatag(metatag);
+		holder.specter$clearMetatag(metatag);
 
-		content.getValues().forEach((id, value) -> metatag.put(registry.get(id), value));
+		content.getValues().forEach(pair -> {
+			holder.specter$putMetatagValue(metatag, pair.getFirst(), pair.getSecond());
+		});
 	}
 
 	@Override
 	public Identifier getFabricId() {
-		return Identifier.of(SpecterGlobals.MODID, this.side == ResourceType.SERVER_DATA ? "metatags_data" : "metatags_resources");
+		return ID;
 	}
 }

@@ -6,6 +6,9 @@ import static dev.spiritstudios.specter.impl.registry.SpecterRegistry.RELOADABLE
 import java.util.Optional;
 
 import com.mojang.serialization.Lifecycle;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -14,18 +17,11 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.registry.entry.RegistryEntryInfo;
-import net.minecraft.resource.ResourceType;
-
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
 import dev.spiritstudios.specter.api.registry.client.reloadable.ClientReloadableRegistryEvents;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
-import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
 import dev.spiritstudios.specter.impl.registry.reloadable.ReloadableRegistriesS2CPayload;
 import dev.spiritstudios.specter.impl.registry.reloadable.SpecterReloadableRegistriesImpl;
 
@@ -37,7 +33,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 			return;
 
 		Metatag<R, V> metatag = data.metatag();
-		Registry<R> registry = metatag.registry();
+		RegistryKey<Registry<R>> registry = metatag.registryKey();
 		MetatagValueHolder<R> metatagHolder = MetatagValueHolder.getOrCreate(registry);
 
 		metatagHolder.specter$clearMetatag(metatag);
@@ -66,10 +62,6 @@ public class SpecterRegistryClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		ResourceManagerHelper
-				.get(ResourceType.CLIENT_RESOURCES)
-				.registerReloadListener(new MetatagReloader(ResourceType.CLIENT_RESOURCES));
-
 		ClientPlayNetworking.registerGlobalReceiver(
 				METATAGS_SYNC.payloadId(),
 				(payload, context) ->
@@ -103,7 +95,6 @@ public class SpecterRegistryClient implements ClientModInitializer {
 			for (MetatagsS2CPayload.MetatagData<?, ?> data : payload.metatags())
 				putMetatagValues(data);
 		});
-
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			SpecterReloadableRegistriesImpl.setManager(null);

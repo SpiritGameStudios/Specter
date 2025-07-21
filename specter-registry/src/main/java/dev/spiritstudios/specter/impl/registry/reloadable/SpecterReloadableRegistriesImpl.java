@@ -15,6 +15,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 public final class SpecterReloadableRegistriesImpl {
 	private static final Map<Identifier, ReloadableRegistryInfo<?>> RELOADABLE_REGISTRIES = new Object2ObjectLinkedOpenHashMap<>();
@@ -42,7 +43,7 @@ public final class SpecterReloadableRegistriesImpl {
 
 		if (SpecterGlobals.DEBUG && manager != null) {
 			manager.streamAllRegistryKeys().forEach(key -> {
-				SpecterGlobals.debug(key.getValue().toString());
+				Specter.debug(key.getValue().toString());
 			});
 		}
 	}

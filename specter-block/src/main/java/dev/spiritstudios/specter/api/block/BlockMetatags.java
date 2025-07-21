@@ -7,10 +7,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
 
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.mixin.block.AxeItemAccessor;
 import dev.spiritstudios.specter.mixin.block.ShovelItemAccessor;
 
@@ -19,33 +18,23 @@ public final class BlockMetatags {
 	 * A metatag that specifies that a block is strippable.
 	 */
 	public static final Metatag<Block, Block> STRIPPABLE = Metatag.builder(
-					Registries.BLOCK,
-					Identifier.of(SpecterGlobals.MODID, "strippable"),
+					RegistryKeys.BLOCK,
+					Specter.id("strippable"),
 					Registries.BLOCK.getCodec()
 			)
 			.packetCodec(PacketCodecs.registryValue(RegistryKeys.BLOCK))
-			.existingCombined(
-					block -> AxeItemAccessor.getStrippedBlocks().get(block),
-					() -> AxeItemAccessor.getStrippedBlocks().entrySet().stream()
-							.map(entry -> new Metatag.Entry<>(entry.getKey(), entry.getValue()))
-							.iterator()
-			).build();
+			.existingCombined(AxeItemAccessor::getStrippedBlocks).build();
 
 	/**
 	 * A metatag that specifies that a block is flattenable.
 	 */
 	public static final Metatag<Block, BlockState> FLATTENABLE = Metatag.builder(
-					Registries.BLOCK,
-					Identifier.of(SpecterGlobals.MODID, "flattenable"),
+					RegistryKeys.BLOCK,
+					Specter.id("flattenable"),
 					BlockState.CODEC
 			)
 			.packetCodec(PacketCodecs.entryOf(Block.STATE_IDS).cast())
-			.existingCombined(
-					block -> ShovelItemAccessor.getPathStates().get(block),
-					() -> ShovelItemAccessor.getPathStates().entrySet().stream()
-							.map(entry -> new Metatag.Entry<>(entry.getKey(), entry.getValue()))
-							.iterator()
-			)
+			.existingCombined(ShovelItemAccessor::getPathStates)
 			.build();
 
 	/**
@@ -54,8 +43,8 @@ public final class BlockMetatags {
 	 * @implNote This metatag does not include blocks made waxable by vanilla or blocks that are registered as waxable using {@link net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry OxidizableBlocksRegistry}
 	 */
 	public static final Metatag<Block, Block> WAXABLE = Metatag.builder(
-					Registries.BLOCK,
-					Identifier.of(SpecterGlobals.MODID, "waxable"),
+					RegistryKeys.BLOCK,
+					Specter.id("waxable"),
 					Registries.BLOCK.getCodec()
 			)
 			.packetCodec(PacketCodecs.registryValue(RegistryKeys.BLOCK))
@@ -67,8 +56,8 @@ public final class BlockMetatags {
 	 * @implNote This metatag does not include blocks made oxidizable by vanilla or blocks that are registered as oxidizable using {@link net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry OxidizableBlocksRegistry}
 	 */
 	public static final Metatag<Block, Block> OXIDIZABLE = Metatag.builder(
-					Registries.BLOCK,
-					Identifier.of(SpecterGlobals.MODID, "oxidizable"),
+					RegistryKeys.BLOCK,
+					Specter.id("oxidizable"),
 					Registries.BLOCK.getCodec()
 			)
 			.packetCodec(PacketCodecs.registryValue(RegistryKeys.BLOCK))
@@ -80,8 +69,8 @@ public final class BlockMetatags {
 	 * @implNote Due to a limitation of the fabric api, blocks registered as flammable using {@link net.fabricmc.fabric.api.registry.FlammableBlockRegistry FlammableBlockRegistry}, by vanilla, or using other means, are not included in this metatag.
 	 */
 	public static final Metatag<Block, FlammableBlockData> FLAMMABLE = Metatag.builder(
-					Registries.BLOCK,
-					Identifier.of(SpecterGlobals.MODID, "flammable"),
+					RegistryKeys.BLOCK,
+					Specter.id("flammable"),
 					FlammableBlockData.CODEC
 			)
 			.packetCodec(FlammableBlockData.PACKET_CODEC)

@@ -1,14 +1,13 @@
 package dev.spiritstudios.testmod.registry;
 
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-
-import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 
 @SuppressWarnings("unused")
@@ -21,28 +20,6 @@ public class SpecterRegistryGameTest {
 				Text.of("Metatag value")
 		);
 
-		context.complete();
-	}
-
-	@GameTest
-	public void testMetatagPut(TestContext context) {
-		SpecterRegistryTestMod.TEST_METATAG.put(Blocks.GRANITE, 420);
-		context.assertEquals(
-				SpecterRegistryTestMod.TEST_METATAG.get(Blocks.GRANITE).orElse(null),
-				420,
-				Text.of("Metatag value")
-		);
-
-		context.complete();
-	}
-
-	@GameTest
-	public void testClientMetatagIsolation(TestContext context) {
-		SpecterAssertions.assertThrows(
-				AssertionError.class,
-				() -> SpecterRegistryTestMod.TEST_CLIENT_METATAG.get(Blocks.DIORITE),
-				"Client Metatag was not properly isolated from server"
-		);
 		context.complete();
 	}
 

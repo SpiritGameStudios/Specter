@@ -1,78 +1,73 @@
 package dev.spiritstudios.specter.impl.registry.metatag;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Iterators;
 import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
-import dev.spiritstudios.specter.api.core.util.SpecterAssertions;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public record ExistingCombinedMetatag<R, V>(
-	Registry<R> registry,
-	Identifier id,
-	Codec<V> codec,
-	PacketCodec<RegistryByteBuf, V> packetCodec,
-	ResourceType side,
-	Function<R, V> existingGetter,
-	Supplier<Iterator<Entry<R, V>>> existingIterator
+		RegistryKey<Registry<R>> registryKey,
+		Identifier id,
+		Codec<V> codec,
+		PacketCodec<RegistryByteBuf, V> packetCodec,
+		Supplier<@Unmodifiable Map<R, V>> existingGetter
 ) implements Metatag<R, V> {
 	@Override
 	public Optional<V> get(R entry) {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
-
-		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry))
-			.or(() -> Optional.ofNullable(existingGetter.apply(entry)));
+		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValue(this, entry))
+				.or(() -> Optional.ofNullable(existingGetter.get().get(entry)));
 	}
 
-	public Iterator<Entry<R, V>> rawIterator() {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
+	public Map<R, V> rawValues() {
+		return Collections.unmodifiableMap(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValues(this));
+	}
 
-		return this.registry.stream().map(entry -> {
-			V value = MetatagValueHolder.getOrCreate(registry).specter$getMetatagValue(this, entry);
-			return value == null ? null : new Entry<>(entry, value);
-		}).filter(Objects::nonNull).iterator();
+	public Iterator<Map.Entry<R, V>> rawIterator() {
+		return rawValues().entrySet().iterator();
 	}
 
 	@NotNull
 	@Override
-	public Iterator<Entry<R, V>> iterator() {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
-
+	public Iterator<Map.Entry<R, V>> iterator() {
 		return Iterators.concat(
-			rawIterator(),
-			this.existingIterator().get()
+				rawIterator(),
+				existingGetter.get().entrySet().iterator()
 		);
 	}
 
 	@Override
-	public void put(R entry, V value) {
-		if (this.side == ResourceType.CLIENT_RESOURCES) SpecterAssertions.assertClient();
+	public @Unmodifiable Map<R, V> values() {
+		Map<R, V> map = new Object2ObjectOpenHashMap<>(existingGetter.get());
+		map.putAll(rawValues());
 
-		if (this.registry.getId(entry) == null) throw new IllegalArgumentException("Entry is not in the registry");
-		MetatagValueHolder.getOrCreate(registry).specter$putMetatagValue(this, entry, value);
+		return map;
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof ExistingCombinedMetatag<?, ?> that)) return false;
-		return Objects.equals(id, that.id) && Objects.equals(registry.getKey(), that.registry.getKey());
+		return Objects.equals(id, that.id) && Objects.equals(registryKey, that.registryKey);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(registry.getKey(), id);
+		return Objects.hash(registryKey, id);
 	}
 }

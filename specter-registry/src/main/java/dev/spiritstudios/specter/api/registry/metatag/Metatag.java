@@ -1,24 +1,28 @@
 package dev.spiritstudios.specter.api.registry.metatag;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+import com.google.common.collect.Iterators;
 import com.mojang.serialization.Codec;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+import org.apache.commons.lang3.stream.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
-
-import dev.spiritstudios.specter.api.core.SpecterGlobals;
+import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.metatag.ExistingCombinedMetatag;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagImpl;
@@ -31,7 +35,7 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagImpl;
  * <p>
  * A regular tag can be thought of like an array of registry entries, a metatag on the other hand could be compared to a map with registry entries as keys.
  * <h2>Basic usage</h2>
- * To create your own metatag, use {@link Metatag#builder(Registry, Identifier, Codec)}. Your metatag will be automatically registered upon calling {@link Builder#build()}.
+ * To create your own metatag, use {@link Metatag#builder(RegistryKey, Identifier, Codec)}. Your metatag will be automatically registered upon calling {@link Builder#build()}.
  * <h2>Client-sided usage</h2>
  * Metatags are not accessible to the client by default. To use them on the client, you must either:
  * <li>Make your metatag client side only with {@link Builder#side(ResourceType)}, moving it from datapack to resource pack.</li>
@@ -41,12 +45,12 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagImpl;
  * @param <V> The type of data stored in a metatag entry.
  * @see MetatagEvents
  */
-public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
-	static <R, V> Builder<R, V> builder(Registry<R> registry, Identifier id, Codec<V> codec) {
+public interface Metatag<R, V> extends Iterable<Map.Entry<R, V>> {
+	static <R, V> Builder<R, V> builder(RegistryKey<Registry<R>> registry, Identifier id, Codec<V> codec) {
 		return new Builder<>(registry, id, codec);
 	}
 
-	Registry<R> registry();
+	RegistryKey<Registry<R>> registryKey();
 
 	Identifier id();
 
@@ -54,40 +58,31 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 
 	PacketCodec<RegistryByteBuf, V> packetCodec();
 
-	ResourceType side();
-
 	Optional<V> get(R entry);
 
 	@Override
-	@NotNull
-	Iterator<Entry<R, V>> iterator();
+	@Unmodifiable
+	default @NotNull Iterator<Map.Entry<R, V>> iterator() {
+		return Iterators.unmodifiableIterator(values().entrySet().iterator());
+	}
 
-	/**
-	 * Puts a value into this metatag for the given registry.
-	 * <p>
-	 * Do not use this unless the data you are adding is generated at runtime.
-	 * Metatags should always be defined in data packs when possible.
-	 * </p>
-	 *
-	 * @param entry The registry to attach the entry to.
-	 * @param value The value to put.
-	 */
-	void put(R entry, V value);
+	@Unmodifiable
+	Map<R, V> values();
 
-	record Entry<R, V>(R key, V value) {
+	default Stream<Map.Entry<R, V>> stream() {
+		return Streams.of(iterator());
 	}
 
 	final class Builder<R, V> {
-		private final Registry<R> registry;
+		private final RegistryKey<Registry<R>> registryKey;
 		private final Identifier id;
 		private final Codec<V> codec;
 		private @Nullable PacketCodec<RegistryByteBuf, V> packetCodec;
 		private ResourceType side = ResourceType.SERVER_DATA;
-		private Function<R, V> existingGetter;
-		private Supplier<Iterator<Entry<R, V>>> existingIterator;
+		private Supplier<Map<R, V>> existingGetter;
 
-		private Builder(Registry<R> registry, Identifier id, Codec<V> codec) {
-			this.registry = registry;
+		private Builder(RegistryKey<Registry<R>> registryKey, Identifier id, Codec<V> codec) {
+			this.registryKey = registryKey;
 			this.id = id;
 			this.codec = codec;
 		}
@@ -112,10 +107,8 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 			return this;
 		}
 
-		public Builder<R, V> existingCombined(Function<R, V> existingGetter,
-											Supplier<Iterator<Entry<R, V>>> existingIterator) {
+		public Builder<R, V> existingCombined(Supplier<Map<R, V>> existingGetter) {
 			this.existingGetter = existingGetter;
-			this.existingIterator = existingIterator;
 			return this;
 		}
 
@@ -123,20 +116,20 @@ public interface Metatag<R, V> extends Iterable<Metatag.Entry<R, V>> {
 		 * Creates a new metatag and registers it.
 		 */
 		public Metatag<R, V> build() {
-			Metatag<R, V> metatag = existingGetter != null && existingIterator != null ?
-					new ExistingCombinedMetatag<>(registry, id, codec, packetCodec, side, existingGetter, existingIterator) :
-					new MetatagImpl<>(registry, id, codec, packetCodec, side);
+			Metatag<R, V> metatag = existingGetter != null ?
+					new ExistingCombinedMetatag<>(registryKey, id, codec, packetCodec, existingGetter) :
+					new MetatagImpl<>(registryKey, id, codec, packetCodec);
 
 			if (side == ResourceType.CLIENT_RESOURCES && FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
-				SpecterGlobals.LOGGER.warn(
+				Specter.LOGGER.warn(
 						"Client-side metatag {} is being registered on the server. This should only be done on the client.",
 						id
 				);
 
-				SpecterGlobals.LOGGER.warn("This warning may be changed to an exception in the future.");
+				Specter.LOGGER.warn("This warning may be changed to an exception in the future.");
 			}
 
-			MetatagHolder.of(registry).specter$registerMetatag(metatag);
+			MetatagHolder.of(registryKey).specter$registerMetatag(metatag);
 			return metatag;
 		}
 	}
