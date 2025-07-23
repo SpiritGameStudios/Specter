@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "specter-block-testmod",
+	"id": "specter_block_testmod",
 	"version": "${mod_version}",
 	"name": "Specter",
 	"description": "Library for Spirit Studios mods (Block module tests)",

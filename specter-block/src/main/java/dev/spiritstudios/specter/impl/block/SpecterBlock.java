@@ -16,7 +16,6 @@ public class SpecterBlock implements ModInitializer {
 	public static final BiMap<Block, Block> OXIDATION_LEVEL_INCREASES = HashBiMap.create();
 	public static final BiMap<Block, Block> OXIDATION_LEVEL_DECREASES = HashBiMap.create();
 
-
 	@Override
 	public void onInitialize() {
 		BlockMetatags.init();

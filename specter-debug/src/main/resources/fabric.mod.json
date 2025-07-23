@@ -26,7 +26,6 @@
 			"environment": "client"
 		}
 	],
-	"accessWidener": "specter-debug.accesswidener",
 	"custom": {
 		"modmenu": {
 			"parent": "specter",

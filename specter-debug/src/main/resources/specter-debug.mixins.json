@@ -4,8 +4,8 @@
 	"package": "dev.spiritstudios.specter.mixin.debug",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ClientConnectionMixin",
 		"DebugInfoSenderMixin",
+		"PathAccessor",
 		"PathNodeNavigatorMixin",
 		"SharedConstantsMixin"
 	],

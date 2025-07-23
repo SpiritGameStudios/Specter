@@ -15,28 +15,28 @@ import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.block.FlammableBlockData;
 
 @Mixin(FireBlock.class)
-public class FireBlockMixin {
+public abstract class FireBlockMixin {
 	@WrapOperation(method = "getBurnChance(Lnet/minecraft/block/BlockState;)I", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2IntMap;getInt(Ljava/lang/Object;)I", remap = false))
 	private int getBurnChanceFromMetatag(
-		Object2IntMap<Block> instance,
-		Object value,
-		Operation<Integer> original,
-		@Local(argsOnly = true) BlockState state
+			Object2IntMap<Block> instance,
+			Object value,
+			Operation<Integer> original,
+			@Local(argsOnly = true) BlockState state
 	) {
 		return BlockMetatags.FLAMMABLE.get((state).getBlock())
-			.map(FlammableBlockData::burn)
-			.orElseGet(() -> original.call(instance, value));
+				.map(FlammableBlockData::burn)
+				.orElseGet(() -> original.call(instance, value));
 	}
 
 	@WrapOperation(method = "getSpreadChance(Lnet/minecraft/block/BlockState;)I", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2IntMap;getInt(Ljava/lang/Object;)I", remap = false))
 	private int getSpreadChanceFromMetatag(
-		Object2IntMap<Block> instance,
-		Object value,
-		Operation<Integer> original,
-		@Local(argsOnly = true) BlockState state
+			Object2IntMap<Block> instance,
+			Object value,
+			Operation<Integer> original,
+			@Local(argsOnly = true) BlockState state
 	) {
 		return BlockMetatags.FLAMMABLE.get((state).getBlock())
-			.map(FlammableBlockData::spread)
-			.orElseGet(() -> original.call(instance, value));
+				.map(FlammableBlockData::spread)
+				.orElseGet(() -> original.call(instance, value));
 	}
 }

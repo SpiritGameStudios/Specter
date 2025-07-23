@@ -15,8 +15,8 @@ import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
@@ -27,9 +27,9 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 
 public final class MetatagCommand {
 	public static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->
-			CommandSource.suggestIdentifiers(Registries.ROOT.stream()
-					.filter(registry -> !MetatagHolder.of(registry.getKey()).specter$getMetatags().isEmpty())
-					.map(registry -> registry.getKey().getValue()), builder);
+			CommandSource.suggestIdentifiers(context.getSource().getRegistryManager().streamAllRegistryKeys()
+					.filter(key -> !MetatagHolder.ofAny(key).specter$getMetatags().isEmpty())
+					.map(RegistryKey::getValue), builder);
 
 	public static final Function<String, SuggestionProvider<ServerCommandSource>> METATAG_SUGGESTIONS = (registryArg) -> (context, builder) -> {
 		Registry<?> registry = getRegistryFromContext(context, registryArg);
@@ -62,7 +62,8 @@ public final class MetatagCommand {
 	}
 
 	private static Registry<?> getRegistryFromContext(CommandContext<ServerCommandSource> context, String registryArg) {
-		return Registries.ROOT.get(context.getArgument(registryArg, Identifier.class));
+		return context.getSource().getRegistryManager()
+				.getOrThrow(RegistryKey.ofRegistry(context.getArgument(registryArg, Identifier.class)));
 	}
 
 	private static Metatag<?, ?> getMetatagFromContext(CommandContext<ServerCommandSource> context) {
