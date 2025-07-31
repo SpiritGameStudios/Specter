@@ -1,4 +1,4 @@
 {
-	"options.specter.screenshake_intensity": "Screenshake Intensity",
-	"options.specter.screenshake_intensity.description": "Controls the intensity of screenshake effects made using the Specter API."
+    "options.specter.screenshake_intensity": "Screenshake Intensity",
+    "options.specter.screenshake_intensity.description": "Controls the intensity of screenshake effects made using the Specter API."
 }

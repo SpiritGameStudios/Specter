@@ -1,10 +1,11 @@
 package dev.spiritstudios.specter.impl.render.shake;
 
+import static net.minecraft.server.command.CommandManager.argument;
+
 import java.util.Collection;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 
@@ -17,8 +18,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import dev.spiritstudios.specter.api.render.shake.ScreenshakeS2CPayload;
-
-import static net.minecraft.server.command.CommandManager.argument;
 
 public class ScreenshakeCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {

@@ -3,17 +3,14 @@ package dev.spiritstudios.specter.impl.render.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.spiritstudios.specter.api.render.client.shake.Screenshake;
-
 import it.unimi.dsi.fastutil.objects.ObjectFloatMutablePair;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.random.Random;
 
-import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
+import dev.spiritstudios.specter.api.render.client.shake.Screenshake;
 
 public final class ScreenshakeManager {
 	private static final List<ObjectFloatMutablePair<Screenshake>> screenshakes = new ArrayList<>();
