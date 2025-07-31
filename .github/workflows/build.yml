@@ -3,7 +3,7 @@ on: [ push, pull_request, merge_group ]
 
 jobs:
     build:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v4
             -   uses: gradle/actions/wrapper-validation@v4
