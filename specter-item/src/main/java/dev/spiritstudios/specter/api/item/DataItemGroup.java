@@ -1,8 +1,6 @@
 package dev.spiritstudios.specter.api.item;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import com.mojang.serialization.Codec;

@@ -12,7 +12,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
@@ -23,6 +22,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;

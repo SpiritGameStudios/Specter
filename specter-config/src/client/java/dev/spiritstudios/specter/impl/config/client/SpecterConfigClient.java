@@ -6,9 +6,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
 import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
-import dev.spiritstudios.specter.impl.core.Specter;
 
-import org.apache.commons.lang3.ObjectUtils;
 
 public class SpecterConfigClient implements ClientModInitializer {
 	@Override

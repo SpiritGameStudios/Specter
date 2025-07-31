@@ -1,9 +1,6 @@
 package dev.spiritstudios.specter.api.entity;
 
 import com.mojang.serialization.Codec;
-
-import dev.spiritstudios.specter.impl.entity.DataAttributeContainerImpl;
-
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
@@ -15,6 +12,8 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+
+import dev.spiritstudios.specter.impl.entity.DataAttributeContainerImpl;
 
 public interface DataAttributeContainer {
 	Codec<DataAttributeContainer> CODEC = Codec.unboundedMap(

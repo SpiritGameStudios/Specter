@@ -1,7 +1,5 @@
 package dev.spiritstudios.testmod.block;
 
-import net.fabricmc.api.ModInitializer;
-
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
@@ -13,6 +11,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.api.ModInitializer;
 
 public class SpecterBlockTestMod implements ModInitializer {
 	public static final Block TEST_BLOCK = new Block(AbstractBlock.Settings.create()

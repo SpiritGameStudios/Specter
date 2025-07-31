@@ -1,7 +1,6 @@
 package dev.spiritstudios.testmod.entity;
 
 import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.MovementType;
 import net.minecraft.entity.mob.SilverfishEntity;
 import net.minecraft.util.math.Vec3d;
 

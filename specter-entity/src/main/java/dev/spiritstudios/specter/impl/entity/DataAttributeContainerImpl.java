@@ -1,7 +1,5 @@
 package dev.spiritstudios.specter.impl.entity;
 
-import dev.spiritstudios.specter.api.entity.DataAttributeContainer;
-
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
@@ -9,6 +7,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.registry.entry.RegistryEntry;
 
+import dev.spiritstudios.specter.api.entity.DataAttributeContainer;
 import dev.spiritstudios.specter.mixin.entity.DefaultAttributeContainerAccessor;
 
 // Yes, this is a builder builder. I love codecs.

@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;

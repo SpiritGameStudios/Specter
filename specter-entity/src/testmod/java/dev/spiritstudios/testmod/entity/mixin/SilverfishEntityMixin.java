@@ -12,7 +12,6 @@ import net.minecraft.entity.mob.SilverfishEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import dev.spiritstudios.specter.api.entity.EntityPart;
 import dev.spiritstudios.specter.api.entity.PartHolder;
 import dev.spiritstudios.testmod.entity.SilverfishPart;
 

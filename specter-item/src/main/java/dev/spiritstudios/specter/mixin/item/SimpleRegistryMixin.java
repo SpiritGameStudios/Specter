@@ -1,26 +1,21 @@
 package dev.spiritstudios.specter.mixin.item;
 
-import com.mojang.serialization.Lifecycle;
 
-import dev.spiritstudios.specter.impl.item.UnfrozenRegistry;
+import java.util.Map;
 
 import it.unimi.dsi.fastutil.objects.ObjectList;
-
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
-
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.SimpleRegistry;
-
-import net.minecraft.registry.entry.RegistryEntry;
-
-import net.minecraft.registry.entry.RegistryEntryInfo;
-import net.minecraft.util.Identifier;
-
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Map;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.SimpleRegistry;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryInfo;
+import net.minecraft.util.Identifier;
+
+import dev.spiritstudios.specter.impl.item.UnfrozenRegistry;
 
 @Mixin(SimpleRegistry.class)
 public abstract class SimpleRegistryMixin<T> implements UnfrozenRegistry<T> {

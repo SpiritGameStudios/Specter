@@ -10,10 +10,11 @@ import java.util.List;
 
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.loader.api.FabricLoader;
 
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;

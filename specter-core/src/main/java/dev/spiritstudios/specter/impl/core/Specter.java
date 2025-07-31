@@ -1,10 +1,11 @@
 package dev.spiritstudios.specter.impl.core;
 
-import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.api.ModInitializer;
 
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 

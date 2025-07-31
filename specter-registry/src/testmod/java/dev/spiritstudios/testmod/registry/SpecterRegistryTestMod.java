@@ -1,11 +1,12 @@
 package dev.spiritstudios.testmod.registry;
 
 import com.mojang.serialization.Codec;
-import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.block.Block;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.RegistryKeys;
+
+import net.fabricmc.api.ModInitializer;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.core.Specter;

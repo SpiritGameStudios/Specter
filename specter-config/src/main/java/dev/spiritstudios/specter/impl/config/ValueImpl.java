@@ -28,10 +28,10 @@ public class ValueImpl<T> implements Value<T> {
 	private T value;
 
 	public ValueImpl(T defaultValue,
-					 Codec<T> codec,
-					 PacketCodec<ByteBuf, T> packetCodec,
-					 String comment,
-					 boolean sync
+					Codec<T> codec,
+					PacketCodec<ByteBuf, T> packetCodec,
+					String comment,
+					boolean sync
 	) {
 		this.defaultValue = defaultValue;
 		this.comment = comment;

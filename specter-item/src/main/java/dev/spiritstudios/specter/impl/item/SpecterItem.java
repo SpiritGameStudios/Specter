@@ -1,17 +1,7 @@
 package dev.spiritstudios.specter.impl.item;
 
-import dev.spiritstudios.specter.api.core.exception.UnreachableException;
-
-import dev.spiritstudios.specter.api.item.DataItemGroup;
-import dev.spiritstudios.specter.mixin.item.SimpleRegistryAccessor;
-
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
-
-import dev.spiritstudios.specter.api.item.ItemMetatags;
-import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
-
-import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
+import java.util.Map;
+import java.util.Set;
 
 import net.minecraft.item.ItemGroup;
 import net.minecraft.registry.Registries;
@@ -20,8 +10,15 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.SimpleRegistry;
 
-import java.util.Map;
-import java.util.Set;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
+
+import dev.spiritstudios.specter.api.core.exception.UnreachableException;
+import dev.spiritstudios.specter.api.item.DataItemGroup;
+import dev.spiritstudios.specter.api.item.ItemMetatags;
+import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
+import dev.spiritstudios.specter.mixin.item.SimpleRegistryAccessor;
 
 public class SpecterItem implements ModInitializer {
 	@Override

@@ -22,7 +22,7 @@ public final class JsonFormat {
 	private static final Gson COMPRESSED_GSON = new GsonBuilder()
 			.setStrictness(Strictness.LENIENT)
 			.create();
-	
+
 	public static final DynamicFormat<JsonElement> COMPRESSED = DynamicFormat.of(
 			JsonOps.COMPRESSED,
 			(writer, value) -> COMPRESSED_GSON.toJson(value, JsonElement.class, writer),

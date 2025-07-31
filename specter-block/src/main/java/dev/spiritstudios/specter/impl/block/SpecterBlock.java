@@ -1,16 +1,14 @@
 package dev.spiritstudios.specter.impl.block;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.block.Block;
+
+import net.fabricmc.api.ModInitializer;
 
 import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.registry.metatag.MetatagEvents;
 
-import java.util.Map;
 
 public class SpecterBlock implements ModInitializer {
 	public static final Object2ObjectOpenHashMap<Block, Block> WAXED_TO_UNWAXED_BLOCKS =  new Object2ObjectOpenHashMap<>();

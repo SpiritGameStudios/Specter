@@ -2,12 +2,12 @@ package dev.spiritstudios.specter.impl.registry.client;
 
 import static dev.spiritstudios.specter.impl.registry.SpecterRegistry.METATAGS_SYNC;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;

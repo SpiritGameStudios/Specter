@@ -7,8 +7,6 @@ import com.mojang.serialization.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
 
 import dev.spiritstudios.specter.impl.dfu.SpecterDataFixerRegistryImpl;
 

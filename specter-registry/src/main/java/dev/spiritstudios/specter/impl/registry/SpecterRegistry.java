@@ -1,5 +1,7 @@
 package dev.spiritstudios.specter.impl.registry;
 
+import net.minecraft.resource.ResourceType;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -7,8 +9,6 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-
-import net.minecraft.resource.ResourceType;
 
 import dev.spiritstudios.specter.api.serialization.SplitPayloadHandler;
 import dev.spiritstudios.specter.impl.core.Specter;
