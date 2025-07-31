@@ -2,6 +2,7 @@ package dev.spiritstudios.specter.impl.item;
 
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 
+import dev.spiritstudios.specter.api.item.DataItemGroup;
 import dev.spiritstudios.specter.mixin.item.SimpleRegistryAccessor;
 
 import net.fabricmc.api.ModInitializer;

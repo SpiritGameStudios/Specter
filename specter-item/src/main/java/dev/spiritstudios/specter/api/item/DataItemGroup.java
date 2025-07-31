@@ -1,20 +1,18 @@
-package dev.spiritstudios.specter.impl.item;
+package dev.spiritstudios.specter.api.item;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
-import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
-
-import dev.spiritstudios.specter.api.item.SpecterItemCodecs;
 
 public class DataItemGroup extends ItemGroup {
 	public static final Codec<DataItemGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -33,14 +31,40 @@ public class DataItemGroup extends ItemGroup {
 				Type.CATEGORY,
 				displayName,
 				() -> icon,
-				(displayContext, entries) -> items.forEach(entries::add)
+				(displayContext, entries) -> {
+					for (ItemStack item : items) {
+						entries.add(item);
+					}
+				}
 		);
 
 		this.icon = icon;
 		this.items = items;
 	}
 
+	public DataItemGroup(Text displayName, ItemStack icon, ItemStack... items) {
+		super(
+				null,
+				-1,
+				Type.CATEGORY,
+				displayName,
+				() -> icon,
+				(displayContext, entries) -> {
+					for (ItemStack item : items) {
+						entries.add(item);
+					}
+				}
+		);
+
+		this.icon = icon;
+		this.items = Arrays.asList(items);
+	}
+
 	public DataItemGroup(Text displayName, ItemConvertible icon, List<ItemStack> items) {
+		this(displayName, new ItemStack(icon), items);
+	}
+
+	public DataItemGroup(Text displayName, ItemConvertible icon, ItemStack... items) {
 		this(displayName, new ItemStack(icon), items);
 	}
 
