@@ -48,15 +48,13 @@ public class ConfigHolder<T extends Config<T>, F> {
 
 		this.config = ReflectionHelper.instantiate(clazz);
 
-		this.config.fields().forEach(pair -> {
-			pair.value().init(pair.field().getName());
-			Specter.debug("Registered config value: %s".formatted(pair.value().translationKey(id)));
-		});
+		this.config.fields().forEach(pair -> pair.value().init(pair.field().getName()));
 
-		if (!load())
+		if (!load()) {
 			Specter.LOGGER.error("Failed to load config file: {}, default values will be used", path());
-		else
+		} else {
 			save(); // Save the config to disk to ensure it's up to date
+		}
 	}
 
 	/**

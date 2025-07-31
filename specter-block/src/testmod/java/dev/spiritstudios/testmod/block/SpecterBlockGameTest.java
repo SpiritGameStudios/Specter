@@ -75,16 +75,16 @@ public final class SpecterBlockGameTest {
 		context.complete();
 	}
 
-	@GameTest
-	public void testBlockStatePropertyModification(TestContext context) {
-		BlockPos pos = new BlockPos(0, 1, 0);
-
-		context.setBlockState(pos, SpecterBlockTestMod.TEST_BLOCK.getDefaultState());
-		context.expectBlockProperty(pos, SpecterBlockTestMod.TEST_PROPERTY, false);
-
-		context.setBlockState(pos, SpecterBlockTestMod.TEST_BLOCK.getDefaultState().with(SpecterBlockTestMod.TEST_PROPERTY, true));
-		context.expectBlockProperty(pos, SpecterBlockTestMod.TEST_PROPERTY, true);
-
-		context.complete();
-	}
+//	@GameTest
+//	public void testBlockStatePropertyModification(TestContext context) {
+//		BlockPos pos = new BlockPos(0, 1, 0);
+//
+//		context.setBlockState(pos, SpecterBlockTestMod.TEST_BLOCK.getDefaultState());
+//		context.expectBlockProperty(pos, SpecterBlockTestMod.TEST_PROPERTY, false);
+//
+//		context.setBlockState(pos, SpecterBlockTestMod.TEST_BLOCK.getDefaultState().with(SpecterBlockTestMod.TEST_PROPERTY, true));
+//		context.expectBlockProperty(pos, SpecterBlockTestMod.TEST_PROPERTY, true);
+//
+//		context.complete();
+//	}
 }

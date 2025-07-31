@@ -21,12 +21,10 @@ public record ConfigSyncS2CPayload(ConfigHolder<?, ?> config) implements CustomP
 			PacketCodec.<ByteBuf, ConfigHolder<?, ?>>of(
 					(value, buf) -> {
 						Identifier.PACKET_CODEC.encode(buf, value.id());
-						Specter.debug("Encoding config sync packet for %s".formatted(value.id()));
 						value.packetEncode(buf);
 					},
 					buf -> {
 						Identifier id = Identifier.PACKET_CODEC.decode(buf);
-						Specter.debug("Decoding config sync packet for %s".formatted(id));
 						ConfigHolder<?, ?> config = ConfigHolderRegistry.get(id);
 						config.save();
 

@@ -23,10 +23,7 @@ public class NestedConfigValue<T extends NestedConfig<T>> implements Value<T> {
 
 	public NestedConfigValue(T defaultValue, boolean sync, String comment) {
 		this.defaultValue = defaultValue;
-		this.defaultValue.fields().forEach(pair -> {
-			pair.value().init(pair.field().getName());
-			Specter.debug("Registered config value: %s".formatted(pair.value().name()));
-		});
+		this.defaultValue.fields().forEach(pair -> pair.value().init(pair.field().getName()));
 
 		this.sync = sync;
 		this.comment = comment;

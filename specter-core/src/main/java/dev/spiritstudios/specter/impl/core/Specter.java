@@ -16,10 +16,6 @@ public class Specter implements ModInitializer {
 		return Identifier.of(MODID, path);
 	}
 
-	public static void debug(String message) {
-		if (SpecterGlobals.DEBUG) LOGGER.info(message);
-	}
-
 	@Override
 	public void onInitialize() {
 		if (SpecterGlobals.FORGE)
