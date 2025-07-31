@@ -9,4 +9,9 @@ public final class SpecterItemCodecs {
 			ItemStack.CODEC,
 			ItemStack.REGISTRY_ENTRY_CODEC
 	);
+
+	public static final Codec<ItemStack> UNCOUNTED_ITEM_STACK_OR_NAME = Codec.withAlternative(
+			ItemStack.UNCOUNTED_CODEC,
+			ItemStack.REGISTRY_ENTRY_CODEC
+	);
 }

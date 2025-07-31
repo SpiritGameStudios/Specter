@@ -7,8 +7,7 @@
 	},
 	"items": [
 		{
-			"id": "minecraft:potato",
-			"count": 12
+			"id": "minecraft:potato"
 		},
 		"minecraft:carrot",
 		"specter-item-testmod:test_item"
