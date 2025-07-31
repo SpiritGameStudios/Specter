@@ -24,14 +24,13 @@ public abstract class AxeItemMixin {
 	}
 
 	@WrapOperation(method = "tryStrip", at = @At(value = "INVOKE", target = "Ljava/util/Optional;ofNullable(Ljava/lang/Object;)Ljava/util/Optional;"))
-	private Optional<Object> tryStrip(
+	private Optional<BlockState> tryStrip(
 			Object value,
-			Operation<Optional<Object>> original,
+			Operation<Optional<BlockState>> original,
 			@Local(argsOnly = true) BlockState state
 	) {
-		Optional<Object> unwaxedBlock = Optional.ofNullable(SpecterBlock.WAXED_TO_UNWAXED_BLOCKS.get(state.getBlock()))
-				.map(block -> block.getStateWithProperties(state));
-
-		return unwaxedBlock.or(() -> original.call(value));
+		return Optional.ofNullable(SpecterBlock.WAXED_TO_UNWAXED_BLOCKS.get(state.getBlock()))
+				.map(block -> block.getStateWithProperties(state))
+				.or(() -> original.call(value));
 	}
 }

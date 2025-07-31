@@ -20,7 +20,7 @@ import dev.spiritstudios.specter.api.core.SpecterGlobals;
 import dev.spiritstudios.specter.impl.core.Specter;
 
 @Mixin(RunArgs.Network.class)
-public class RunArgsNetworkMixin {
+public abstract class RunArgsNetworkMixin {
 	@Shadow
 	@Final
 	@Mutable
