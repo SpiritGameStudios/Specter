@@ -21,6 +21,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.SimpleRegistry;
 
 import java.util.Map;
+import java.util.Set;
 
 public class SpecterItem implements ModInitializer {
 	@Override
@@ -38,7 +39,7 @@ public class SpecterItem implements ModInitializer {
 					accessor.setFrozen(false);
 
 					// remove data item groups, we are about to load them in again
-					for (Map.Entry<RegistryKey<ItemGroup>, ItemGroup> entry : registry.getEntrySet()) {
+					for (Map.Entry<RegistryKey<ItemGroup>, ItemGroup> entry : Set.copyOf(registry.getEntrySet())) {
 						if (entry.getValue() instanceof DataItemGroup) {
 							unfrozen.specter$remove(entry.getKey());
 						}
