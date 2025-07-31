@@ -1,11 +1,14 @@
 {
-	"translate": "specter.test",
+	"display_name": {
+		"translate": "specter.test"
+	},
 	"icon": {
 		"id": "minecraft:carrot"
 	},
 	"items": [
 		{
-			"id": "minecraft:potato"
+			"id": "minecraft:potato",
+			"count": 12
 		},
 		"minecraft:carrot",
 		"specter-item-testmod:test_item"

@@ -5,9 +5,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"registry.RegistriesMixin",
-		"registry.metatag.RegistryKeyMixin",
-		"registry.reloadable.DataPackContentsMixin",
-		"registry.reloadable.ReloadableRegistriesMixin"
+		"registry.metatag.RegistryKeyMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

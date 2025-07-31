@@ -6,6 +6,7 @@ import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.OptionalDynamic;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.SharedConstants;
@@ -52,19 +53,17 @@ public final class SpecterDataFixerRegistryImpl {
 		dataFixers.put(modId, new VersionedDataFixer(dataFixer, currentDataVersion));
 	}
 
-	public NbtCompound update(
+	public <T> T update(
 			DataFixTypes types,
-			NbtCompound compound
+			Dynamic<T> dynamic
 	) {
-		Dynamic<NbtElement> dynamic = new Dynamic<>(NbtOps.INSTANCE, compound);
-
-		NbtCompound specterDataVersions = compound.getCompound("SpecterDataVersions").orElse(new NbtCompound());
+		OptionalDynamic<T> specterDataVersions = dynamic.get("SpecterDataVersions");
 
 		for (Map.Entry<String, VersionedDataFixer> entry : dataFixers.entrySet()) {
 			String modId = entry.getKey();
 			VersionedDataFixer value = entry.getValue();
 
-			int dataVersion = specterDataVersions.getInt(modId, 0);
+			int dataVersion = specterDataVersions.get(modId).asInt(0);
 
 			dynamic = value.dataFixer().update(
 					((DataFixTypesAccessor) (Object) types).getTypeReference(),
@@ -73,7 +72,7 @@ public final class SpecterDataFixerRegistryImpl {
 			);
 		}
 
-		return (NbtCompound) dynamic.getValue();
+		return dynamic.getValue();
 	}
 
 	public NbtCompound writeDataVersions(NbtCompound compound) {

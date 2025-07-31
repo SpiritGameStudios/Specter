@@ -5,7 +5,12 @@ import java.util.stream.Stream;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -17,7 +22,7 @@ import net.minecraft.util.StringIdentifiable;
 import dev.spiritstudios.specter.impl.serialization.text.TextContentRegistryImpl;
 
 @Mixin(TextCodecs.class)
-public class TextCodecsMixin {
+public abstract class TextCodecsMixin {
 	@ModifyVariable(method = "dispatchingCodec", at = @At("STORE"), ordinal = 0)
 	private static <T extends StringIdentifiable, E> MapCodec<E> dispatchingCodec(MapCodec<E> original, T[] types) {
 		if (!types.getClass().getComponentType().isAssignableFrom(TextContent.Type.class)) return original;
@@ -33,18 +38,18 @@ public class TextCodecsMixin {
 			public <T1> DataResult<E> decode(DynamicOps<T1> ops, MapLike<T1> input) {
 				DataResult<E> originalResult = original.decode(ops, input);
 				return originalResult.result().isPresent() ? originalResult : TextContentRegistryImpl.getTypes().values().stream()
-					.filter(entry -> input.get(entry.field()) != null)
-					.findFirst()
-					.map(entry -> (DataResult<E>) entry.type().codec().decode(ops, input))
-					.orElse(originalResult);
+						.filter(entry -> input.get(entry.field()) != null)
+						.findFirst()
+						.map(entry -> (DataResult<E>) entry.type().codec().decode(ops, input))
+						.orElse(originalResult);
 			}
 
 			@Override
 			public <T1> Stream<T1> keys(DynamicOps<T1> ops) {
 				return Stream.concat(
-					original.keys(ops),
-					TextContentRegistryImpl.getTypes().values().stream()
-						.flatMap(entry -> entry.type().codec().keys(ops))
+						original.keys(ops),
+						TextContentRegistryImpl.getTypes().values().stream()
+								.flatMap(entry -> entry.type().codec().keys(ops))
 				);
 			}
 		};
@@ -57,8 +62,8 @@ public class TextCodecsMixin {
 		if (!values.get().getClass().getComponentType().isAssignableFrom(TextContent.Type.class)) return originalCodec;
 
 		return Codec.withAlternative(
-			originalCodec,
-			Codec.stringResolver(StringIdentifiable::asString, id -> (T) TextContentRegistryImpl.getTypes().get(id).type())
+				originalCodec,
+				Codec.stringResolver(StringIdentifiable::asString, id -> (T) TextContentRegistryImpl.getTypes().get(id).type())
 		);
 	}
 }

@@ -34,6 +34,11 @@ public record ExistingCombinedMetatag<R, V>(
 				.or(() -> Optional.ofNullable(existingGetter.get().get(entry)));
 	}
 
+	@Override
+	public boolean containsKey(R entry) {
+		return MetatagValueHolder.getOrCreate(registryKey).specter$contains(this, entry) || existingGetter.get().containsKey(entry);
+	}
+
 	public Map<R, V> rawValues() {
 		return Collections.unmodifiableMap(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValues(this));
 	}

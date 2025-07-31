@@ -15,7 +15,7 @@ import dev.spiritstudios.specter.impl.serialization.SpecterSerialization;
 import dev.spiritstudios.specter.impl.serialization.text.TextTranslationSupplier;
 
 @Mixin(TranslationStorage.class)
-public class TranslationStorageMixin implements TextTranslationSupplier {
+public abstract class TranslationStorageMixin implements TextTranslationSupplier {
 	@Unique
 	private Map<String, Text> textTranslations;
 

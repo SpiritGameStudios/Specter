@@ -1,0 +1,19 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-gui-testmod",
+	"version": "${mod_version}",
+	"name": "Specter GUI (Test Mod)",
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+	},
+	"depends": {
+		"specter-gui": "*"
+	},
+	"mixins": [
+		{
+			"config": "specter-gui-testmod.client.mixins.json",
+			"environment": "client"
+		}
+	]
+}

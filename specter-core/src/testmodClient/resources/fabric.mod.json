@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-core-testmod",
+	"version": "${mod_version}",
+	"name": "Specter Core (Test Mod)",
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"dev.spiritstudios.testmod.core.SpecterCoreTestModClient"
+		]
+	},
+	"depends": {
+		"specter-core": "*"
+	}
+}

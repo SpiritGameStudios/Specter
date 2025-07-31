@@ -8,12 +8,12 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.item.ItemConvertible;
 
-import dev.spiritstudios.specter.impl.item.SpecterItem;
+import dev.spiritstudios.specter.api.item.ItemMetatags;
 
 @Mixin(targets = "net.minecraft.block.ComposterBlock$ComposterInventory")
-public class ComposterBlock$ComposterInventoryMixin {
+public abstract class ComposterBlock$ComposterInventoryMixin {
 	@WrapOperation(method = "canInsert", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2FloatMap;containsKey(Ljava/lang/Object;)Z", remap = false))
 	private boolean canInsert(Object2FloatMap<ItemConvertible> instance, Object o, Operation<Boolean> original) {
-		return SpecterItem.ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((ItemConvertible) o) || original.call(instance, o);
+		return ItemMetatags.COMPOSTING_CHANCE.containsKey(((ItemConvertible) o).asItem()) || original.call(instance, o);
 	}
 }

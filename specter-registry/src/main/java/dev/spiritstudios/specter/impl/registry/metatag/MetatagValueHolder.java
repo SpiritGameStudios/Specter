@@ -31,6 +31,10 @@ public final class MetatagValueHolder<R> {
 		return (V) values.get(metatag, entry);
 	}
 
+	public boolean specter$contains(Metatag<R, ?> metatag, R entry) {
+		return values.contains(metatag, entry);
+	}
+
 	public void specter$clearMetatag(Metatag<R, ?> metatag) {
 		values.row(metatag).clear();
 	}

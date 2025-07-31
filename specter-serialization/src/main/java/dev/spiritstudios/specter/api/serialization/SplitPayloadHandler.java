@@ -4,6 +4,10 @@ import java.util.function.Consumer;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.PacketByteBuf;
@@ -14,21 +18,16 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-
 public class SplitPayloadHandler<T> {
 	private final PacketCodec<PacketByteBuf, PayloadPart> partCodec = PacketCodecs.BYTE_ARRAY.xmap(
-		PayloadPart::new,
-		PayloadPart::bytes
+			PayloadPart::new,
+			PayloadPart::bytes
 	).cast();
-	private final Event<Consumer<T>> receiveCallback = EventFactory.createArrayBacked(
-		Consumer.class,
-		consumers -> t -> {
-			for (Consumer<T> consumer : consumers) consumer.accept(t);
-		}
+	private final Event<ReceiveCallback<T>> receiveCallback = EventFactory.createArrayBacked(
+			ReceiveCallback.class,
+			consumers -> (t, registryManager) -> {
+				for (ReceiveCallback<T> consumer : consumers) consumer.receive(t, registryManager);
+			}
 	);
 	private final CustomPayload.Id<PayloadPart> payloadId;
 	private final PacketCodec<? super RegistryByteBuf, T> codec;
@@ -55,13 +54,13 @@ public class SplitPayloadHandler<T> {
 		sender.accept(new PayloadPart(new byte[0]));
 	}
 
-	public void receive(PayloadPart part, DynamicRegistryManager manager) {
-		if (receivedData == null) receivedData = new RegistryByteBuf(Unpooled.buffer(), manager);
+	public void receive(PayloadPart part, DynamicRegistryManager registryManager) {
+		if (receivedData == null) receivedData = new RegistryByteBuf(Unpooled.buffer(), registryManager);
 
 		if (part.bytes.length == 0) {
 			T payload = codec.decode(receivedData);
 			receivedData = null;
-			receiveCallback.invoker().accept(payload);
+			receiveCallback.invoker().receive(payload, registryManager);
 			return;
 		}
 
@@ -72,12 +71,16 @@ public class SplitPayloadHandler<T> {
 		return payloadId;
 	}
 
-	public Event<Consumer<T>> receiveCallback() {
+	public Event<ReceiveCallback<T>> receiveCallback() {
 		return receiveCallback;
 	}
 
 	public void register(PayloadTypeRegistry<? extends ByteBuf> registry) {
 		registry.register(payloadId, partCodec);
+	}
+
+	public interface ReceiveCallback<T> {
+		void receive(T payload, DynamicRegistryManager registryManager);
 	}
 
 	public class PayloadPart implements CustomPayload {

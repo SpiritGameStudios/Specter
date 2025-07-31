@@ -11,12 +11,12 @@ import net.minecraft.item.ItemStack;
 import dev.spiritstudios.specter.api.item.ItemMetatags;
 
 @Mixin(FuelRegistry.class)
-public class FuelRegistryMixin {
+public abstract class FuelRegistryMixin {
 	@ModifyReturnValue(method = "isFuel", at = @At("RETURN"))
 	private boolean canUseAsFuel(boolean original, @Local(argsOnly = true) ItemStack stack) {
 		if (stack.isEmpty()) return original;
 
-		boolean hasFuelMetatag = ItemMetatags.FUEL.get(stack.getItem()).isPresent();
+		boolean hasFuelMetatag = ItemMetatags.FUEL.containsKey(stack.getItem());
 		return original || hasFuelMetatag;
 	}
 

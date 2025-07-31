@@ -1,0 +1,13 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-render-testmod",
+	"version": "${mod_version}",
+	"name": "Specter Render (Test Mod)",
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+	},
+	"depends": {
+		"specter-render": "*"
+	}
+}

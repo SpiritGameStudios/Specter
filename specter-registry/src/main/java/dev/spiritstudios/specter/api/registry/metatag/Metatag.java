@@ -60,6 +60,8 @@ public interface Metatag<R, V> extends Iterable<Map.Entry<R, V>> {
 
 	Optional<V> get(R entry);
 
+	boolean containsKey(R entry);
+
 	@Override
 	@Unmodifiable
 	default @NotNull Iterator<Map.Entry<R, V>> iterator() {

@@ -7,8 +7,6 @@
 		"ComposterBlock$ComposterInventoryMixin",
 		"ComposterBlockMixin",
 		"FuelRegistryMixin",
-		"ItemGroupMixin",
-		"ItemGroupsMixin",
 		"ShapedRecipeJsonBuilderAccessor"
 	],
 	"injectors": {

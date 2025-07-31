@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.mixin.item;
+package dev.spiritstudios.specter.mixin.item.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +10,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.registry.DynamicRegistryManager;
 
 import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
-import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 import dev.spiritstudios.specter.impl.item.DataItemGroup;
 
 @Mixin(ItemGroups.class)
@@ -29,13 +30,15 @@ public abstract class ItemGroupsMixin {
 		List<ItemGroup> groups = new ArrayList<>(original);
 
 		List<ItemGroup> filtered = stream()
-			.filter(itemGroup -> itemGroup.getType() == ItemGroup.Type.CATEGORY && !itemGroup.isSpecial())
-			.filter(ItemGroup::shouldDisplay)
-			.toList();
+				.filter(itemGroup -> itemGroup.getType() == ItemGroup.Type.CATEGORY && !itemGroup.isSpecial())
+				.filter(ItemGroup::shouldDisplay)
+				.toList();
 
-		SpecterReloadableRegistries.lookup().ifPresent(manager -> {
+		if (MinecraftClient.getInstance().world != null) {
+			DynamicRegistryManager registryManager = MinecraftClient.getInstance().world.getRegistryManager();
+
 			AtomicInteger offset = new AtomicInteger();
-			manager.getOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).streamEntries().forEach(r -> {
+			registryManager.getOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).streamEntries().forEach(r -> {
 				DataItemGroup group = r.value();
 
 				if (groups.contains(group)) return;
@@ -44,7 +47,8 @@ public abstract class ItemGroupsMixin {
 				groups.add(group);
 				offset.getAndIncrement();
 			});
-		});
+		}
+
 
 		return groups;
 	}

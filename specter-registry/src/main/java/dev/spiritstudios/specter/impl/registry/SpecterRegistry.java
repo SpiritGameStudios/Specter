@@ -14,14 +14,8 @@ import dev.spiritstudios.specter.api.serialization.SplitPayloadHandler;
 import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
 import dev.spiritstudios.specter.impl.registry.metatag.data.MetatagReloader;
-import dev.spiritstudios.specter.impl.registry.reloadable.ReloadableRegistriesS2CPayload;
 
 public class SpecterRegistry implements ModInitializer {
-	public static final SplitPayloadHandler<ReloadableRegistriesS2CPayload> RELOADABLE_REGISTRIES_SYNC = new SplitPayloadHandler<>(
-			Specter.id("reloadable_registries"),
-			ReloadableRegistriesS2CPayload.CODEC
-	);
-
 	public static final SplitPayloadHandler<MetatagsS2CPayload> METATAGS_SYNC = new SplitPayloadHandler<>(
 			Specter.id("metatags"),
 			MetatagsS2CPayload.CODEC
@@ -36,17 +30,10 @@ public class SpecterRegistry implements ModInitializer {
 		);
 
 		METATAGS_SYNC.register(PayloadTypeRegistry.playS2C());
-		RELOADABLE_REGISTRIES_SYNC.register(PayloadTypeRegistry.playS2C());
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			METATAGS_SYNC.send(
 					MetatagsS2CPayload.getOrCreatePayload(server.getRegistryManager()),
-					sender::sendPacket,
-					server.getRegistryManager()
-			);
-
-			RELOADABLE_REGISTRIES_SYNC.send(
-					ReloadableRegistriesS2CPayload.getOrCreatePayload(),
 					sender::sendPacket,
 					server.getRegistryManager()
 			);
@@ -56,18 +43,9 @@ public class SpecterRegistry implements ModInitializer {
 			MetatagsS2CPayload.clearCache();
 			MetatagsS2CPayload metatagPayload = MetatagsS2CPayload.getOrCreatePayload(server.getRegistryManager());
 
-			ReloadableRegistriesS2CPayload.clearCache();
-			ReloadableRegistriesS2CPayload reloadableRegistryPayload = ReloadableRegistriesS2CPayload.getOrCreatePayload();
-
 			PlayerLookup.all(server).forEach(player -> {
 				METATAGS_SYNC.send(
 						metatagPayload,
-						payload -> ServerPlayNetworking.send(player, payload),
-						server.getRegistryManager()
-				);
-
-				RELOADABLE_REGISTRIES_SYNC.send(
-						reloadableRegistryPayload,
 						payload -> ServerPlayNetworking.send(player, payload),
 						server.getRegistryManager()
 				);

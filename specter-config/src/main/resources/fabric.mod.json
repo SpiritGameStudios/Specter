@@ -30,10 +30,11 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=${fabric_loader_version}",
-		"minecraft": "~${minecraft_version}-",
+		"fabricloader": ">=0.16.14",
 		"fabric-api": "*",
-		"java": ">=21"
+		"specter-core": "*",
+		"specter-gui": "*",
+		"specter-serialization": "*"
 	},
 	"custom": {
 		"modmenu": {

@@ -34,7 +34,6 @@ allprojects {
 		enabled = false
 	}
 
-
 	tasks.withType<JavaCompile> {
 		options.encoding = "UTF-8"
 		options.release = 21
@@ -119,9 +118,7 @@ allprojects {
 
 	tasks.withType<ProcessResources> {
 		val map = mapOf(
-			"mod_version" to mod.version,
-			"fabric_loader_version" to rootProject.libs.versions.fabric.loader.get(),
-			"minecraft_version" to rootProject.libs.versions.minecraft.get()
+			"mod_version" to mod.version
 		)
 
 		inputs.properties(map)

@@ -1,4 +1,4 @@
-package dev.spiritstudios.specter.mixin.item;
+package dev.spiritstudios.specter.mixin.item.client;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,11 +9,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.DynamicRegistryManager;
 
 import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
-import dev.spiritstudios.specter.api.registry.reloadable.SpecterReloadableRegistries;
 
 @Mixin(ItemGroup.class)
 public abstract class ItemGroupMixin {
@@ -25,11 +26,15 @@ public abstract class ItemGroupMixin {
 		if (this.getType() != ItemGroup.Type.SEARCH) return original;
 
 		List<ItemStack> stacks = new ArrayList<>(original);
-		SpecterReloadableRegistries.lookup().ifPresent(manager ->
-			manager.getOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).streamEntries()
-				.map(r -> r.value().getSearchTabStacks())
-				.filter(searchTabStacks -> !searchTabStacks.isEmpty())
-				.forEach(stacks::addAll));
+
+		if (MinecraftClient.getInstance().world != null) {
+			DynamicRegistryManager registryManager = MinecraftClient.getInstance().world.getRegistryManager();
+
+			registryManager.getOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).streamEntries()
+					.map(r -> r.value().getSearchTabStacks())
+					.filter(searchTabStacks -> !searchTabStacks.isEmpty())
+					.forEach(stacks::addAll);
+		}
 
 		return stacks;
 	}

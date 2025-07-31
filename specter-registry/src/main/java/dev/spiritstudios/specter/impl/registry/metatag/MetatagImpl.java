@@ -27,6 +27,11 @@ public record MetatagImpl<R, V>(
 		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValue(this, entry));
 	}
 
+	@Override
+	public boolean containsKey(R entry) {
+		return MetatagValueHolder.getOrCreate(registryKey).specter$contains(this, entry);
+	}
+
 	@Unmodifiable
 	@Override
 	public Map<R, V> values() {
