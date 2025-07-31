@@ -21,7 +21,6 @@ public class DataItemGroup extends ItemGroup {
 			SpecterItemCodecs.UNCOUNTED_ITEM_STACK_OR_NAME.listOf().fieldOf("items").forGetter(group -> group.items)
 	).apply(instance, DataItemGroup::new));
 
-	private final ItemStack icon;
 	private final List<ItemStack> items;
 
 	public DataItemGroup(Text displayName, ItemStack icon, List<ItemStack> items) {
@@ -38,7 +37,6 @@ public class DataItemGroup extends ItemGroup {
 				}
 		);
 
-		this.icon = icon;
 		this.items = items;
 	}
 
@@ -56,7 +54,6 @@ public class DataItemGroup extends ItemGroup {
 				}
 		);
 
-		this.icon = icon;
 		this.items = Arrays.asList(items);
 	}
 
@@ -66,25 +63,5 @@ public class DataItemGroup extends ItemGroup {
 
 	public DataItemGroup(Text displayName, ItemConvertible icon, ItemStack... items) {
 		this(displayName, new ItemStack(icon), items);
-	}
-
-	@Override
-	public ItemStack getIcon() {
-		return icon;
-	}
-
-	@Override
-	public Collection<ItemStack> getDisplayStacks() {
-		return items;
-	}
-
-	@Override
-	public Collection<ItemStack> getSearchTabStacks() {
-		return items;
-	}
-
-	@Override
-	public boolean shouldDisplay() {
-		return true;
 	}
 }

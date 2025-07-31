@@ -1,6 +1,6 @@
 [versions]
 fabric_loom = "1.11-SNAPSHOT"
-spotless = "7.0.3"
+spotless = "7.2.0"
 
 minecraft = "1.21.5"
 yarn = "1.21.5+build.1"
