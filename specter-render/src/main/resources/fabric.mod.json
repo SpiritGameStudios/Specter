@@ -19,6 +19,7 @@
 			"dev.spiritstudios.specter.impl.render.client.SpecterRenderClient"
 		]
 	},
+	"accessWidener": "specter-render.accesswidener",
 	"mixins": [
 		"specter-render.mixins.json",
 		{
