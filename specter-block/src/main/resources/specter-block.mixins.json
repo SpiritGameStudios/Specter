@@ -1,19 +1,19 @@
 {
-	"required": true,
-	"minVersion": "0.8",
-	"package": "dev.spiritstudios.specter.mixin.block",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"AxeItemAccessor",
-		"AxeItemMixin",
-		"BlockAccessor",
-		"FireBlockMixin",
-		"HoneycombItemMixin",
-		"OxidizableMixin",
-		"ShovelItemAccessor",
-		"ShovelItemMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.spiritstudios.specter.mixin.block",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AxeItemAccessor",
+    "AxeItemMixin",
+    "BlockAccessor",
+    "FireBlockMixin",
+    "HoneycombItemMixin",
+    "OxidizableMixin",
+    "ShovelItemAccessor",
+    "ShovelItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

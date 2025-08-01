@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-worldgen",
+	"version": "${mod_version}",
+	"name": "Specter World Generation",
+	"description": "Library for Spirit Studios mods (World Generation module)",
+	"authors": [],
+	"contact": {
+		"repo": "https://github.com/SpiritGameStudios/Specter",
+		"issues": "https://github.com/SpiritGameStudios/Specter/issues"
+	},
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+
+	},
+	"mixins": [
+		"specter-worldgen.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"fabric-api": "*",
+		"specter-core": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"parent": "specter",
+			"badges": [
+				"library"
+			]
+		}
+	}
+}

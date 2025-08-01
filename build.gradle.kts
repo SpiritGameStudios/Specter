@@ -166,9 +166,9 @@ allprojects {
 				sourceDir.toFile().walk()
 					.filter { it.isDirectory }
 					.forEach {
-						val hasFiles = it.listFiles()!!
-							.filter { file -> !file.isDirectory }
-							.any { file -> file.isFile && file.name.endsWith(".java") }
+						val hasFiles = it.listFiles()
+							?.filter { file -> !file.isDirectory }
+							?.any { file -> file.isFile && file.name.endsWith(".java") } ?: false;
 
 						if (!hasFiles || it.resolve("package-info.java").exists())
 							return@forEach
