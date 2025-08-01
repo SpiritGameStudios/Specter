@@ -1,10 +1,9 @@
 package dev.spiritstudios.specter.api.worldgen;
 
-import com.mojang.datafixers.util.Either;
+import java.util.Optional;
+import java.util.function.Function;
 
-import dev.spiritstudios.specter.mixin.worldgen.LegacySinglePoolElementAccessor;
-import dev.spiritstudios.specter.mixin.worldgen.SinglePoolElementAccessor;
-import dev.spiritstudios.specter.mixin.worldgen.StructurePoolElementAccessor;
+import com.mojang.datafixers.util.Either;
 
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.structure.StructureLiquidSettings;
@@ -14,8 +13,9 @@ import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.processor.StructureProcessorList;
 import net.minecraft.util.Identifier;
 
-import java.util.Optional;
-import java.util.function.Function;
+import dev.spiritstudios.specter.mixin.worldgen.LegacySinglePoolElementAccessor;
+import dev.spiritstudios.specter.mixin.worldgen.SinglePoolElementAccessor;
+import dev.spiritstudios.specter.mixin.worldgen.StructurePoolElementAccessor;
 
 public final class SpecterStructurePoolElements {
 	public static Function<StructurePool.Projection, LegacySinglePoolElement> ofLegacySingle(Identifier id) {
