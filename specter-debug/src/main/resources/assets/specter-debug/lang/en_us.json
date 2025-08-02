@@ -3,9 +3,10 @@
     "commands.heal.not_living": "Cannot heal non-living entity",
     "commands.heal.success": "Healed %s for %s health",
     "item.specter-debug.loot_loader": "Loot Loader",
+    "item.specter-debug.loot_loader.invalid_id": "\"%s\" is not a valid identifier.",
     "item.specter-debug.loot_loader.invalid_loot_table": "Loot Table \"%s\" either does not exist or is invalid.",
     "item.specter-debug.loot_loader.loaded_loot_table": "Loot Table \"%s\" loaded successfully.",
-    "item.specter-debug.loot_loader.no_loot_table": "To use the Loot Loader, rename it to the Id of the loot table you wish to load.",
+    "item.specter-debug.loot_loader.no_loot_table": "To use the Loot Loader, rename it to the identifier of the loot table you wish to load.",
     "tooltip.metatag.composting_chance": {
         "color": "dark_purple",
         "text": "Composting chance:"

@@ -19,8 +19,6 @@ import net.minecraft.world.World;
 
 public class LootLoaderItem extends Item {
 	private static final Text NO_LOOT_TABLE = Text.translatable("item.specter-debug.loot_loader.no_loot_table");
-	private static final Text INVALID_LOOT_TABLE = Text.translatable("item.specter-debug.loot_loader.invalid_loot_table");
-	private static final Text LOADED_LOOT_TABLE = Text.translatable("item.specter-debug.loot_loader.loaded_loot_table");
 
 	public LootLoaderItem(Settings settings) {
 		super(settings);
@@ -30,7 +28,7 @@ public class LootLoaderItem extends Item {
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		PlayerEntity player = context.getPlayer();
 		World world = context.getWorld();
-		if (player == null || world.isClient()) return ActionResult.PASS;
+		if (player == null || world.isClient()) return ActionResult.SUCCESS;
 
 		BlockPos pos = context.getBlockPos();
 		BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -43,21 +41,42 @@ public class LootLoaderItem extends Item {
 			return ActionResult.FAIL;
 		}
 
-		String[] split = stack.getName().getString().split(":");
-		Identifier lootTableId = Identifier.of(split[0], split[1]);
+		Identifier lootTableId = Identifier.tryParse(stack.getName().getString());
+		if (lootTableId == null) {
+			player.sendMessage(
+					Text.translatable(
+							"item.specter-debug.loot_loader.invalid_id",
+							stack.getName().getString()
+					),
+					true
+			);
+			return ActionResult.FAIL;
+		}
 
 		MinecraftServer server = world.getServer();
 		if (server == null) return ActionResult.FAIL;
 
 		RegistryKey<LootTable> lootTable = RegistryKey.of(RegistryKeys.LOOT_TABLE, lootTableId);
 		if (server.getReloadableRegistries().getLootTable(lootTable) == LootTable.EMPTY) {
-			player.sendMessage(INVALID_LOOT_TABLE, true);
+			player.sendMessage(
+					Text.translatable(
+							"item.specter-debug.loot_loader.invalid_loot_table",
+							lootTableId.toString()
+					),
+					true
+			);
 			return ActionResult.FAIL;
 		}
 
 		lootableInventory.setLootTable(lootTable, world.random.nextLong());
 
-		player.sendMessage(LOADED_LOOT_TABLE, true);
+		player.sendMessage(
+				Text.translatable(
+						"item.specter-debug.loot_loader.loaded_loot_table",
+						lootTableId.toString()
+				),
+				true
+		);
 		return ActionResult.SUCCESS;
 	}
 }
