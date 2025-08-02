@@ -1,15 +1,21 @@
 package dev.spiritstudios.specter.impl.registry.metatag.data;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+
+import dev.spiritstudios.specter.impl.core.Specter;
+
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import net.minecraft.registry.Registry;
@@ -45,10 +51,15 @@ public class MetatagContent<R, V> {
 	}
 
 	public void parseAndAddResource(RegistryWrapper.WrapperLookup wrapperLookup, Identifier id, Resource resource) {
-		try (InputStreamReader resourceReader = new InputStreamReader(resource.getInputStream())) {
-			JsonObject resourceJson = JsonHelper.deserialize(resourceReader);
+		try (BufferedReader resourceReader = resource.getReader()) {
+			DataResult<MetatagResource<R, V>> result = resourceCodec.parse(JsonOps.INSTANCE, JsonParser.parseReader(resourceReader));
 
-			MetatagResource<R, V> parsed = resourceCodec.parse(JsonOps.INSTANCE, resourceJson).getOrThrow();
+			if (result.error().isPresent()) {
+				Specter.LOGGER.error("Couldn't parse metatag file '{}': {}", id, result.error().get());
+				return;
+			}
+
+			MetatagResource<R, V> parsed = result.getOrThrow();
 			if (parsed.replace()) {
 				this.values.clear();
 				this.values.trim(parsed.entries().size());
@@ -61,7 +72,6 @@ public class MetatagContent<R, V> {
 					values.add(Pair.of(entry.value(), pair.getSecond()));
 				});
 			}
-
 		} catch (IOException e) {
 			throw new JsonSyntaxException("Failed to read metatag %s from resource.".formatted(id));
 		}
