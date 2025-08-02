@@ -16,7 +16,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -27,7 +26,7 @@ import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 public class MetatagContent<R, V> {
 	private final RegistryKey<Registry<R>> registryKey;
 	private final Metatag<R, V> metatag;
-	private final ObjectArrayList<Pair<RegistryEntry.Reference<R>, V>> values;
+	private final ObjectArrayList<Pair<R, V>> values;
 	private final Codec<MetatagResource<R, V>> resourceCodec;
 
 	public MetatagContent(RegistryKey<Registry<R>> registryKey, Metatag<R, V> metatag) {
@@ -41,7 +40,7 @@ public class MetatagContent<R, V> {
 		return metatag;
 	}
 
-	public List<Pair<RegistryEntry.Reference<R>, V>> getValues() {
+	public List<Pair<R, V>> getValues() {
 		return Collections.unmodifiableList(this.values);
 	}
 
@@ -59,7 +58,7 @@ public class MetatagContent<R, V> {
 
 			for (Pair<RegistryKey<R>, V> pair : parsed.entries()) {
 				lookup.getOptional(pair.getFirst()).ifPresent(entry -> {
-					values.add(Pair.of(entry, pair.getSecond()));
+					values.add(Pair.of(entry.value(), pair.getSecond()));
 				});
 			}
 

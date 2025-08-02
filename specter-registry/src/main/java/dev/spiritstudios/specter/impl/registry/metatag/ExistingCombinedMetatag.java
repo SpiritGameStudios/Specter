@@ -17,7 +17,6 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
@@ -33,13 +32,6 @@ public record ExistingCombinedMetatag<R, V>(
 	public Optional<V> get(R entry) {
 		return Optional.ofNullable(MetatagValueHolder.getOrCreate(registryKey).specter$getMetatagValue(this, entry))
 				.or(() -> Optional.ofNullable(existingGetter.get().get(entry)));
-	}
-
-	@Override
-	public Optional<V> get(RegistryEntry<R> entry) {
-		if (!(entry instanceof RegistryEntry.Reference<R> reference)) return Optional.empty();
-		MetataggedEntry<R> metataggedEntry = MetataggedEntry.of(reference);
-		return Optional.ofNullable(metataggedEntry.specter$getMetatagValue(this));
 	}
 
 	@Override

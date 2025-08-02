@@ -12,7 +12,6 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
@@ -31,13 +30,6 @@ public record MetatagImpl<R, V>(
 	@Override
 	public boolean containsKey(R entry) {
 		return MetatagValueHolder.getOrCreate(registryKey).specter$contains(this, entry);
-	}
-
-	@Override
-	public Optional<V> get(RegistryEntry<R> entry) {
-		if (!(entry instanceof RegistryEntry.Reference<R> reference)) return Optional.empty();
-		MetataggedEntry<R> metataggedEntry = MetataggedEntry.of(reference);
-		return Optional.ofNullable(metataggedEntry.specter$getMetatagValue(this));
 	}
 
 	@Unmodifiable

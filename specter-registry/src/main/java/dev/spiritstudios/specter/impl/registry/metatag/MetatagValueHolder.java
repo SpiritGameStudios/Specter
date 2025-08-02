@@ -9,7 +9,6 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
@@ -40,11 +39,8 @@ public final class MetatagValueHolder<R> {
 		values.row(metatag).clear();
 	}
 
-	public <T> void specter$putMetatagValue(Metatag<R, T> metatag, RegistryEntry.Reference<R> entry, T value) {
-		values.put(metatag, entry.value(), value);
-
-		MetataggedEntry<R> metataggedEntry = MetataggedEntry.of(entry);
-		metataggedEntry.specter$setMetatagValues(values.column(entry.value()));
+	public <T> void specter$putMetatagValue(Metatag<R, T> metatag, R entry, T value) {
+		values.put(metatag, entry, value);
 	}
 
 	@SuppressWarnings("unchecked")
