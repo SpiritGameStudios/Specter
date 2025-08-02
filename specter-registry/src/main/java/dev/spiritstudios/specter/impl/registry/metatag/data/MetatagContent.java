@@ -2,20 +2,15 @@ package dev.spiritstudios.specter.impl.registry.metatag.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-
-import dev.spiritstudios.specter.impl.core.Specter;
-
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import net.minecraft.registry.Registry;
@@ -24,10 +19,10 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
+import dev.spiritstudios.specter.impl.core.Specter;
 
 public class MetatagContent<R, V> {
 	private final RegistryKey<Registry<R>> registryKey;
