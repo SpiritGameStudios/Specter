@@ -1,5 +1,6 @@
 package dev.spiritstudios.specter.mixin.registry.metatag;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,18 +20,20 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 @Mixin(RegistryKey.class)
 public abstract class RegistryKeyMixin<R> implements MetatagHolder<R> {
 	@Unique
-	private final Map<Identifier, Metatag<R, ?>> metatags = new Object2ObjectOpenHashMap<>();
+	private Map<Identifier, Metatag<R, ?>> metatags;
 
 	@Unique
 	private MetatagValueHolder<R> valueHolder;
 
 	@Override
 	public void specter$registerMetatag(Metatag<R, ?> metatag) {
+		if (metatags == null) metatags = new Object2ObjectOpenHashMap<>();
 		metatags.put(metatag.id(), metatag);
 	}
 
 	@Override
 	public @Nullable Metatag<R, ?> specter$getMetatag(Identifier id) {
+		if (metatags == null) return null;
 		return this.metatags.get(id);
 	}
 
@@ -46,6 +49,7 @@ public abstract class RegistryKeyMixin<R> implements MetatagHolder<R> {
 
 	@Override
 	public Set<Map.Entry<Identifier, Metatag<R, ?>>> specter$getMetatags() {
+		if (metatags == null) return Collections.emptySet();
 		return ImmutableSet.copyOf(metatags.entrySet());
 	}
 }
