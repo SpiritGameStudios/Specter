@@ -1,0 +1,6 @@
+{
+	"model": {
+		"type": "minecraft:model",
+		"model": "specter-debug:item/loot_loader"
+	}
+}
