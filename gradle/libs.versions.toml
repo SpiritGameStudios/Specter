@@ -2,20 +2,17 @@
 fabric_loom = "1.11-SNAPSHOT"
 spotless = "7.2.0"
 
-minecraft = "1.21.5"
-yarn = "1.21.5+build.1"
+minecraft = "1.21.8"
+yarn = "1.21.8+build.1"
 
-fabric_loader = "0.16.14"
-fabric_api = "0.128.1+1.21.5"
+fabric_loader = "0.17.2"
+fabric_api = "0.132.0+1.21.8"
 
 nightconfig = "3.8.1"
-modmenu = "14.0.0-rc.2"
-
-stapi = "2.5.0+1.21.5-rc1"
+modmenu = "15.0.0-beta.3"
 
 [plugins]
 fabric_loom = { id = "fabric-loom", version.ref = "fabric_loom" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [libraries]
 minecraft = { group = "mojang", name = "minecraft", version.ref = "minecraft" }
@@ -29,4 +26,5 @@ nightconfig_toml = { group = "com.electronwill.night-config", name = "toml", ver
 
 modmenu = { group = "com.terraformersmc", name = "modmenu", version.ref = "modmenu" }
 
-stapi = { group = "xyz.nucleoid", name = "server-translations-api", version.ref = "stapi" }
+plugin_fabric_loom = { group = "fabric-loom", name = "fabric-loom.gradle.plugin", version.ref = "fabric_loom" }
+plugin_spotless = { group = "com.diffplug.spotless", name = "com.diffplug.spotless.gradle.plugin", version.ref = "spotless" }
