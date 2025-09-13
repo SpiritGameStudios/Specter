@@ -2,14 +2,14 @@ plugins {
 	id("specter.common.conventions")
 }
 
-val main by sourceSets
-val client by sourceSets
-val testmod by sourceSets.creating
-val testmodClient by sourceSets.creating
+sourceSets {
+	create("testmod")
+	create("testmodClient")
+}
 
 tasks.register<DefaultTask>("checkstyle") {
 	dependsOn(tasks.checkstyleMain)
-	dependsOn(tasks["checkstyleClient"])
+	dependsOn(tasks.checkstyleClient)
 	dependsOn(tasks["checkstyleTestmod"])
 }
 
@@ -25,19 +25,19 @@ loom {
 			vmArg("-Dfabric-api.gametest.report-file=${project.layout.buildDirectory.get()}/junit.xml")
 			runDir = "build/gametest"
 
-			source(testmod)
+			source(sourceSets["testmod"])
 		}
 
 		create("testmodClient") {
 			client()
 			configName = "Testmod Client"
-			source(testmodClient)
+			source(sourceSets["testmodClient"])
 		}
 
 		create("testmodServer") {
 			server()
 			name = "Testmod Server"
-			source(testmod)
+			source(sourceSets["testmod"])
 		}
 
 		configureEach {
@@ -70,23 +70,33 @@ dependencies {
 	}
 }
 
-main.compileClasspath += mainClasspath
-main.runtimeClasspath += mainClasspath
+sourceSets {
+	main {
+		compileClasspath += mainClasspath
+		runtimeClasspath += mainClasspath
+	}
 
-client.compileClasspath += clientClasspath
-client.runtimeClasspath += clientClasspath
+	client {
+		compileClasspath += clientClasspath
+		runtimeClasspath += clientClasspath
+	}
 
-testmod.compileClasspath += main.compileClasspath
-testmod.runtimeClasspath += main.runtimeClasspath
+	val testmod = getByName("testmod") {
+		compileClasspath += main.get().compileClasspath
+		runtimeClasspath += main.get().runtimeClasspath
 
-testmodClient.compileClasspath += client.compileClasspath
-testmodClient.runtimeClasspath += client.runtimeClasspath
+		compileClasspath += testmodClasspath
+		runtimeClasspath += testmodClasspath
+	}
 
-testmod.compileClasspath += testmodClasspath
-testmod.runtimeClasspath += testmodClasspath
+	getByName("testmodClient") {
+		compileClasspath += client.get().compileClasspath
+		runtimeClasspath += client.get().runtimeClasspath
 
-testmodClient.compileClasspath += testmod.compileClasspath
-testmodClient.runtimeClasspath += testmod.runtimeClasspath
+		compileClasspath += testmod.compileClasspath
+		runtimeClasspath += testmod.runtimeClasspath
+	}
+}
 
 val fatJavadoc by tasks.registering(Javadoc::class) {
 	group = "documentation"
@@ -114,7 +124,7 @@ val fatJavadoc by tasks.registering(Javadoc::class) {
 		source(proj.sourceSets["client"].allJava.srcDirs)
 	}
 
-	classpath = files(main.compileClasspath, client.compileClasspath)
+	classpath = files(sourceSets.main.get().compileClasspath, sourceSets["client"].compileClasspath)
 }
 
 val fatJavadocJar by tasks.registering(Jar::class) {

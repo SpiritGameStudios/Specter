@@ -9,16 +9,21 @@ pluginManagement {
 
 rootProject.name = "specter"
 
-include("core")
+fun module(path: String) {
+	include(path)
+	val project = project(":$path")
+	project.projectDir = file("modules/$path")
+}
 
-include("dfu")
-include("render")
-include("config")
-include("registry")
-include("item")
-include("block")
-include("entity")
-include("debug")
-include("gui")
-include("serialization")
-include("worldgen")
+module("core")
+module("dfu")
+module("render")
+module("config")
+module("registry")
+module("item")
+module("block")
+module("entity")
+module("debug")
+module("gui")
+module("serialization")
+module("worldgen")
