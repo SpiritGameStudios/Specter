@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.spiritstudios.specter.mixin.serialization",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"TextCodecsMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "specter-serialization",
+	"version": "${mod_version}",
+	"name": "Specter Serialization",
+	"description": "Library for Spirit Studios mods (Serialization module)",
+	"authors": [],
+	"contact": {
+		"repo": "https://github.com/SpiritGameStudios/Specter",
+		"issues": "https://github.com/SpiritGameStudios/Specter/issues"
+	},
+	"license": "MPL-2.0",
+	"environment": "*",
+	"entrypoints": {
+
+	},
+	"mixins": [
+		"specter-serialization.mixins.json",
+		{
+			"config": "specter-serialization.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"fabric-api": "*",
+		"specter-core": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"parent": "specter",
+			"badges": [
+				"library"
+			]
+		}
+	}
+}

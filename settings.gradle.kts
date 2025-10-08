@@ -3,19 +3,27 @@ pluginManagement {
 		maven("https://maven.fabricmc.net/")
 		gradlePluginPortal()
 	}
+
+	includeBuild("build-logic")
 }
 
-rootProject.name = "specter-api"
+rootProject.name = "specter"
 
-include("specter-core")
-include("specter-dfu")
-include("specter-render")
-include("specter-config")
-include("specter-registry")
-include("specter-item")
-include("specter-block")
-include("specter-entity")
-include("specter-debug")
-include("specter-gui")
-include("specter-serialization")
-include("specter-worldgen")
+fun module(path: String) {
+	include(path)
+	val project = project(":$path")
+	project.projectDir = file("modules/$path")
+}
+
+module("core")
+module("dfu")
+module("render")
+module("config")
+module("registry")
+module("item")
+module("block")
+module("entity")
+module("debug")
+module("gui")
+module("serialization")
+module("worldgen")
