@@ -1,12 +1,11 @@
 package dev.spiritstudios.testmod.core;
 
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
-
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
 
@@ -15,7 +14,7 @@ public class SpecterCoreTestModClient implements ClientModInitializer {
 			new KeyBinding(
 					"specter.test",
 					GLFW.GLFW_KEY_B,
-					KeyBinding.MISC_CATEGORY
+					KeyBinding.Category.MISC
 			)
 	);
 

@@ -36,6 +36,6 @@ public class SilverfishEntityMixin extends HostileEntity implements PartHolder<S
 	@Override
 	public void tickMovement() {
 		super.tickMovement();
-		parts.getFirst().setPosition(parts.getFirst().getRelativePos().add(this.getPos()));
+		parts.getFirst().setPosition(parts.getFirst().getRelativePos().add(this.getEntityPos()));
 	}
 }

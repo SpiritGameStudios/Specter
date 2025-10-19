@@ -3,16 +3,15 @@ package dev.spiritstudios.specter.api.gui.client.widget;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.navigation.GuiNavigationType;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.input.KeyCodes;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -51,20 +50,30 @@ public class SpecterSliderWidget extends ClickableWidget {
 	}
 
 	// region Input
+
+
 	@Override
-	public void onClick(double mouseX, double mouseY) {
-		this.setValueFromMouse(mouseX);
+	public void onClick(Click click, boolean doubled) {
+		super.onClick(click, doubled);
+
+		if (click.isLeft()) {
+			this.setValueFromMouse(click.x());
+		}
 	}
 
 	@Override
-	protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		this.setValueFromMouse(mouseX);
-		super.onDrag(mouseX, mouseY, deltaX, deltaY);
+	public void onRelease(Click click) {
+		super.onRelease(click);
+
+		if (click.isLeft()) {
+			super.playDownSound(MinecraftClient.getInstance().getSoundManager());
+		}
 	}
 
 	@Override
-	public void onRelease(double mouseX, double mouseY) {
-		super.playDownSound(MinecraftClient.getInstance().getSoundManager());
+	protected void onDrag(Click click, double offsetX, double offsetY) {
+		super.onDrag(click, offsetX, offsetY);
+		this.setValueFromMouse(offsetX);
 	}
 
 	private void setValueFromMouse(double mouseX) {
@@ -72,16 +81,16 @@ public class SpecterSliderWidget extends ClickableWidget {
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (KeyCodes.isToggle(keyCode)) {
+	public boolean keyPressed(KeyInput input) {
+		if (input.isEnterOrSpace()) {
 			this.sliderFocused = !this.sliderFocused;
 			return true;
 		}
 
 		if (!this.sliderFocused) return false;
 
-		if (keyCode == GLFW.GLFW_KEY_LEFT || keyCode == GLFW.GLFW_KEY_RIGHT) {
-			float sign = keyCode == GLFW.GLFW_KEY_LEFT ? -1.0F : 1.0F;
+		if (input.isLeft() || input.isRight()) {
+			float sign = input.isLeft() ? -1.0F : 1.0F;
 			this.setValue(this.value + sign * (this.step == 0.0 ? 0.01 : this.step));
 
 			return true;

@@ -23,7 +23,7 @@ public abstract class EntityPart<T extends Entity> extends Entity {
 	private Vec3d relativePos = new Vec3d(0, 0, 0);
 
 	public EntityPart(T owner, EntityDimensions dimensions) {
-		super(owner.getType(), owner.getWorld());
+		super(owner.getType(), owner.getEntityWorld());
 		this.owner = owner;
 		this.dimensions = dimensions;
 		this.calculateDimensions();

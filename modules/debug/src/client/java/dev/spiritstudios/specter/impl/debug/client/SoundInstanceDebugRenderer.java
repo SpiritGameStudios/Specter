@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -15,12 +16,21 @@ import net.minecraft.client.sound.WeightedSoundSet;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
+import net.minecraft.world.debug.DebugDataStore;
 
 public class SoundInstanceDebugRenderer implements DebugRenderer.Renderer, SoundInstanceListener {
 	private final List<SoundEntry> sounds = new ArrayList<>();
 
 	@Override
-	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
+	public void onSoundPlayed(SoundInstance sound, WeightedSoundSet soundSet, float range) {
+		sounds.add(new SoundEntry(
+				sound,
+				Util.getMeasuringTimeMs()
+		));
+	}
+
+	@Override
+	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum) {
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		long time = Util.getMeasuringTimeMs();
@@ -71,14 +81,6 @@ public class SoundInstanceDebugRenderer implements DebugRenderer.Renderer, Sound
 					true, 0.0F, true
 			);
 		}
-	}
-
-	@Override
-	public void onSoundPlayed(SoundInstance sound, WeightedSoundSet soundSet, float range) {
-		sounds.add(new SoundEntry(
-				sound,
-				Util.getMeasuringTimeMs()
-		));
 	}
 
 	record SoundEntry(SoundInstance instance, long time) {

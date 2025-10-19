@@ -3,7 +3,6 @@ package dev.spiritstudios.specter.impl.debug.client;
 import java.util.List;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 
@@ -13,9 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import dev.spiritstudios.specter.api.block.BlockMetatags;
-import dev.spiritstudios.specter.api.core.client.debug.DebugRendererRegistry;
 import dev.spiritstudios.specter.api.item.ItemMetatags;
-import dev.spiritstudios.specter.impl.core.Specter;
 
 public class SpecterDebugClient implements ClientModInitializer {
 	private static void addMetatagLine(List<Text> lines, String key, Object... values) {
@@ -40,16 +37,12 @@ public class SpecterDebugClient implements ClientModInitializer {
 			BlockMetatags.WAXABLE.get(block).ifPresent(entry -> addMetatagLine(lines, "waxable", entry.getName()));
 		});
 
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			DebugRenderCommand.register(dispatcher);
-		});
-
 		SoundInstanceDebugRenderer soundInstanceDebugRenderer = new SoundInstanceDebugRenderer();
 
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			client.getSoundManager().registerListener(soundInstanceDebugRenderer);
 		});
 
-		DebugRendererRegistry.register(Specter.id("sound_instance"), soundInstanceDebugRenderer);
+//		DebugRenderers.register(Specter.id("sound_instance"), soundInstanceDebugRenderer);
 	}
 }

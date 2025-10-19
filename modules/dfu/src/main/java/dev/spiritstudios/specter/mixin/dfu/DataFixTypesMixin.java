@@ -13,12 +13,15 @@ import dev.spiritstudios.specter.impl.dfu.SpecterDataFixerRegistryImpl;
 @Mixin(DataFixTypes.class)
 public abstract class DataFixTypesMixin {
 	@WrapMethod(
-		method = "update(Lcom/mojang/datafixers/DataFixer;Lcom/mojang/serialization/Dynamic;II)Lcom/mojang/serialization/Dynamic;"
+			method = "update(Lcom/mojang/datafixers/DataFixer;Lcom/mojang/serialization/Dynamic;II)Lcom/mojang/serialization/Dynamic;"
 	)
 	private <T> Dynamic<T> update(DataFixer dataFixer, Dynamic<T> dynamic, int oldVersion, int newVersion, Operation<Dynamic<T>> original) {
-		return new Dynamic<>(dynamic.getOps(), SpecterDataFixerRegistryImpl.get().update(
-			(DataFixTypes) (Object) this,
-			original.call(dataFixer, dynamic, oldVersion, newVersion)
-		));
+		return new Dynamic<>(
+				dynamic.getOps(),
+				SpecterDataFixerRegistryImpl.get().update(
+						(DataFixTypes) (Object) this,
+						original.call(dataFixer, dynamic, oldVersion, newVersion)
+				)
+		);
 	}
 }
