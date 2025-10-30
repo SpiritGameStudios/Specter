@@ -2,26 +2,24 @@ package dev.spiritstudios.specter.api.item;
 
 import java.util.Arrays;
 import java.util.List;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-
-public class DataItemGroup extends ItemGroup {
+public class DataItemGroup extends CreativeModeTab {
 	public static final Codec<DataItemGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			TextCodecs.CODEC.fieldOf("display_name").forGetter(ItemGroup::getDisplayName),
-			ItemStack.UNCOUNTED_CODEC.fieldOf("icon").forGetter(ItemGroup::getIcon),
+			ComponentSerialization.CODEC.fieldOf("display_name").forGetter(CreativeModeTab::getDisplayName),
+			ItemStack.SINGLE_ITEM_CODEC.fieldOf("icon").forGetter(CreativeModeTab::getIconItem),
 			SpecterItemCodecs.UNCOUNTED_ITEM_STACK_OR_NAME.listOf().fieldOf("items").forGetter(group -> group.items)
 	).apply(instance, DataItemGroup::new));
 
 	private final List<ItemStack> items;
 
-	public DataItemGroup(Text displayName, ItemStack icon, List<ItemStack> items) {
+	public DataItemGroup(Component displayName, ItemStack icon, List<ItemStack> items) {
 		super(
 				null,
 				-1,
@@ -30,7 +28,7 @@ public class DataItemGroup extends ItemGroup {
 				() -> icon,
 				(displayContext, entries) -> {
 					for (ItemStack item : items) {
-						entries.add(item);
+						entries.accept(item);
 					}
 				}
 		);
@@ -38,7 +36,7 @@ public class DataItemGroup extends ItemGroup {
 		this.items = items;
 	}
 
-	public DataItemGroup(Text displayName, ItemStack icon, ItemStack... items) {
+	public DataItemGroup(Component displayName, ItemStack icon, ItemStack... items) {
 		super(
 				null,
 				-1,
@@ -47,7 +45,7 @@ public class DataItemGroup extends ItemGroup {
 				() -> icon,
 				(displayContext, entries) -> {
 					for (ItemStack item : items) {
-						entries.add(item);
+						entries.accept(item);
 					}
 				}
 		);
@@ -55,11 +53,11 @@ public class DataItemGroup extends ItemGroup {
 		this.items = Arrays.asList(items);
 	}
 
-	public DataItemGroup(Text displayName, ItemConvertible icon, List<ItemStack> items) {
+	public DataItemGroup(Component displayName, ItemLike icon, List<ItemStack> items) {
 		this(displayName, new ItemStack(icon), items);
 	}
 
-	public DataItemGroup(Text displayName, ItemConvertible icon, ItemStack... items) {
+	public DataItemGroup(Component displayName, ItemLike icon, ItemStack... items) {
 		this(displayName, new ItemStack(icon), items);
 	}
 }

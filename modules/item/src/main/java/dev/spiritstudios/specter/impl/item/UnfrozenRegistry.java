@@ -1,7 +1,7 @@
 package dev.spiritstudios.specter.impl.item;
 
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
 
 public interface UnfrozenRegistry<T> {
-	void specter$remove(RegistryKey<T> key);
+	void specter$remove(ResourceKey<T> key);
 }

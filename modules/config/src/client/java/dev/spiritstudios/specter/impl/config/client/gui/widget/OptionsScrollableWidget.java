@@ -3,24 +3,25 @@ package dev.spiritstudios.specter.impl.config.client.gui.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 
-public class OptionsScrollableWidget extends ElementListWidget<OptionsScrollableWidget.OptionEntry> {
-	public OptionsScrollableWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
+public class OptionsScrollableWidget extends ContainerObjectSelectionList<OptionsScrollableWidget.OptionEntry> {
+	public OptionsScrollableWidget(Minecraft client, int width, int height, int y, int itemHeight) {
 		super(client, width, height, y, itemHeight);
 		this.centerListVertically = false;
 	}
 
 	@Override
-	protected int getScrollbarX() {
-		return super.getScrollbarX() + 32;
+	protected int scrollBarX() {
+		return super.scrollBarX() + 32;
 	}
 
 	@Override
@@ -28,19 +29,19 @@ public class OptionsScrollableWidget extends ElementListWidget<OptionsScrollable
 		return 400;
 	}
 
-	public void addOptions(List<ClickableWidget> options) {
+	public void addOptions(List<AbstractWidget> options) {
 		for (int i = 0; i < options.size(); i += 2) {
-			ClickableWidget widget = options.get(i);
-			ClickableWidget widget2 = i + 1 < options.size() ? options.get(i + 1) : null;
+			AbstractWidget widget = options.get(i);
+			AbstractWidget widget2 = i + 1 < options.size() ? options.get(i + 1) : null;
 
 			this.addEntry(new OptionEntry(widget, widget2, this.width));
 		}
 	}
 
 	protected static class OptionEntry extends Entry<OptionEntry> {
-		private final List<ClickableWidget> widgets = new ArrayList<>();
+		private final List<AbstractWidget> widgets = new ArrayList<>();
 
-		public OptionEntry(ClickableWidget widget, @Nullable ClickableWidget widget2, int width) {
+		public OptionEntry(AbstractWidget widget, @Nullable AbstractWidget widget2, int width) {
 			widget.setWidth(310);
 			if (widget2 != null) {
 				widget2.setWidth(150);
@@ -55,7 +56,7 @@ public class OptionsScrollableWidget extends ElementListWidget<OptionsScrollable
 		}
 
 		@Override
-		public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
+		public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
 			widgets.forEach(widget -> {
 				widget.setY(0);
 				widget.render(context, mouseX, mouseY, deltaTicks);
@@ -63,12 +64,12 @@ public class OptionsScrollableWidget extends ElementListWidget<OptionsScrollable
 		}
 
 		@Override
-		public List<? extends Selectable> selectableChildren() {
+		public @NotNull List<? extends NarratableEntry> narratables() {
 			return widgets;
 		}
 
 		@Override
-		public List<? extends Element> children() {
+		public @NotNull List<? extends GuiEventListener> children() {
 			return widgets;
 		}
 	}

@@ -108,7 +108,6 @@ val fatJavadoc by tasks.registering(Javadoc::class) {
 		memberLevel = JavadocMemberLevel.PACKAGE
 		addStringOption("Xdoclint:none", "-quiet")
 		links(
-			"https://maven.fabricmc.net/docs/yarn-${libs.versions.yarn.get()}/",
 			"https://guava.dev/releases/33.3.1-jre/api/docs/",
 			"https://asm.ow2.io/javadoc/",
 			"https://docs.oracle.com/en/java/javase/21/docs/api/",

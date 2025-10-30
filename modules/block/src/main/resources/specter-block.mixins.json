@@ -6,7 +6,6 @@
   "mixins": [
     "AxeItemAccessor",
     "AxeItemMixin",
-    "BlockAccessor",
     "FireBlockMixin",
     "HoneycombItemMixin",
     "OxidizableMixin",

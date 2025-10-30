@@ -2,19 +2,16 @@ package dev.spiritstudios.specter.impl.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.api.ModInitializer;
-
+import net.minecraft.resources.ResourceLocation;
 import dev.spiritstudios.specter.api.core.SpecterGlobals;
 
 public class Specter implements ModInitializer {
 	public static final String MODID = "specter";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	public static Identifier id(String path) {
-		return Identifier.of(MODID, path);
+	public static ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
 
 	@Override

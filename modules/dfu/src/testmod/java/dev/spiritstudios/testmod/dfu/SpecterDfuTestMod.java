@@ -3,23 +3,21 @@ package dev.spiritstudios.testmod.dfu;
 import com.mojang.datafixers.DataFixerBuilder;
 import com.mojang.datafixers.schemas.Schema;
 import net.fabricmc.api.ModInitializer;
-
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import dev.spiritstudios.specter.api.dfu.DataFixHelper;
 import dev.spiritstudios.specter.api.dfu.SpecterDataFixRegistry;
 
 public class SpecterDfuTestMod implements ModInitializer {
 	private static final Item TEST_ITEM = Registry.register(
-		Registries.ITEM,
-		Identifier.of("specter_dfu_testmod", "test_item_new"),
-		new Item(new Item.Settings()
-			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of("specter_dfu_testmod", "test_item_new"))))
+		BuiltInRegistries.ITEM,
+		ResourceLocation.fromNamespaceAndPath("specter_dfu_testmod", "test_item_new"),
+		new Item(new Item.Properties()
+			.setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("specter_dfu_testmod", "test_item_new"))))
 	);
 
 	@Override
@@ -31,8 +29,8 @@ public class SpecterDfuTestMod implements ModInitializer {
 		DataFixHelper.renameItem(
 			build,
 			"Rename test_item to test_item_new",
-			Identifier.of("specter_dfu_testmod", "test_item_new"),
-			Identifier.of("specter_dfu_testmod", "test_item"),
+			ResourceLocation.fromNamespaceAndPath("specter_dfu_testmod", "test_item_new"),
+			ResourceLocation.fromNamespaceAndPath("specter_dfu_testmod", "test_item"),
 			renameItemSchema
 		);
 

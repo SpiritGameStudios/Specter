@@ -10,11 +10,12 @@ import net.minecraft.SharedConstants;
 
 @Mixin(SharedConstants.class)
 public abstract class SharedConstantsMixin {
+
 	@Shadow
-	public static boolean isDevelopment;
+	public static boolean IS_RUNNING_IN_IDE;
 
 	@Inject(method = "<clinit>", at = @At("RETURN"))
 	private static void clinit(CallbackInfo ci) {
-		isDevelopment = true;
+		IS_RUNNING_IN_IDE = true;
 	}
 }

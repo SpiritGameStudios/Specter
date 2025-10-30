@@ -1,25 +1,24 @@
 package dev.spiritstudios.testmod.config;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.Value;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
 import dev.spiritstudios.specter.api.serialization.format.TomlFormat;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 public class TestConfig extends Config<TestConfig> {
 	public static final ConfigHolder<TestConfig, ?> JSON_HOLDER = ConfigHolder
-		.builder(Identifier.of("specter-config-testmod", "jsontestconfig"), TestConfig.class)
+		.builder(ResourceLocation.fromNamespaceAndPath("specter-config-testmod", "jsontestconfig"), TestConfig.class)
 		.format(JsonCFormat.INSTANCE)
 		.build();
 
 	public static final ConfigHolder<TestConfig, ?> TOML_HOLDER = ConfigHolder
-		.builder(Identifier.of("specter-config-testmod", "tomltestconfig"), TestConfig.class)
+		.builder(ResourceLocation.fromNamespaceAndPath("specter-config-testmod", "tomltestconfig"), TestConfig.class)
 		.format(TomlFormat.INSTANCE)
 		.build();
 
@@ -56,7 +55,7 @@ public class TestConfig extends Config<TestConfig> {
 		.comment("This is a test enum")
 		.build();
 
-	public final Value<Item> testItem = registryValue(Items.BEDROCK, Registries.ITEM)
+	public final Value<Item> testItem = registryValue(Items.BEDROCK, BuiltInRegistries.ITEM)
 		.comment("This is a test item")
 		.build();
 

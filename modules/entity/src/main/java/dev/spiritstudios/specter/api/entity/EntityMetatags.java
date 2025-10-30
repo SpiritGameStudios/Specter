@@ -1,12 +1,10 @@
 package dev.spiritstudios.specter.api.entity;
 
 import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.RegistryKeys;
-
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.core.Specter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EntityType;
 
 public final class EntityMetatags {
 	/**
@@ -16,7 +14,7 @@ public final class EntityMetatags {
 	 * @apiNote This metatag does not include default attributes set by vanilla or other mods that use the vanilla attribute system.
 	 */
 	public static final Metatag<EntityType<?>, DataAttributeContainer> DEFAULT_ATTRIBUTES = Metatag.builder(
-			RegistryKeys.ENTITY_TYPE,
+			Registries.ENTITY_TYPE,
 			Specter.id("default_attributes"),
 			DataAttributeContainer.CODEC
 	).packetCodec(DataAttributeContainer.PACKET_CODEC).build();

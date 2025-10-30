@@ -4,7 +4,7 @@
 	"package": "dev.spiritstudios.specter.mixin.item",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ComposterBlock$ComposterInventoryMixin",
+		"ComposterBlock$InputContainerMixin",
 		"ComposterBlockMixin",
 		"FuelRegistryMixin",
 		"ShapedRecipeJsonBuilderAccessor",

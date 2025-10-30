@@ -1,21 +1,20 @@
 package dev.spiritstudios.testmod.item;
 
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 
 public class SpecterItemTestMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Registry.register(
-			Registries.ITEM,
-			Identifier.of("specter-item-testmod", "test_item"),
-			new Item(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of("specter-item-testmod", "test_item"))))
+			BuiltInRegistries.ITEM,
+			ResourceLocation.fromNamespaceAndPath("specter-item-testmod", "test_item"),
+			new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("specter-item-testmod", "test_item"))))
 		);
 	}
 }

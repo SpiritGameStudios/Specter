@@ -9,33 +9,31 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.nbt.NbtHelper;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 
 public final class MetatagCommand {
-	public static final SuggestionProvider<ServerCommandSource> REGISTRY_SUGGESTIONS = (context, builder) ->
-			CommandSource.suggestIdentifiers(context.getSource().getRegistryManager().streamAllRegistryKeys()
+	public static final SuggestionProvider<CommandSourceStack> REGISTRY_SUGGESTIONS = (context, builder) ->
+			SharedSuggestionProvider.suggestResource(context.getSource().registryAccess().listRegistryKeys()
 					.filter(key -> !MetatagHolder.ofAny(key).specter$getMetatags().isEmpty())
-					.map(RegistryKey::getValue), builder);
+					.map(ResourceKey::location), builder);
 
-	public static final Function<String, SuggestionProvider<ServerCommandSource>> METATAG_SUGGESTIONS = (registryArg) -> (context, builder) -> {
+	public static final Function<String, SuggestionProvider<CommandSourceStack>> METATAG_SUGGESTIONS = (registryArg) -> (context, builder) -> {
 		Registry<?> registry = getRegistryFromContext(context, registryArg);
 		if (registry == null) return null;
-		return CommandSource.suggestIdentifiers(
-				MetatagHolder.of(registry.getKey())
+		return SharedSuggestionProvider.suggestResource(
+				MetatagHolder.of(registry.key())
 						.specter$getMetatags()
 						.stream()
 						.map(Map.Entry::getKey),
@@ -44,13 +42,13 @@ public final class MetatagCommand {
 	};
 
 
-	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		dispatcher.register(CommandManager.literal("metatag")
-				.requires(source -> source.hasPermissionLevel(2))
-				.then(CommandManager.literal("dump")
-						.then(CommandManager.argument("registry", IdentifierArgumentType.identifier())
+	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+		dispatcher.register(Commands.literal("metatag")
+				.requires(source -> source.hasPermission(2))
+				.then(Commands.literal("dump")
+						.then(Commands.argument("registry", ResourceLocationArgument.id())
 								.suggests(REGISTRY_SUGGESTIONS)
-								.then(CommandManager.argument("metatag", IdentifierArgumentType.identifier())
+								.then(Commands.argument("metatag", ResourceLocationArgument.id())
 										.suggests(METATAG_SUGGESTIONS.apply("registry"))
 										.executes(context -> dump(
 												context,
@@ -61,33 +59,33 @@ public final class MetatagCommand {
 				));
 	}
 
-	private static Registry<?> getRegistryFromContext(CommandContext<ServerCommandSource> context, String registryArg) {
-		return context.getSource().getRegistryManager()
-				.getOrThrow(RegistryKey.ofRegistry(context.getArgument(registryArg, Identifier.class)));
+	private static Registry<?> getRegistryFromContext(CommandContext<CommandSourceStack> context, String registryArg) {
+		return context.getSource().registryAccess()
+				.lookupOrThrow(ResourceKey.createRegistryKey(context.getArgument(registryArg, ResourceLocation.class)));
 	}
 
-	private static Metatag<?, ?> getMetatagFromContext(CommandContext<ServerCommandSource> context) {
+	private static Metatag<?, ?> getMetatagFromContext(CommandContext<CommandSourceStack> context) {
 		Registry<?> registry = getRegistryFromContext(context, "registry");
-		Identifier metatagId = context.getArgument("metatag", Identifier.class);
-		return MetatagHolder.of(registry.getKey()).specter$getMetatag(metatagId);
+		ResourceLocation metatagId = context.getArgument("metatag", ResourceLocation.class);
+		return MetatagHolder.of(registry.key()).specter$getMetatag(metatagId);
 	}
 
-	private static <R, V> int dump(CommandContext<ServerCommandSource> context, Metatag<R, V> metatag) {
+	private static <R, V> int dump(CommandContext<CommandSourceStack> context, Metatag<R, V> metatag) {
 		Codec<MetatagResource<R, V>> codec = MetatagResource.resourceCodecOf(metatag);
 
-		DynamicRegistryManager registryManager = context.getSource().getRegistryManager();
-		Registry<R> registry = registryManager.getOrThrow(metatag.registryKey());
+		RegistryAccess registryManager = context.getSource().registryAccess();
+		Registry<R> registry = registryManager.lookupOrThrow(metatag.registryKey());
 
 		MetatagResource<R, V> resource = new MetatagResource<>(
 				false,
 				metatag.stream()
 						.map(entry ->
-								Pair.of(registry.getKey(entry.getKey()).orElseThrow(), entry.getValue()))
+								Pair.of(registry.getResourceKey(entry.getKey()).orElseThrow(), entry.getValue()))
 						.toList()
 		);
 
-		context.getSource().sendFeedback(() ->
-				NbtHelper.toPrettyPrintedText(codec.encodeStart(NbtOps.INSTANCE, resource).getOrThrow()), true);
+		context.getSource().sendSuccess(() ->
+				NbtUtils.toPrettyComponent(codec.encodeStart(NbtOps.INSTANCE, resource).getOrThrow()), true);
 		return Command.SINGLE_SUCCESS;
 	}
 }

@@ -8,7 +8,7 @@
 	},
 	"client": [
 		"ClientPlayNetworkHandlerAccessor",
-		"ClientRegistriesMixin",
+		"RegistryDataCollectorMixin",
 		"WorldAccessor"
 	]
 }

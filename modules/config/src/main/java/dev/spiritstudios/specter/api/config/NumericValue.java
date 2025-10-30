@@ -2,13 +2,10 @@ package dev.spiritstudios.specter.api.config;
 
 import java.util.List;
 import java.util.function.BiFunction;
-
+import net.minecraft.network.codec.StreamCodec;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import org.apache.commons.lang3.function.TriFunction;
-
-import net.minecraft.network.codec.PacketCodec;
-
 import dev.spiritstudios.specter.impl.config.NumericValueImpl;
 
 /**
@@ -31,7 +28,7 @@ public interface NumericValue<T extends Number & Comparable<T>> extends Value<T>
 		protected final TriFunction<T, T, T, T> clamp;
 		protected String comment;
 		protected boolean sync;
-		protected PacketCodec<ByteBuf, T> packetCodec;
+		protected StreamCodec<ByteBuf, T> packetCodec;
 		protected T min;
 		protected T max;
 		protected double step;
@@ -72,7 +69,7 @@ public interface NumericValue<T extends Number & Comparable<T>> extends Value<T>
 			return this;
 		}
 
-		public NumericValue.Builder<T> packetCodec(PacketCodec<ByteBuf, T> packetCodec) {
+		public NumericValue.Builder<T> packetCodec(StreamCodec<ByteBuf, T> packetCodec) {
 			this.packetCodec = packetCodec;
 			return this;
 		}

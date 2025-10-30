@@ -3,27 +3,24 @@ package dev.spiritstudios.specter.impl.registry.metatag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import com.google.common.collect.ImmutableList;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 @ApiStatus.Internal
 public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
-	public static final PacketCodec<RegistryByteBuf, MetatagsS2CPayload> CODEC = MetatagsS2CPayload.MetatagData.CODEC
-			.collect(PacketCodecs.toList())
-			.xmap(MetatagsS2CPayload::new, MetatagsS2CPayload::metatags);
+	public static final StreamCodec<RegistryFriendlyByteBuf, MetatagsS2CPayload> CODEC = MetatagsS2CPayload.MetatagData.CODEC
+			.apply(ByteBufCodecs.list())
+			.map(MetatagsS2CPayload::new, MetatagsS2CPayload::metatags);
 
 	private static @Nullable MetatagsS2CPayload CACHE;
 
@@ -36,12 +33,12 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 		);
 	}
 
-	public static MetatagsS2CPayload getOrCreatePayload(RegistryWrapper.WrapperLookup wrapperLookup) {
+	public static MetatagsS2CPayload getOrCreatePayload(HolderLookup.Provider wrapperLookup) {
 		if (CACHE != null) return CACHE;
 
 		List<MetatagData<?, ?>> metatags = new ArrayList<>();
 
-		wrapperLookup.streamAllRegistryKeys().forEach(key -> {
+		wrapperLookup.listRegistryKeys().forEach(key -> {
 			MetatagHolder.ofAny(key).specter$getMetatags().forEach(entry -> {
 				if (entry.getValue().packetCodec() == null) return;
 
@@ -58,29 +55,29 @@ public record MetatagsS2CPayload(List<MetatagData<?, ?>> metatags) {
 	}
 
 	public record MetatagData<R, V>(Metatag<R, V> metatag, Map<R, V> entries) {
-		private static final PacketCodec<ByteBuf, Metatag<?, ?>> METATAG_CODEC =
-				Identifier.PACKET_CODEC.dispatch(
-						metatag -> metatag.registryKey().getValue(),
-						key -> Identifier.PACKET_CODEC.xmap(
-								id -> MetatagHolder.ofAny(RegistryKey.ofRegistry(key))
+		private static final StreamCodec<ByteBuf, Metatag<?, ?>> METATAG_CODEC =
+				ResourceLocation.STREAM_CODEC.dispatch(
+						metatag -> metatag.registryKey().location(),
+						key -> ResourceLocation.STREAM_CODEC.map(
+								id -> MetatagHolder.ofAny(ResourceKey.createRegistryKey(key))
 										.specter$getMetatag(id),
 								Metatag::id
 						)
 				);
 
-		public static final PacketCodec<RegistryByteBuf, MetatagData<?, ?>> CODEC = METATAG_CODEC
-				.<RegistryByteBuf>cast()
+		public static final StreamCodec<RegistryFriendlyByteBuf, MetatagData<?, ?>> CODEC = METATAG_CODEC
+				.<RegistryFriendlyByteBuf>cast()
 				.dispatch(
 						MetatagData::metatag,
 						MetatagData::codec
 				);
 
-		public static <R, V> PacketCodec<RegistryByteBuf, MetatagData<R, V>> codec(Metatag<R, V> metatag) {
-			return PacketCodecs.map(
+		public static <R, V> StreamCodec<RegistryFriendlyByteBuf, MetatagData<R, V>> codec(Metatag<R, V> metatag) {
+			return ByteBufCodecs.map(
 					expected -> (Map<R, V>) new Object2ObjectLinkedOpenHashMap<R, V>(expected),
-					PacketCodecs.registryValue(metatag.registryKey()),
+					ByteBufCodecs.registry(metatag.registryKey()),
 					metatag.packetCodec()
-			).xmap(
+			).map(
 					map -> new MetatagData<>(metatag, map),
 					MetatagData::entries
 			);

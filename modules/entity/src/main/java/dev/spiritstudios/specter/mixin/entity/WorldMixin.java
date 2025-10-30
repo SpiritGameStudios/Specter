@@ -13,17 +13,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.TypeFilter;
-import net.minecraft.util.function.LazyIterationConsumer;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.util.AbortableIterationConsumer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.AABB;
 
 import dev.spiritstudios.specter.api.entity.EntityPart;
 import dev.spiritstudios.specter.api.entity.PartHolder;
 import dev.spiritstudios.specter.impl.entity.EntityPartWorld;
 
-@Mixin(World.class)
+@Mixin(Level.class)
 public abstract class WorldMixin implements EntityPartWorld {
 
 	@Unique
@@ -34,26 +34,26 @@ public abstract class WorldMixin implements EntityPartWorld {
 			Predicate<? super T> predicate,
 			List<? super T> result,
 			int limit,
-			TypeFilter<Entity, T> filter,
+			EntityTypeTest<Entity, T> filter,
 			Entity entity,
-			CallbackInfoReturnable<LazyIterationConsumer.NextIteration> cir
+			CallbackInfoReturnable<AbortableIterationConsumer.Continuation> cir
 	) {
 		if (entity instanceof PartHolder<?> partHolder) {
 			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
-				T partCasted = filter.downcast(part);
+				T partCasted = filter.tryCast(part);
 
 				if (partCasted != null && predicate.test(partCasted)) {
 					result.add(partCasted);
 					if (result.size() >= limit) {
-						cir.setReturnValue(LazyIterationConsumer.NextIteration.ABORT);
+						cir.setReturnValue(AbortableIterationConsumer.Continuation.ABORT);
 					}
 				}
 			}
 		}
 	}
 
-	@WrapMethod(method = "getOtherEntities")
-	private List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> predicate, Operation<List<Entity>> original) {
+	@WrapMethod(method = "getEntities(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;Ljava/util/function/Predicate;)Ljava/util/List;")
+	private List<Entity> getOtherEntities(Entity except, AABB box, Predicate<? super Entity> predicate, Operation<List<Entity>> original) {
 		List<Entity> list = original.call(except, box, predicate);
 
 		for (EntityPart<?> part : this.specter$parts.values()) {

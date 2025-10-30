@@ -5,15 +5,15 @@ import java.util.Map;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.AxeItem;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.level.block.Block;
 
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 
 @Mixin(AxeItem.class)
 public interface AxeItemAccessor {
-	@Accessor("STRIPPED_BLOCKS")
-	static Map<Block, Block> getStrippedBlocks() {
+	@Accessor
+	static Map<Block, Block> getSTRIPPABLES() {
 		throw new UnreachableException();
 	}
 }

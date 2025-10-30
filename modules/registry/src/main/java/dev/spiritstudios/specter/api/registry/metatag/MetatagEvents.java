@@ -1,9 +1,7 @@
 package dev.spiritstudios.specter.api.registry.metatag;
 
-import net.minecraft.resource.ResourceManager;
-
 import net.fabricmc.fabric.api.event.Event;
-
+import net.minecraft.server.packs.resources.ResourceManager;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
 
 public final class MetatagEvents {

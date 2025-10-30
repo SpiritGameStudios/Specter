@@ -1,11 +1,8 @@
 package dev.spiritstudios.specter.impl.block;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
-import net.minecraft.block.Block;
-
 import net.fabricmc.api.ModInitializer;
-
+import net.minecraft.world.level.block.Block;
 import dev.spiritstudios.specter.api.block.BlockMetatags;
 import dev.spiritstudios.specter.api.registry.metatag.MetatagEvents;
 

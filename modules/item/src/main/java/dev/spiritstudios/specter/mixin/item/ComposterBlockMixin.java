@@ -6,22 +6,22 @@ import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import net.minecraft.block.ComposterBlock;
-import net.minecraft.item.ItemConvertible;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.ComposterBlock;
 
 import dev.spiritstudios.specter.api.item.ItemMetatags;
 
 @Mixin(ComposterBlock.class)
 public abstract class ComposterBlockMixin {
-	@WrapOperation(method = "addToComposter", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2FloatMap;getFloat(Ljava/lang/Object;)F", remap = false))
-	private static float addToComposter(Object2FloatMap<ItemConvertible> instance, Object o, Operation<Float> original) {
-		return ItemMetatags.COMPOSTING_CHANCE.get(((ItemConvertible) o).asItem())
+	@WrapOperation(method = "addItem", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2FloatMap;getFloat(Ljava/lang/Object;)F", remap = false))
+	private static float addToComposter(Object2FloatMap<ItemLike> instance, Object o, Operation<Float> original) {
+		return ItemMetatags.COMPOSTING_CHANCE.get(((ItemLike) o).asItem())
 				.orElseGet(() -> original.call(instance, o));
 	}
 
-	@WrapOperation(method = {"compost", "onUseWithItem"}, at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2FloatMap;containsKey(Ljava/lang/Object;)Z", remap = false))
-	private static boolean compost(Object2FloatMap<ItemConvertible> instance, Object o, Operation<Boolean> original) {
-		ItemConvertible itemConvertible = (ItemConvertible) o;
+	@WrapOperation(method = {"insertItem", "useItemOn"}, at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/Object2FloatMap;containsKey(Ljava/lang/Object;)Z", remap = false))
+	private static boolean compost(Object2FloatMap<ItemLike> instance, Object o, Operation<Boolean> original) {
+		ItemLike itemConvertible = (ItemLike) o;
 		return ItemMetatags.COMPOSTING_CHANCE.containsKey(itemConvertible.asItem()) || original.call(instance, o);
 	}
 }

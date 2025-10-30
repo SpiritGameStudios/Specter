@@ -4,7 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Pair;
@@ -12,25 +17,17 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.Identifier;
-
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.api.registry.metatag.data.MetatagResource;
 import dev.spiritstudios.specter.impl.core.Specter;
 
 public class MetatagContent<R, V> {
-	private final RegistryKey<Registry<R>> registryKey;
+	private final ResourceKey<Registry<R>> registryKey;
 	private final Metatag<R, V> metatag;
 	private final ObjectArrayList<Pair<R, V>> values;
 	private final Codec<MetatagResource<R, V>> resourceCodec;
 
-	public MetatagContent(RegistryKey<Registry<R>> registryKey, Metatag<R, V> metatag) {
+	public MetatagContent(ResourceKey<Registry<R>> registryKey, Metatag<R, V> metatag) {
 		this.registryKey = registryKey;
 		this.metatag = metatag;
 		this.values = new ObjectArrayList<>();
@@ -45,8 +42,8 @@ public class MetatagContent<R, V> {
 		return Collections.unmodifiableList(this.values);
 	}
 
-	public void parseAndAddResource(RegistryWrapper.WrapperLookup wrapperLookup, Identifier id, Resource resource) {
-		try (BufferedReader resourceReader = resource.getReader()) {
+	public void parseAndAddResource(HolderLookup.Provider wrapperLookup, ResourceLocation id, Resource resource) {
+		try (BufferedReader resourceReader = resource.openAsReader()) {
 			DataResult<MetatagResource<R, V>> result = resourceCodec.parse(JsonOps.INSTANCE, JsonParser.parseReader(resourceReader));
 
 			if (result.error().isPresent()) {
@@ -60,10 +57,10 @@ public class MetatagContent<R, V> {
 				this.values.trim(parsed.entries().size());
 			}
 
-			RegistryEntryLookup<R> lookup = wrapperLookup.getOrThrow(registryKey);
+			HolderGetter<R> lookup = wrapperLookup.lookupOrThrow(registryKey);
 
-			for (Pair<RegistryKey<R>, V> pair : parsed.entries()) {
-				lookup.getOptional(pair.getFirst()).ifPresent(entry -> {
+			for (Pair<ResourceKey<R>, V> pair : parsed.entries()) {
+				lookup.get(pair.getFirst()).ifPresent(entry -> {
 					values.add(Pair.of(entry.value(), pair.getSecond()));
 				});
 			}

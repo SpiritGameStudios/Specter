@@ -2,14 +2,11 @@ package dev.spiritstudios.specter.impl.render.client;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import it.unimi.dsi.fastutil.objects.ObjectFloatMutablePair;
-
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.random.Random;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import dev.spiritstudios.specter.api.render.client.shake.Screenshake;
 
 public final class ScreenshakeManager {
@@ -19,7 +16,7 @@ public final class ScreenshakeManager {
 		screenshakes.add(ObjectFloatMutablePair.of(screenshake, 0.0F));
 	}
 
-	public static void update(float delta, MatrixStack matrices, Random random) {
+	public static void update(float delta, PoseStack matrices, RandomSource random) {
 		List<ObjectFloatMutablePair<Screenshake>> screenshakes = new ArrayList<>(ScreenshakeManager.screenshakes);
 		for (ObjectFloatMutablePair<Screenshake> pair : screenshakes) {
 			Screenshake screenshake = pair.first();
@@ -33,7 +30,7 @@ public final class ScreenshakeManager {
 			}
 		}
 
-		float intensity = SpecterRenderClient.SCREENSHAKE_INTENSITY.getValue().floatValue();
+		float intensity = SpecterRenderClient.SCREENSHAKE_INTENSITY.get().floatValue();
 
 		if (ScreenshakeManager.screenshakes.isEmpty() || intensity == 0.0F) return;
 
@@ -49,9 +46,9 @@ public final class ScreenshakeManager {
 			float posIntensity = screenshake.posIntensity() * (1 - progress / screenshake.duration());
 			float rotationIntensity = screenshake.rotationIntensity() * (1 - progress / screenshake.duration());
 
-			float angle = random.nextFloat() * MathHelper.TAU;
-			float sin = MathHelper.sin(angle);
-			float cos = MathHelper.cos(angle);
+			float angle = random.nextFloat() * Mth.TWO_PI;
+			float sin = Mth.sin(angle);
+			float cos = Mth.cos(angle);
 
 			x += cos * posIntensity;
 			y += sin * posIntensity;
@@ -67,7 +64,7 @@ public final class ScreenshakeManager {
 
 		matrices.translate(x, y, 0);
 
-		matrices.multiply(Math.random() > 0.5 ? RotationAxis.POSITIVE_Z.rotation(rotationZ) : RotationAxis.NEGATIVE_Z.rotation(rotationZ));
-		matrices.multiply(Math.random() > 0.5 ? RotationAxis.POSITIVE_X.rotation(rotationX) : RotationAxis.NEGATIVE_X.rotation(rotationX));
+		matrices.mulPose(Math.random() > 0.5 ? Axis.ZP.rotation(rotationZ) : Axis.ZN.rotation(rotationZ));
+		matrices.mulPose(Math.random() > 0.5 ? Axis.XP.rotation(rotationX) : Axis.XN.rotation(rotationX));
 	}
 }

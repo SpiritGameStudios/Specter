@@ -4,18 +4,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-
 import dev.spiritstudios.testmod.gui.SpecterGuiTestScreen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
 
-	protected TitleScreenMixin(Text title) {
+	protected TitleScreenMixin(Component title) {
 		super(title);
 	}
 
@@ -24,12 +22,12 @@ public abstract class TitleScreenMixin extends Screen {
 		at = @At("HEAD")
 	)
 	protected void init(CallbackInfo ci) {
-		if (this.client == null) return;
+		if (this.minecraft == null) return;
 
-		this.addDrawableChild(ButtonWidget.builder(
-				Text.of("SPECTRE GUI TEST"),
-				button -> this.client.setScreen(new SpecterGuiTestScreen()))
-			.dimensions(0, 0, 100, 20)
+		this.addRenderableWidget(Button.builder(
+				Component.nullToEmpty("SPECTRE GUI TEST"),
+				button -> this.minecraft.setScreen(new SpecterGuiTestScreen()))
+			.bounds(0, 0, 100, 20)
 			.build()
 		);
 	}

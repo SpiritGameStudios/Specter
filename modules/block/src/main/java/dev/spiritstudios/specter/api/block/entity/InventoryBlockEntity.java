@@ -1,71 +1,70 @@
 package dev.spiritstudios.specter.api.block.entity;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
 
 /**
  * A simple {@link BlockEntity} with an inventory that is synchronized with the client.
  */
 public class InventoryBlockEntity extends BlockEntity implements ImplementedInventory {
-	protected final DefaultedList<ItemStack> inventory;
+	protected final NonNullList<ItemStack> inventory;
 
 	public InventoryBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int size) {
 		super(type, pos, state);
-		inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+		inventory = NonNullList.withSize(size, ItemStack.EMPTY);
 	}
 
 	@Override
-	public DefaultedList<ItemStack> getItems() {
+	public NonNullList<ItemStack> getItems() {
 		return inventory;
 	}
 
 	@Override
-	protected void writeData(WriteView view) {
-		super.writeData(view);
+	protected void saveAdditional(ValueOutput view) {
+		super.saveAdditional(view);
 
-		Inventories.writeData(view, this.inventory);
+		ContainerHelper.saveAllItems(view, this.inventory);
 	}
 
 
 	@Override
-	protected void readData(ReadView view) {
-		super.readData(view);
+	protected void loadAdditional(ValueInput view) {
+		super.loadAdditional(view);
 
-		this.clear();
-		Inventories.readData(view, this.inventory);
+		this.clearContent();
+		ContainerHelper.loadAllItems(view, this.inventory);
 	}
 
 	@Nullable
 	@Override
-	public Packet<ClientPlayPacketListener> toUpdatePacket() {
-		return BlockEntityUpdateS2CPacket.create(this);
+	public Packet<ClientGamePacketListener> getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
-	protected void readComponents(ComponentsAccess componentsAccess) {
-		super.readComponents(componentsAccess);
-		componentsAccess.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(this.getItems());
+	protected void applyImplicitComponents(DataComponentGetter componentsAccess) {
+		super.applyImplicitComponents(componentsAccess);
+		componentsAccess.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getItems());
 	}
 
 	@Override
-	protected void addComponents(ComponentMap.Builder builder) {
-		super.addComponents(builder);
-		builder.add(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(this.getItems()));
+	protected void collectImplicitComponents(DataComponentMap.Builder builder) {
+		super.collectImplicitComponents(builder);
+		builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItems()));
 	}
 }

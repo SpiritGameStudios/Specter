@@ -4,28 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
-
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.impl.config.ConfigHolderRegistry;
 import dev.spiritstudios.specter.impl.core.Specter;
 
-public record ConfigSyncS2CPayload(ConfigHolder<?, ?> config) implements CustomPayload {
-	public static final Id<ConfigSyncS2CPayload> ID = new Id<>(Specter.id("config_sync"));
-	public static final PacketCodec<ByteBuf, ConfigSyncS2CPayload> CODEC = PacketCodec.tuple(
-			PacketCodec.<ByteBuf, ConfigHolder<?, ?>>of(
+public record ConfigSyncS2CPayload(ConfigHolder<?, ?> config) implements CustomPacketPayload {
+	public static final Type<ConfigSyncS2CPayload> ID = new Type<>(Specter.id("config_sync"));
+	public static final StreamCodec<ByteBuf, ConfigSyncS2CPayload> CODEC = StreamCodec.composite(
+			StreamCodec.<ByteBuf, ConfigHolder<?, ?>>ofMember(
 					(value, buf) -> {
-						Identifier.PACKET_CODEC.encode(buf, value.id());
+						ResourceLocation.STREAM_CODEC.encode(buf, value.id());
 						value.packetEncode(buf);
 					},
 					buf -> {
-						Identifier id = Identifier.PACKET_CODEC.decode(buf);
+						ResourceLocation id = ResourceLocation.STREAM_CODEC.decode(buf);
 						ConfigHolder<?, ?> config = ConfigHolderRegistry.get(id);
 						config.save();
 
@@ -50,12 +48,12 @@ public record ConfigSyncS2CPayload(ConfigHolder<?, ?> config) implements CustomP
 	public static void sendPayloadsToAll(MinecraftServer server) {
 		List<ConfigSyncS2CPayload> payloads = ConfigSyncS2CPayload.getPayloads();
 
-		server.getPlayerManager().getPlayerList().forEach(
+		server.getPlayerList().getPlayers().forEach(
 				player -> payloads.forEach(payload -> ServerPlayNetworking.send(player, payload)));
 	}
 
 	@Override
-	public Id<ConfigSyncS2CPayload> getId() {
+	public Type<ConfigSyncS2CPayload> type() {
 		return ID;
 	}
 }

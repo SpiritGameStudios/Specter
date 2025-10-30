@@ -6,26 +6,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-
+import net.minecraft.core.Registry;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import com.google.common.collect.Iterators;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 
 public record ExistingCombinedMetatag<R, V>(
-		RegistryKey<Registry<R>> registryKey,
-		Identifier id,
+		ResourceKey<Registry<R>> registryKey,
+		ResourceLocation id,
 		Codec<V> codec,
-		PacketCodec<RegistryByteBuf, V> packetCodec,
+		StreamCodec<RegistryFriendlyByteBuf, V> packetCodec,
 		Supplier<@Unmodifiable Map<R, V>> existingGetter
 ) implements Metatag<R, V> {
 	@Override

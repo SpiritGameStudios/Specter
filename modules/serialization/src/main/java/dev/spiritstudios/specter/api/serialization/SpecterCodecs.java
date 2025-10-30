@@ -2,23 +2,20 @@ package dev.spiritstudios.specter.api.serialization;
 
 import java.util.List;
 import java.util.function.Function;
-
+import net.minecraft.Util;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapEncoder;
 import com.mojang.serialization.MapLike;
 import org.joml.Vector4d;
-
-import net.minecraft.util.Util;
-
 import dev.spiritstudios.specter.impl.serialization.codec.FuzzyCodec;
 import dev.spiritstudios.specter.impl.serialization.codec.KeyDispatchingCodec;
 
 public final class SpecterCodecs {
 	public static final Codec<Vector4d> VECTOR4D = Codec.DOUBLE.listOf()
 		.comapFlatMap(
-			list -> Util.decodeFixedLengthList(list, 4)
+			list -> Util.fixedSize(list, 4)
 				.map(vecList -> new Vector4d(vecList.getFirst(), vecList.get(1), vecList.get(2), vecList.get(3))),
 			vector -> List.of(vector.x(), vector.y(), vector.z(), vector.w())
 		);

@@ -1,79 +1,77 @@
 package dev.spiritstudios.specter.api.gui.client.widget;
 
 import java.util.function.Supplier;
-
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+public class SpecterButtonWidget extends Button {
+	protected final Supplier<Component> message;
 
-public class SpecterButtonWidget extends ButtonWidget {
-	protected final Supplier<Text> message;
-
-	protected SpecterButtonWidget(int x, int y, int width, int height, Supplier<Text> message, PressAction onPress, NarrationSupplier narrationSupplier) {
+	protected SpecterButtonWidget(int x, int y, int width, int height, Supplier<Component> message, OnPress onPress, CreateNarration narrationSupplier) {
 		super(x, y, width, height, message.get(), onPress, narrationSupplier);
 
 		this.message = message;
 	}
 
-	public static Builder builder(Supplier<Text> message, PressAction onPress) {
-		return new Builder(message, onPress);
+	public static dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder builder(Supplier<Component> message, OnPress onPress) {
+		return new dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder(message, onPress);
 	}
 
 	@Override
-	public Text getMessage() {
+	public Component getMessage() {
 		return message.get();
 	}
 
 	public static final class Builder {
-		private final Supplier<Text> message;
-		private final ButtonWidget.PressAction onPress;
+		private final Supplier<Component> message;
+		private final Button.OnPress onPress;
 		@Nullable
 		private Tooltip tooltip;
 		private int x;
 		private int y;
 		private int width = 150;
 		private int height = 20;
-		private ButtonWidget.NarrationSupplier narrationSupplier = ButtonWidget.DEFAULT_NARRATION_SUPPLIER;
+		private Button.CreateNarration narrationSupplier = Button.DEFAULT_NARRATION;
 
-		public Builder(Supplier<Text> message, ButtonWidget.PressAction onPress) {
+		public Builder(Supplier<Component> message, Button.OnPress onPress) {
 			this.message = message;
 			this.onPress = onPress;
 		}
 
-		public Builder position(int x, int y) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder position(int x, int y) {
 			this.x = x;
 			this.y = y;
 			return this;
 		}
 
-		public Builder width(int width) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder width(int width) {
 			this.width = width;
 			return this;
 		}
 
-		public Builder height(int height) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder height(int height) {
 			this.height = height;
 			return this;
 		}
 
-		public Builder size(int width, int height) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder size(int width, int height) {
 			this.width = width;
 			this.height = height;
 			return this;
 		}
 
-		public Builder dimensions(int x, int y, int width, int height) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder dimensions(int x, int y, int width, int height) {
 			return this.position(x, y).size(width, height);
 		}
 
-		public Builder tooltip(@Nullable Tooltip tooltip) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder tooltip(@Nullable Tooltip tooltip) {
 			this.tooltip = tooltip;
 			return this;
 		}
 
-		public Builder narrationSupplier(ButtonWidget.NarrationSupplier narrationSupplier) {
+		public dev.spiritstudios.specter.api.gui.client.widget.SpecterButtonWidget.Builder narrationSupplier(Button.CreateNarration narrationSupplier) {
 			this.narrationSupplier = narrationSupplier;
 			return this;
 		}

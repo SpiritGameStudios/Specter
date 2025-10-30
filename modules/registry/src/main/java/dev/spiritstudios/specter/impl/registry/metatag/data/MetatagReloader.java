@@ -6,17 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagEventsImpl;
@@ -24,11 +21,11 @@ import dev.spiritstudios.specter.impl.registry.metatag.MetatagHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 
 public class MetatagReloader implements SimpleResourceReloadListener<Collection<MetatagContent<?, ?>>> {
-	public static final Identifier ID = Specter.id("metatags_data");
+	public static final ResourceLocation ID = Specter.id("metatags_data");
 
-	private final RegistryWrapper.WrapperLookup wrapperLookup;
+	private final HolderLookup.Provider wrapperLookup;
 
-	public MetatagReloader(RegistryWrapper.WrapperLookup wrapperLookup) {
+	public MetatagReloader(HolderLookup.Provider wrapperLookup) {
 		this.wrapperLookup = wrapperLookup;
 	}
 
@@ -41,24 +38,24 @@ public class MetatagReloader implements SimpleResourceReloadListener<Collection<
 		return CompletableFuture.supplyAsync(() -> {
 			Map<Metatag<?, ?>, MetatagContent<?, ?>> metatagContents = new IdentityHashMap<>();
 
-			wrapperLookup.streamAllRegistryKeys().forEach(key -> {
-				Identifier registryId = key.getValue();
+			wrapperLookup.listRegistryKeys().forEach(key -> {
+				ResourceLocation registryId = key.location();
 				String metatagPath = registryId.getNamespace() + "/" + registryId.getPath();
 
-				Map<Identifier, List<Resource>> resources = ResourceFinder
+				Map<ResourceLocation, List<Resource>> resources = FileToIdConverter
 						.json("metatags/" + metatagPath)
-						.findAllResources(manager);
+						.listMatchingResourceStacks(manager);
 
 				if (resources.isEmpty()) return;
 
-				for (Map.Entry<Identifier, List<Resource>> resource : resources.entrySet()) {
-					Identifier resourceId = resource.getKey();
+				for (Map.Entry<ResourceLocation, List<Resource>> resource : resources.entrySet()) {
+					ResourceLocation resourceId = resource.getKey();
 
 					// Transform the path into the Metatag ID (e.g. specter:metatags/minecraft/block/strippable.json -> specter:strippable)
 					String path = resourceId.getPath();
 					path = path.substring(path.lastIndexOf('/') + 1);
 					path = path.substring(0, path.lastIndexOf('.'));
-					Identifier metatagId = Identifier.of(resourceId.getNamespace(), path);
+					ResourceLocation metatagId = ResourceLocation.fromNamespaceAndPath(resourceId.getNamespace(), path);
 
 					Metatag<?, ?> metatag = MetatagHolder.ofAny(key).specter$getMetatag(metatagId);
 					if (metatag == null) continue;
@@ -88,7 +85,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<Collection<
 
 	private <R, V> void loadMetatag(MetatagContent<R, V> content) {
 		Metatag<R, V> metatag = content.getMetatag();
-		RegistryKey<Registry<R>> registryKey = metatag.registryKey();
+		ResourceKey<Registry<R>> registryKey = metatag.registryKey();
 		MetatagValueHolder<R> holder = MetatagValueHolder.getOrCreate(registryKey);
 
 		holder.specter$clearMetatag(metatag);
@@ -99,7 +96,7 @@ public class MetatagReloader implements SimpleResourceReloadListener<Collection<
 	}
 
 	@Override
-	public Identifier getFabricId() {
+	public ResourceLocation getFabricId() {
 		return ID;
 	}
 }

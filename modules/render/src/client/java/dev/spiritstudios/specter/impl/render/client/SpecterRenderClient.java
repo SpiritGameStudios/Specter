@@ -1,27 +1,25 @@
 package dev.spiritstudios.specter.impl.render.client;
 
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
+import net.minecraft.client.OptionInstance;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import dev.spiritstudios.specter.api.render.client.shake.Screenshake;
 import dev.spiritstudios.specter.api.render.shake.ScreenshakeS2CPayload;
 
 public class SpecterRenderClient implements ClientModInitializer {
-	public static final SimpleOption<Double> SCREENSHAKE_INTENSITY = new SimpleOption<>(
+	public static final OptionInstance<Double> SCREENSHAKE_INTENSITY = new OptionInstance<>(
 			"options.specter.screenshake_intensity",
-			SimpleOption.constantTooltip(Text.translatable("options.specter.screenshake_intensity.description")),
-			(optionText, value) -> value == 0.0 ? ScreenTexts.composeToggleText(optionText, false) : getPercentValueText(optionText, value),
-			SimpleOption.DoubleSliderCallbacks.INSTANCE,
+			OptionInstance.cachedConstantTooltip(Component.translatable("options.specter.screenshake_intensity.description")),
+			(optionText, value) -> value == 0.0 ? CommonComponents.optionStatus(optionText, false) : getPercentValueText(optionText, value),
+			OptionInstance.UnitDouble.INSTANCE,
 			1.0,
 			value -> {}
 	);
 
-	private static Text getPercentValueText(Text prefix, double value) {
-		return Text.translatable("options.percent_value", prefix, (int)(value * 100.0));
+	private static Component getPercentValueText(Component prefix, double value) {
+		return Component.translatable("options.percent_value", prefix, (int)(value * 100.0));
 	}
 
 	@Override

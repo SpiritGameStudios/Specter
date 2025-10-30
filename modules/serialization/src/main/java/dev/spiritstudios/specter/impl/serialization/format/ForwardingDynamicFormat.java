@@ -4,14 +4,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
+import net.minecraft.resources.DelegatingOps;
 import com.mojang.serialization.DynamicOps;
-
-import net.minecraft.util.dynamic.ForwardingDynamicOps;
-
 import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
 
-public class ForwardingDynamicFormat<T> extends ForwardingDynamicOps<T> implements DynamicFormat<T> {
+public class ForwardingDynamicFormat<T> extends DelegatingOps<T> implements DynamicFormat<T> {
 	private final BiConsumer<Writer, T> write;
 	private final Function<Reader, T> read;
 	private final String name;

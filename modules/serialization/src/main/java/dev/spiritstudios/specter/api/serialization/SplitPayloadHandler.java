@@ -5,22 +5,20 @@ import java.util.function.Consumer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
 public class SplitPayloadHandler<T> {
-	private final PacketCodec<PacketByteBuf, PayloadPart> partCodec = PacketCodecs.BYTE_ARRAY.xmap(
+	private final StreamCodec<FriendlyByteBuf, PayloadPart> partCodec = ByteBufCodecs.BYTE_ARRAY.map(
 			PayloadPart::new,
 			PayloadPart::bytes
 	).cast();
@@ -30,17 +28,17 @@ public class SplitPayloadHandler<T> {
 				for (ReceiveCallback<T> consumer : consumers) consumer.receive(t, registryManager);
 			}
 	);
-	private final CustomPayload.Id<PayloadPart> payloadId;
-	private final PacketCodec<? super RegistryByteBuf, T> codec;
-	private @Nullable RegistryByteBuf receivedData;
+	private final CustomPacketPayload.Type<PayloadPart> payloadId;
+	private final StreamCodec<? super RegistryFriendlyByteBuf, T> codec;
+	private @Nullable RegistryFriendlyByteBuf receivedData;
 
-	public SplitPayloadHandler(Identifier id, PacketCodec<? super RegistryByteBuf, T> codec) {
-		this.payloadId = new CustomPayload.Id<>(id);
+	public SplitPayloadHandler(ResourceLocation id, StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
+		this.payloadId = new CustomPacketPayload.Type<>(id);
 		this.codec = codec;
 	}
 
-	public void send(T payload, Consumer<CustomPayload> sender, DynamicRegistryManager manager) {
-		RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), manager);
+	public void send(T payload, Consumer<CustomPacketPayload> sender, RegistryAccess manager) {
+		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), manager);
 		codec.encode(buf, payload);
 
 		int readableBytes = buf.readableBytes();
@@ -55,8 +53,8 @@ public class SplitPayloadHandler<T> {
 		sender.accept(new PayloadPart(new byte[0]));
 	}
 
-	public void receive(PayloadPart part, DynamicRegistryManager registryManager) {
-		if (receivedData == null) receivedData = new RegistryByteBuf(Unpooled.buffer(), registryManager);
+	public void receive(PayloadPart part, RegistryAccess registryManager) {
+		if (receivedData == null) receivedData = new RegistryFriendlyByteBuf(Unpooled.buffer(), registryManager);
 
 		if (part.bytes.length == 0) {
 			T payload = codec.decode(receivedData);
@@ -68,7 +66,7 @@ public class SplitPayloadHandler<T> {
 		receivedData.writeBytes(part.bytes);
 	}
 
-	public CustomPayload.Id<PayloadPart> payloadId() {
+	public CustomPacketPayload.Type<PayloadPart> payloadId() {
 		return payloadId;
 	}
 
@@ -81,10 +79,10 @@ public class SplitPayloadHandler<T> {
 	}
 
 	public interface ReceiveCallback<T> {
-		void receive(T payload, DynamicRegistryManager registryManager);
+		void receive(T payload, RegistryAccess registryManager);
 	}
 
-	public class PayloadPart implements CustomPayload {
+	public class PayloadPart implements CustomPacketPayload {
 		private final byte[] bytes;
 
 		private PayloadPart(byte[] bytes) {
@@ -92,7 +90,7 @@ public class SplitPayloadHandler<T> {
 		}
 
 		@Override
-		public Id<? extends CustomPayload> getId() {
+		public Type<? extends CustomPacketPayload> type() {
 			return SplitPayloadHandler.this.payloadId;
 		}
 

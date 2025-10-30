@@ -1,11 +1,9 @@
 package dev.spiritstudios.specter.api.core.client.event;
 
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-
 import net.fabricmc.fabric.api.event.Event;
-
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import dev.spiritstudios.specter.impl.core.client.ClientKeybindEventsImpl;
 
 /**
@@ -16,12 +14,12 @@ public final class ClientKeybindEvents {
 		throw new UnsupportedOperationException("Cannot instantiate utility class");
 	}
 
-	public static Event<KeybindListener> pressed(KeyBinding keybind) {
+	public static Event<KeybindListener> pressed(KeyMapping keybind) {
 		return ClientKeybindEventsImpl.pressed(keybind);
 	}
 
 	@FunctionalInterface
 	public interface KeybindListener {
-		void onKeybind(MinecraftClient client);
+		void onKeybind(Minecraft client);
 	}
 }

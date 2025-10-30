@@ -5,10 +5,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
-
-import net.minecraft.datafixer.DataFixTypes;
-
 import dev.spiritstudios.specter.impl.dfu.SpecterDataFixerRegistryImpl;
+import net.minecraft.util.datafix.DataFixTypes;
 
 @Mixin(DataFixTypes.class)
 public abstract class DataFixTypesMixin {

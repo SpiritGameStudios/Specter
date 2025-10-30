@@ -6,53 +6,54 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 
 import dev.spiritstudios.specter.api.core.collect.SpecterCollectors;
 
 // mmm yessssss very immutable
-public class MutableRegistryManager implements DynamicRegistryManager.Immutable {
-	private final Map<RegistryKey<? extends Registry<?>>, Registry<?>> registries;
+public class MutableRegistryManager implements RegistryAccess.Frozen {
+	private final Map<ResourceKey<? extends Registry<?>>, Registry<?>> registries;
 
 	public MutableRegistryManager(List<? extends Registry<?>> registries) {
 		this.registries = registries.stream().collect(SpecterCollectors.toMap(
-				Registry::getKey, registry -> registry,
+				Registry::key, registry -> registry,
 				Object2ObjectOpenHashMap::new
 		));
 	}
 
-	public MutableRegistryManager(Map<? extends RegistryKey<? extends Registry<?>>, ? extends Registry<?>> registries) {
+	public MutableRegistryManager(Map<? extends ResourceKey<? extends Registry<?>>, ? extends Registry<?>> registries) {
 		this.registries = new Object2ObjectOpenHashMap<>(registries);
 	}
 
-	public MutableRegistryManager(Stream<Entry<?>> entryStream) {
+	public MutableRegistryManager(Stream<RegistryEntry<?>> entryStream) {
 		this.registries = entryStream.collect(SpecterCollectors.toMap(
-				Entry::key, Entry::value,
+				RegistryEntry::key, RegistryEntry::value,
 				Object2ObjectOpenHashMap::new
 		));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> DynamicRegistryManager.Entry<T> of(RegistryKey<? extends Registry<?>> key, Registry<?> value) {
-		return new DynamicRegistryManager.Entry<>((RegistryKey<? extends Registry<T>>) key, (Registry<T>) value);
+	private static <T> RegistryAccess.RegistryEntry<T> of(ResourceKey<? extends Registry<?>> key, Registry<?> value) {
+		return new RegistryAccess.RegistryEntry<>((ResourceKey<? extends Registry<T>>) key, (Registry<T>) value);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> Optional<Registry<E>> getOptional(RegistryKey<? extends Registry<? extends E>> registryRef) {
+	public <E> @NotNull Optional<Registry<E>> lookup(ResourceKey<? extends Registry<? extends E>> registryRef) {
 		return Optional.ofNullable(this.registries.get(registryRef))
 				.map(registry -> (Registry<E>) registry);
 	}
 
 	@Override
-	public Stream<DynamicRegistryManager.Entry<?>> streamAllRegistries() {
+	public @NotNull Stream<RegistryAccess.RegistryEntry<?>> registries() {
 		return this.registries.entrySet().stream().map(entry -> of(entry.getKey(), entry.getValue()));
 	}
 
 	public <T extends Registry<?>> void addRegistry(T registry) {
-		registries.put(registry.getKey(), registry);
+		registries.put(registry.key(), registry);
 	}
 }

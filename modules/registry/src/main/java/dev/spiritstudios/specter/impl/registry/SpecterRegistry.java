@@ -1,7 +1,5 @@
 package dev.spiritstudios.specter.impl.registry;
 
-import net.minecraft.resource.ResourceType;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -9,7 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-
+import net.minecraft.server.packs.PackType;
 import dev.spiritstudios.specter.api.serialization.SplitPayloadHandler;
 import dev.spiritstudios.specter.impl.core.Specter;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
@@ -24,7 +22,7 @@ public class SpecterRegistry implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(
 				MetatagReloader.ID,
 				MetatagReloader::new
 		);
@@ -33,21 +31,21 @@ public class SpecterRegistry implements ModInitializer {
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			METATAGS_SYNC.send(
-					MetatagsS2CPayload.getOrCreatePayload(server.getRegistryManager()),
+					MetatagsS2CPayload.getOrCreatePayload(server.registryAccess()),
 					sender::sendPacket,
-					server.getRegistryManager()
+					server.registryAccess()
 			);
 		});
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
 			MetatagsS2CPayload.clearCache();
-			MetatagsS2CPayload metatagPayload = MetatagsS2CPayload.getOrCreatePayload(server.getRegistryManager());
+			MetatagsS2CPayload metatagPayload = MetatagsS2CPayload.getOrCreatePayload(server.registryAccess());
 
 			PlayerLookup.all(server).forEach(player -> {
 				METATAGS_SYNC.send(
 						metatagPayload,
 						payload -> ServerPlayNetworking.send(player, payload),
-						server.getRegistryManager()
+						server.registryAccess()
 				);
 			});
 		});

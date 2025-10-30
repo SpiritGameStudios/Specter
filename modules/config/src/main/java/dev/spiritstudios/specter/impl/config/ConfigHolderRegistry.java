@@ -2,22 +2,19 @@ package dev.spiritstudios.specter.impl.config;
 
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.resources.ResourceLocation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
-import net.minecraft.util.Identifier;
-
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.impl.config.network.ConfigSyncS2CPayload;
 
 public final class ConfigHolderRegistry {
-	private static final Map<Identifier, ConfigHolder<?, ?>> holders = new Object2ObjectOpenHashMap<>();
+	private static final Map<ResourceLocation, ConfigHolder<?, ?>> holders = new Object2ObjectOpenHashMap<>();
 
-	public static void register(Identifier id, ConfigHolder<?, ?> holder) {
+	public static void register(ResourceLocation id, ConfigHolder<?, ?> holder) {
 		holders.put(id, holder);
 	}
 
-	public static ConfigHolder<?, ?> get(Identifier id) {
+	public static ConfigHolder<?, ?> get(ResourceLocation id) {
 		return holders.get(id);
 	}
 

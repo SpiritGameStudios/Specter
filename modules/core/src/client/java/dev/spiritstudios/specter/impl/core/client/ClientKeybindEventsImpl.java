@@ -3,19 +3,16 @@ package dev.spiritstudios.specter.impl.core.client;
 import java.util.Map;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
 
 public class ClientKeybindEventsImpl {
-	private static final Map<KeyBinding, Event<ClientKeybindEvents.KeybindListener>> EVENTS = new Object2ObjectOpenHashMap<>();
+	private static final Map<KeyMapping, Event<ClientKeybindEvents.KeybindListener>> EVENTS = new Object2ObjectOpenHashMap<>();
 
-	public static Event<ClientKeybindEvents.KeybindListener> pressed(KeyBinding keybind) {
+	public static Event<ClientKeybindEvents.KeybindListener> pressed(KeyMapping keybind) {
 		return EVENTS.computeIfAbsent(
 				keybind,
 				(key) -> EventFactory.createArrayBacked(
@@ -26,9 +23,9 @@ public class ClientKeybindEventsImpl {
 		);
 	}
 
-	public static void tick(MinecraftClient client) {
+	public static void tick(Minecraft client) {
 		EVENTS.forEach((key, value) -> {
-			while (key.wasPressed()) value.invoker().onKeybind(client);
+			while (key.consumeClick()) value.invoker().onKeybind(client);
 		});
 	}
 }

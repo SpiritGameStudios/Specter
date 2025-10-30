@@ -2,24 +2,22 @@ package dev.spiritstudios.specter.impl.registry.client;
 
 import static dev.spiritstudios.specter.impl.registry.SpecterRegistry.METATAGS_SYNC;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import dev.spiritstudios.specter.api.registry.metatag.Metatag;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagValueHolder;
 import dev.spiritstudios.specter.impl.registry.metatag.MetatagsS2CPayload;
 
 public class SpecterRegistryClient implements ClientModInitializer {
 	private static <R, V> void putMetatagValues(MetatagsS2CPayload.MetatagData<R, V> data) {
-		if (MinecraftClient.getInstance().isIntegratedServerRunning())
+		if (Minecraft.getInstance().hasSingleplayerServer())
 			return;
 
 		Metatag<R, V> metatag = data.metatag();
-		RegistryKey<Registry<R>> registry = metatag.registryKey();
+		ResourceKey<Registry<R>> registry = metatag.registryKey();
 		MetatagValueHolder<R> metatagHolder = MetatagValueHolder.getOrCreate(registry);
 
 		metatagHolder.specter$clearMetatag(metatag);
@@ -33,7 +31,7 @@ public class SpecterRegistryClient implements ClientModInitializer {
 				METATAGS_SYNC.payloadId(),
 				(payload, context) ->
 						context.client().execute(() ->
-								METATAGS_SYNC.receive(payload, context.player().getRegistryManager()))
+								METATAGS_SYNC.receive(payload, context.player().registryAccess()))
 		);
 
 		METATAGS_SYNC.receiveCallback().register((payload, registryManager) -> {

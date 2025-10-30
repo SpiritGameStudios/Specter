@@ -1,14 +1,12 @@
 package dev.spiritstudios.specter.api.dfu;
 
 import java.util.Objects;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.datafix.fixes.References;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
-
-import net.minecraft.datafixer.TypeReferences;
-import net.minecraft.util.Identifier;
 
 public class BlockStateRenameFix extends DataFix {
 	private final String name;
@@ -16,7 +14,7 @@ public class BlockStateRenameFix extends DataFix {
 	private final String defaultValue;
 	private final String oldName, newName;
 
-	public BlockStateRenameFix(String name, Identifier blockId, String oldName, String newName, String defaultValue, Schema outputSchema) {
+	public BlockStateRenameFix(String name, ResourceLocation blockId, String oldName, String newName, String defaultValue, Schema outputSchema) {
 		super(outputSchema, false);
 		this.name = name;
 		this.defaultValue = defaultValue;
@@ -29,7 +27,7 @@ public class BlockStateRenameFix extends DataFix {
 	protected TypeRewriteRule makeRule() {
 		return this.fixTypeEverywhereTyped(
 				this.name,
-				this.getInputSchema().getType(TypeReferences.BLOCK_STATE),
+				this.getInputSchema().getType(References.BLOCK_STATE),
 				typed -> typed.update(
 						DSL.remainderFinder(),
 						state -> {

@@ -10,10 +10,9 @@ import com.mojang.serialization.OptionalDynamic;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.SharedConstants;
-import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.datafixer.Schemas;
-import net.minecraft.nbt.NbtCompound;
-
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.util.datafix.DataFixers;
 import dev.spiritstudios.specter.mixin.dfu.DataFixTypesAccessor;
 
 public final class SpecterDataFixerRegistryImpl {
@@ -29,8 +28,8 @@ public final class SpecterDataFixerRegistryImpl {
 	public static SpecterDataFixerRegistryImpl get() {
 		if (INSTANCE != null) return INSTANCE;
 
-		Schema vanillaSchema = Schemas.getFixer()
-				.getSchema(DataFixUtils.makeKey(SharedConstants.getGameVersion().dataVersion().id()));
+		Schema vanillaSchema = DataFixers.getDataFixer()
+				.getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().dataVersion().version()));
 
 		INSTANCE = new SpecterDataFixerRegistryImpl(vanillaSchema);
 		return INSTANCE;
@@ -64,7 +63,7 @@ public final class SpecterDataFixerRegistryImpl {
 			int dataVersion = specterDataVersions.get(modId).asInt(0);
 
 			dynamic = value.dataFixer().update(
-					((DataFixTypesAccessor) (Object) types).getTypeReference(),
+					((DataFixTypesAccessor) (Object) types).getType(),
 					dynamic,
 					dataVersion, value.currentDataVersion()
 			);
@@ -73,8 +72,8 @@ public final class SpecterDataFixerRegistryImpl {
 		return dynamic.getValue();
 	}
 
-	public NbtCompound writeDataVersions(NbtCompound compound) {
-		NbtCompound dataVersions = new NbtCompound();
+	public CompoundTag addCurrentDataVersion(CompoundTag compound) {
+		CompoundTag dataVersions = new CompoundTag();
 		dataFixers.forEach((key, value) -> {
 			dataVersions.putInt(key, value.currentDataVersion());
 		});

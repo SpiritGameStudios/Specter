@@ -1,29 +1,27 @@
 package dev.spiritstudios.specter.api.dfu;
 
 import java.util.Objects;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.datafix.fixes.BlockRenameFix;
+import net.minecraft.util.datafix.fixes.ItemRenameFix;
+import net.minecraft.util.datafix.fixes.SimplestEntityRenameFix;
+import net.minecraft.util.datafix.schemas.NamespacedSchema;
 import com.mojang.datafixers.DataFixerBuilder;
 import com.mojang.datafixers.schemas.Schema;
-
-import net.minecraft.datafixer.fix.BlockNameFix;
-import net.minecraft.datafixer.fix.EntityRenameFix;
-import net.minecraft.datafixer.fix.ItemNameFix;
-import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
-import net.minecraft.util.Identifier;
 
 public final class DataFixHelper {
 	public static void renameBlock(
 		DataFixerBuilder builder,
 		String fixName,
-		Identifier oldId, Identifier newId,
+		ResourceLocation oldId, ResourceLocation newId,
 		Schema schema
 	) {
-		builder.addFixer(BlockNameFix.create(
+		builder.addFixer(BlockRenameFix.create(
 			schema,
 			fixName,
 			input ->
 				Objects.equals(
-					IdentifierNormalizingSchema.normalize(input),
+					NamespacedSchema.ensureNamespaced(input),
 					oldId.toString()
 				) ? newId.toString() : input
 		));
@@ -32,15 +30,15 @@ public final class DataFixHelper {
 	public static void renameItem(
 		DataFixerBuilder builder,
 		String fixName,
-		Identifier oldId, Identifier newId,
+		ResourceLocation oldId, ResourceLocation newId,
 		Schema schema
 	) {
-		builder.addFixer(ItemNameFix.create(
+		builder.addFixer(ItemRenameFix.create(
 			schema,
 			fixName,
 			input ->
 				Objects.equals(
-					IdentifierNormalizingSchema.normalize(input),
+					NamespacedSchema.ensureNamespaced(input),
 					oldId.toString()
 				) ? newId.toString() : input
 		));
@@ -49,14 +47,14 @@ public final class DataFixHelper {
 	public static void renameEntity(
 			DataFixerBuilder builder,
 			String fixName,
-			Identifier oldId, Identifier newId,
+			ResourceLocation oldId, ResourceLocation newId,
 			Schema schema
 	) {
-		builder.addFixer(new EntityRenameFix(fixName, schema, false) {
+		builder.addFixer(new SimplestEntityRenameFix(fixName, schema, false) {
 			@Override
 			protected String rename(String oldName) {
 				return Objects.equals(
-						IdentifierNormalizingSchema.normalize(oldName),
+						NamespacedSchema.ensureNamespaced(oldName),
 						oldId.toString()
 				) ? newId.toString() : oldName;
 			}
@@ -66,7 +64,7 @@ public final class DataFixHelper {
 	public static void renameBlockState(
 			DataFixerBuilder builder,
 			String fixName,
-			Identifier blockId,
+			ResourceLocation blockId,
 			String oldState, String newState,
 			String defaultValue,
 			Schema schema

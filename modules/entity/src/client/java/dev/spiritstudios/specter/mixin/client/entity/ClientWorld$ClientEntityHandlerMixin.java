@@ -8,20 +8,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
 
 import dev.spiritstudios.specter.api.entity.EntityPart;
 import dev.spiritstudios.specter.api.entity.PartHolder;
 
-@Mixin(targets = "net/minecraft/client/world/ClientWorld$ClientEntityHandler")
+@Mixin(targets = "net/minecraft/client/multiplayer/ClientLevel$EntityCallbacks")
 public abstract class ClientWorld$ClientEntityHandlerMixin {
 
 	@Shadow
 	@Final
-	ClientWorld field_27735;
+	ClientLevel field_27735;
 
-	@Inject(method = "startTracking(Lnet/minecraft/entity/Entity;)V", at = @At("RETURN"))
+	@Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
 	private void startTracking(Entity entity, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
 			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {
@@ -30,7 +30,7 @@ public abstract class ClientWorld$ClientEntityHandlerMixin {
 		}
 	}
 
-	@Inject(method = "stopTracking(Lnet/minecraft/entity/Entity;)V", at = @At("RETURN"))
+	@Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
 	private void stopTracking(Entity entity, CallbackInfo ci) {
 		if (entity instanceof PartHolder<?> partHolder) {
 			for (EntityPart<?> part : partHolder.getSpecterEntityParts()) {

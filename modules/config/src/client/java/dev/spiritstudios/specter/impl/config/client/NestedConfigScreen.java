@@ -1,9 +1,8 @@
 package dev.spiritstudios.specter.impl.config.client;
 
-import net.minecraft.client.gui.screen.Screen;
-
 import dev.spiritstudios.specter.api.config.NestedConfig;
 import dev.spiritstudios.specter.api.config.client.ConfigScreen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class NestedConfigScreen extends ConfigScreen {
 	public NestedConfigScreen(NestedConfig<?> config, String id, Screen parent) {

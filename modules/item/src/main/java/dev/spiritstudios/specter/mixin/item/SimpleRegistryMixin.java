@@ -9,50 +9,50 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.SimpleRegistry;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryInfo;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistrationInfo;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 import dev.spiritstudios.specter.impl.item.UnfrozenRegistry;
 
-@Mixin(SimpleRegistry.class)
+@Mixin(MappedRegistry.class)
 public abstract class SimpleRegistryMixin<T> implements UnfrozenRegistry<T> {
 	@Shadow
 	@Final
-	private Map<RegistryKey<T>, RegistryEntry.Reference<T>> keyToEntry;
+	private Map<ResourceKey<T>, Holder.Reference<T>> byKey;
 
 	@Shadow
 	@Final
-	private Map<Identifier, RegistryEntry.Reference<T>> idToEntry;
+	private Map<ResourceLocation, Holder.Reference<T>> byLocation;
 
 	@Shadow
 	@Final
-	private Map<T, RegistryEntry.Reference<T>> valueToEntry;
+	private Map<T, Holder.Reference<T>> byValue;
 
 	@Shadow
 	@Final
-	private ObjectList<RegistryEntry.Reference<T>> rawIdToEntry;
+	private ObjectList<Holder.Reference<T>> byId;
 
 	@Shadow
 	@Final
-	private Reference2IntMap<T> entryToRawId;
+	private Reference2IntMap<T> toId;
 
 	@Shadow
 	@Final
-	private Map<RegistryKey<T>, RegistryEntryInfo> keyToEntryInfo;
+	private Map<ResourceKey<T>, RegistrationInfo> registrationInfos;
 
 	@Override
-	public void specter$remove(RegistryKey<T> key) {
-		RegistryEntry.Reference<T> reference = this.keyToEntry.get(key);
+	public void specter$remove(ResourceKey<T> key) {
+		Holder.Reference<T> reference = this.byKey.get(key);
 		T value = reference.value();
 
-		this.keyToEntry.remove(key);
-		this.idToEntry.remove(key.getValue());
-		this.valueToEntry.remove(value);
-		this.rawIdToEntry.remove(reference);
-		this.entryToRawId.removeInt(value);
-		this.keyToEntryInfo.remove(key);
+		this.byKey.remove(key);
+		this.byLocation.remove(key.location());
+		this.byValue.remove(value);
+		this.byId.remove(reference);
+		this.toId.removeInt(value);
+		this.registrationInfos.remove(key);
 	}
 }

@@ -2,16 +2,13 @@ package dev.spiritstudios.specter.api.config;
 
 import java.util.List;
 import java.util.Optional;
-
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.RecordBuilder;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Identifier;
-
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.impl.config.NestedConfigValue;
 import dev.spiritstudios.specter.impl.config.ValueImpl;
@@ -49,8 +46,8 @@ public interface Value<T> {
 
 	String translationKey(String configId);
 
-	default String translationKey(Identifier configId) {
-		return translationKey(configId.toTranslationKey());
+	default String translationKey(ResourceLocation configId) {
+		return translationKey(configId.toLanguageKey());
 	}
 
 	String name();
@@ -60,7 +57,7 @@ public interface Value<T> {
 		protected final Codec<T> codec;
 		protected String comment;
 		protected boolean sync;
-		protected PacketCodec<ByteBuf, T> packetCodec;
+		protected StreamCodec<ByteBuf, T> packetCodec;
 
 		public Builder(T defaultValue, Codec<T> codec) {
 			this.defaultValue = defaultValue;
@@ -78,7 +75,7 @@ public interface Value<T> {
 			return this;
 		}
 
-		public Builder<T> packetCodec(PacketCodec<ByteBuf, T> packetCodec) {
+		public Builder<T> packetCodec(StreamCodec<ByteBuf, T> packetCodec) {
 			this.packetCodec = packetCodec;
 			return this;
 		}

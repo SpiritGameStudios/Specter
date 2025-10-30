@@ -2,39 +2,38 @@ package dev.spiritstudios.specter.api.gui.client.widget;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
+import net.minecraft.client.InputType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.navigation.GuiNavigationType;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.screen.narration.NarrationPart;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.sound.SoundManager;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
-
-public class SpecterSliderWidget extends ClickableWidget {
-	private static final Identifier SLIDER = Identifier.ofVanilla("widget/slider");
-	private static final Identifier SLIDER_HIGHLIGHTED = Identifier.ofVanilla("widget/slider_highlighted");
-	private static final Identifier SLIDER_HANDLE = Identifier.ofVanilla("widget/slider_handle");
-	private static final Identifier SLIDER_HANDLE_HIGHLIGHTED = Identifier.ofVanilla("widget/slider_handle_highlighted");
+public class SpecterSliderWidget extends AbstractWidget {
+	private static final ResourceLocation SLIDER = ResourceLocation.withDefaultNamespace("widget/slider");
+	private static final ResourceLocation SLIDER_HIGHLIGHTED = ResourceLocation.withDefaultNamespace("widget/slider_highlighted");
+	private static final ResourceLocation SLIDER_HANDLE = ResourceLocation.withDefaultNamespace("widget/slider_handle");
+	private static final ResourceLocation SLIDER_HANDLE_HIGHLIGHTED = ResourceLocation.withDefaultNamespace("widget/slider_handle_highlighted");
 
 	protected final double step;
 	protected final double min;
 	protected final double max;
 
 	protected final DoubleConsumer valueChangedListener;
-	protected final DoubleFunction<Text> messageSupplier;
+	protected final DoubleFunction<Component> messageSupplier;
 	protected double value;
 	protected boolean sliderFocused;
 
-	protected SpecterSliderWidget(int x, int y, int width, int height, double value, double step, double min, double max, DoubleConsumer valueChangedListener, DoubleFunction<Text> messageSupplier) {
+	protected SpecterSliderWidget(int x, int y, int width, int height, double value, double step, double min, double max, DoubleConsumer valueChangedListener, DoubleFunction<Component> messageSupplier) {
 		super(x, y, width, height, messageSupplier.apply(value));
 
 		this.value = value;
@@ -53,7 +52,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 
 
 	@Override
-	public void onClick(Click click, boolean doubled) {
+	public void onClick(MouseButtonEvent click, boolean doubled) {
 		super.onClick(click, doubled);
 
 		if (click.isLeft()) {
@@ -62,27 +61,27 @@ public class SpecterSliderWidget extends ClickableWidget {
 	}
 
 	@Override
-	public void onRelease(Click click) {
+	public void onRelease(MouseButtonEvent click) {
 		super.onRelease(click);
 
 		if (click.isLeft()) {
-			super.playDownSound(MinecraftClient.getInstance().getSoundManager());
+			super.playDownSound(Minecraft.getInstance().getSoundManager());
 		}
 	}
 
 	@Override
-	protected void onDrag(Click click, double offsetX, double offsetY) {
+	protected void onDrag(MouseButtonEvent click, double offsetX, double offsetY) {
 		super.onDrag(click, offsetX, offsetY);
 		this.setValueFromMouse(offsetX);
 	}
 
 	private void setValueFromMouse(double mouseX) {
-		setValue(MathHelper.map(MathHelper.clamp((mouseX - (double) (this.getX() + 4)) / (double) (this.getWidth() - 8), 0.0, 1.0), 0, 1, min, max));
+		setValue(Mth.map(Mth.clamp((mouseX - (double) (this.getX() + 4)) / (double) (this.getWidth() - 8), 0.0, 1.0), 0, 1, min, max));
 	}
 
 	@Override
-	public boolean keyPressed(KeyInput input) {
-		if (input.isEnterOrSpace()) {
+	public boolean keyPressed(KeyEvent input) {
+		if (input.isSelection()) {
 			this.sliderFocused = !this.sliderFocused;
 			return true;
 		}
@@ -109,8 +108,8 @@ public class SpecterSliderWidget extends ClickableWidget {
 			return;
 		}
 
-		GuiNavigationType navigationType = MinecraftClient.getInstance().getNavigationType();
-		if (navigationType == GuiNavigationType.MOUSE || navigationType == GuiNavigationType.KEYBOARD_TAB)
+		InputType navigationType = Minecraft.getInstance().getLastInputType();
+		if (navigationType == InputType.MOUSE || navigationType == InputType.KEYBOARD_TAB)
 			this.sliderFocused = true;
 	}
 
@@ -125,63 +124,63 @@ public class SpecterSliderWidget extends ClickableWidget {
 
 	// region Rendering
 	@Override
-	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-		MinecraftClient client = MinecraftClient.getInstance();
+	protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+		Minecraft client = Minecraft.getInstance();
 
-		context.drawGuiTexture(
+		context.blitSprite(
 				RenderPipelines.GUI_TEXTURED,
 				this.getTexture(),
 				this.getX(),
 				this.getY(),
 				this.getWidth(),
 				this.getHeight(),
-				ColorHelper.fromFloats(this.alpha, 1.0F, 1.0F, 1.0F)
+				ARGB.colorFromFloat(this.alpha, 1.0F, 1.0F, 1.0F)
 		);
 
-		context.drawGuiTexture(
+		context.blitSprite(
 				RenderPipelines.GUI_TEXTURED,
 				this.getHandleTexture(),
-				this.getX() + (int) (MathHelper.map(this.value, min, max, 0, 1) * (this.getWidth() - 8)),
+				this.getX() + (int) (Mth.map(this.value, min, max, 0, 1) * (this.getWidth() - 8)),
 				this.getY(),
 				8,
 				this.getHeight(),
-				ColorHelper.fromFloats(this.alpha, 1.0F, 1.0F, 1.0F)
+				ARGB.colorFromFloat(this.alpha, 1.0F, 1.0F, 1.0F)
 		);
 
 		int color = this.active ? 0xffffff : 0xa0a0a0;
 
-		this.drawScrollableText(context, client.textRenderer, 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
+		this.renderScrollingString(context, client.font, 2, color | Mth.ceil(this.alpha * 255.0F) << 24);
 	}
 
 	@Override
-	public Text getMessage() {
+	public Component getMessage() {
 		return this.messageSupplier.apply(value);
 	}
 
-	protected Identifier getTexture() {
+	protected ResourceLocation getTexture() {
 		return this.isFocused() && !this.sliderFocused ? SLIDER_HIGHLIGHTED : SLIDER;
 	}
 
-	protected Identifier getHandleTexture() {
-		return !this.hovered && !this.sliderFocused ? SLIDER_HANDLE : SLIDER_HANDLE_HIGHLIGHTED;
+	protected ResourceLocation getHandleTexture() {
+		return !this.isHovered && !this.sliderFocused ? SLIDER_HANDLE : SLIDER_HANDLE_HIGHLIGHTED;
 	}
 	// endregion
 
 	// region Narration
 	@Override
-	protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-		builder.put(NarrationPart.TITLE, this.getNarrationMessage());
+	protected void updateWidgetNarration(NarrationElementOutput builder) {
+		builder.add(NarratedElementType.TITLE, this.createNarrationMessage());
 		if (!this.active) return;
 
-		builder.put(
-				NarrationPart.USAGE,
-				Text.translatable(isFocused() ? "narration.slider.usage.focused" : "narration.slider.usage.hovered")
+		builder.add(
+				NarratedElementType.USAGE,
+				Component.translatable(isFocused() ? "narration.slider.usage.focused" : "narration.slider.usage.hovered")
 		);
 	}
 
 	@Override
-	protected MutableText getNarrationMessage() {
-		return Text.translatable("gui.narrate.slider", this.getMessage());
+	protected MutableComponent createNarrationMessage() {
+		return Component.translatable("gui.narrate.slider", this.getMessage());
 	}
 	// endregion
 
@@ -189,8 +188,8 @@ public class SpecterSliderWidget extends ClickableWidget {
 		double oldValue = this.value;
 
 		double newValue = value;
-		newValue = step <= 0.0 ? newValue : MathHelper.map(
-				Math.round(MathHelper.map(newValue, min, max, 0, 1) / step) * step,
+		newValue = step <= 0.0 ? newValue : Mth.map(
+				Math.round(Mth.map(newValue, min, max, 0, 1) / step) * step,
 				0, 1,
 				min, max
 		);
@@ -211,7 +210,7 @@ public class SpecterSliderWidget extends ClickableWidget {
 		private double max = 1.0;
 		private DoubleConsumer valueChangedListener = value -> {
 		};
-		private DoubleFunction<Text> messageSupplier = (value) -> Text.of(String.format("%.2f", value));
+		private DoubleFunction<Component> messageSupplier = (value) -> Component.nullToEmpty(String.format("%.2f", value));
 
 		protected Builder(double value) {
 			this.value = value;
@@ -233,12 +232,12 @@ public class SpecterSliderWidget extends ClickableWidget {
 			return position(x, y).size(width, height);
 		}
 
-		public Builder message(Text message) {
+		public Builder message(Component message) {
 			messageSupplier = (ignored) -> message;
 			return this;
 		}
 
-		public Builder message(DoubleFunction<Text> messageSupplier) {
+		public Builder message(DoubleFunction<Component> messageSupplier) {
 			this.messageSupplier = messageSupplier;
 			return this;
 		}

@@ -7,15 +7,15 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.client.network.ClientRegistries;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.SimpleRegistry;
-import net.minecraft.resource.ResourceFactory;
+import net.minecraft.client.multiplayer.RegistryDataCollector;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.packs.resources.ResourceProvider;
+import net.minecraft.world.item.CreativeModeTab;
 
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import dev.spiritstudios.specter.api.item.DataItemGroup;
@@ -23,30 +23,30 @@ import dev.spiritstudios.specter.api.item.SpecterItemRegistryKeys;
 import dev.spiritstudios.specter.impl.item.UnfrozenRegistry;
 import dev.spiritstudios.specter.mixin.item.SimpleRegistryAccessor;
 
-@Mixin(ClientRegistries.class)
+@Mixin(RegistryDataCollector.class)
 public abstract class ClientRegistriesMixin {
-	@WrapMethod(method = "createRegistryManager(Lnet/minecraft/resource/ResourceFactory;Lnet/minecraft/registry/DynamicRegistryManager$Immutable;Z)Lnet/minecraft/registry/DynamicRegistryManager$Immutable;")
-	private DynamicRegistryManager.Immutable makeMutable(ResourceFactory resourceFactory, DynamicRegistryManager.Immutable registryManager, boolean local, Operation<DynamicRegistryManager.Immutable> original) {
-		DynamicRegistryManager.Immutable result = original.call(resourceFactory, registryManager, local);
+	@WrapMethod(method = "collectGameRegistries")
+	private RegistryAccess.Frozen makeMutable(ResourceProvider resourceFactory, RegistryAccess.Frozen registryManager, boolean local, Operation<RegistryAccess.Frozen> original) {
+		RegistryAccess.Frozen result = original.call(resourceFactory, registryManager, local);
 
-		if (!(Registries.ITEM_GROUP instanceof SimpleRegistry<ItemGroup> registry)) throw new UnreachableException();
+		if (!(BuiltInRegistries.CREATIVE_MODE_TAB instanceof MappedRegistry<CreativeModeTab> registry)) throw new UnreachableException();
 
 		SimpleRegistryAccessor accessor = (SimpleRegistryAccessor) registry;
 		accessor.setFrozen(false);
 
-		@SuppressWarnings("unchecked") UnfrozenRegistry<ItemGroup> unfrozen = ((UnfrozenRegistry<ItemGroup>) registry);
+		@SuppressWarnings("unchecked") UnfrozenRegistry<CreativeModeTab> unfrozen = ((UnfrozenRegistry<CreativeModeTab>) registry);
 
 		// Remove data item groups, we are about to load them in again
 		// We copy the set since otherwise we would be modifying it while iterating
-		for (Map.Entry<RegistryKey<ItemGroup>, ItemGroup> mapEntry : Set.copyOf(registry.getEntrySet())) {
+		for (Map.Entry<ResourceKey<CreativeModeTab>, CreativeModeTab> mapEntry : Set.copyOf(registry.entrySet())) {
 			if (mapEntry.getValue() instanceof DataItemGroup) {
 				unfrozen.specter$remove(mapEntry.getKey());
 			}
 		}
 
-		result.getOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).streamEntries().forEach(entry -> {
-			RegistryKey<ItemGroup> key = RegistryKey.of(RegistryKeys.ITEM_GROUP, entry.registryKey().getValue());
-			Registry.register(Registries.ITEM_GROUP, key, entry.value());
+		result.lookupOrThrow(SpecterItemRegistryKeys.ITEM_GROUP).listElements().forEach(entry -> {
+			ResourceKey<CreativeModeTab> key = ResourceKey.create(Registries.CREATIVE_MODE_TAB, entry.key().location());
+			Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, key, entry.value());
 		});
 
 		accessor.setFrozen(true);

@@ -1,82 +1,82 @@
 package dev.spiritstudios.specter.impl.debug.item;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.LootableInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.loot.LootTable;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.RandomizableContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 public class LootLoaderItem extends Item {
-	private static final Text NO_LOOT_TABLE = Text.translatable("item.specter-debug.loot_loader.no_loot_table");
+	private static final Component NO_LOOT_TABLE = Component.translatable("item.specter-debug.loot_loader.no_loot_table");
 
-	public LootLoaderItem(Settings settings) {
+	public LootLoaderItem(Properties settings) {
 		super(settings);
 	}
 
 	@Override
-	public ActionResult useOnBlock(ItemUsageContext context) {
-		PlayerEntity player = context.getPlayer();
-		World world = context.getWorld();
-		if (player == null || world.isClient()) return ActionResult.SUCCESS;
+	public InteractionResult useOn(UseOnContext context) {
+		Player player = context.getPlayer();
+		Level world = context.getLevel();
+		if (player == null || world.isClientSide()) return InteractionResult.SUCCESS;
 
-		BlockPos pos = context.getBlockPos();
+		BlockPos pos = context.getClickedPos();
 		BlockEntity blockEntity = world.getBlockEntity(pos);
-		if (blockEntity == null) return ActionResult.PASS;
-		if (!(blockEntity instanceof LootableInventory lootableInventory)) return ActionResult.PASS;
+		if (blockEntity == null) return InteractionResult.PASS;
+		if (!(blockEntity instanceof RandomizableContainer lootableInventory)) return InteractionResult.PASS;
 
-		ItemStack stack = context.getStack();
-		if (!stack.contains(DataComponentTypes.CUSTOM_NAME)) {
-			player.sendMessage(NO_LOOT_TABLE, true);
-			return ActionResult.FAIL;
+		ItemStack stack = context.getItemInHand();
+		if (!stack.has(DataComponents.CUSTOM_NAME)) {
+			player.displayClientMessage(NO_LOOT_TABLE, true);
+			return InteractionResult.FAIL;
 		}
 
-		Identifier lootTableId = Identifier.tryParse(stack.getName().getString());
+		ResourceLocation lootTableId = ResourceLocation.tryParse(stack.getHoverName().getString());
 		if (lootTableId == null) {
-			player.sendMessage(
-					Text.translatable(
+			player.displayClientMessage(
+					Component.translatable(
 							"item.specter-debug.loot_loader.invalid_id",
-							stack.getName().getString()
+							stack.getHoverName().getString()
 					),
 					true
 			);
-			return ActionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
 
 		MinecraftServer server = world.getServer();
-		if (server == null) return ActionResult.FAIL;
+		if (server == null) return InteractionResult.FAIL;
 
-		RegistryKey<LootTable> lootTable = RegistryKey.of(RegistryKeys.LOOT_TABLE, lootTableId);
-		if (server.getReloadableRegistries().getLootTable(lootTable) == LootTable.EMPTY) {
-			player.sendMessage(
-					Text.translatable(
+		ResourceKey<LootTable> lootTable = ResourceKey.create(Registries.LOOT_TABLE, lootTableId);
+		if (server.reloadableRegistries().getLootTable(lootTable) == LootTable.EMPTY) {
+			player.displayClientMessage(
+					Component.translatable(
 							"item.specter-debug.loot_loader.invalid_loot_table",
 							lootTableId.toString()
 					),
 					true
 			);
-			return ActionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
 
 		lootableInventory.setLootTable(lootTable, world.random.nextLong());
 
-		player.sendMessage(
-				Text.translatable(
+		player.displayClientMessage(
+				Component.translatable(
 						"item.specter-debug.loot_loader.loaded_loot_table",
 						lootTableId.toString()
 				),
 				true
 		);
-		return ActionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

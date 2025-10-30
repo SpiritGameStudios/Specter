@@ -2,17 +2,17 @@ package dev.spiritstudios.specter.api.registry;
 
 import org.jetbrains.annotations.ApiStatus;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.registry.annotations.Name;
@@ -25,7 +25,7 @@ public final class RegistryHelper {
 					.map(Name::value)
 					.orElseGet(() -> pair.field().getName().toLowerCase());
 
-				Registry.register(registry, Identifier.of(namespace, objectName), pair.value());
+				Registry.register(registry, ResourceLocation.fromNamespaceAndPath(namespace, objectName), pair.value());
 			}
 		);
 	}
@@ -36,11 +36,11 @@ public final class RegistryHelper {
 	@Deprecated(forRemoval = true)
 	@ApiStatus.Obsolete
 	public static void registerItems(Class<?> clazz, String namespace) {
-		registerFields(Registries.ITEM, Item.class, clazz, namespace);
+		registerFields(BuiltInRegistries.ITEM, Item.class, clazz, namespace);
 	}
 
 	public static void registerDataComponentTypes(Class<?> clazz, String namespace) {
-		registerFields(Registries.DATA_COMPONENT_TYPE, fixGenerics(ComponentType.class), clazz, namespace);
+		registerFields(BuiltInRegistries.DATA_COMPONENT_TYPE, fixGenerics(DataComponentType.class), clazz, namespace);
 	}
 
 	/**
@@ -58,29 +58,29 @@ public final class RegistryHelper {
 					.map(Name::value)
 					.orElseGet(() -> pair.field().getName().toLowerCase());
 
-				Registry.register(Registries.BLOCK, Identifier.of(namespace, objectName), pair.value());
+				Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(namespace, objectName), pair.value());
 
 				if (pair.field().isAnnotationPresent(NoBlockItem.class)) return;
-				BlockItem item = new BlockItem(pair.value(), new Item.Settings());
-				Registry.register(Registries.ITEM, Identifier.of(namespace, objectName), item);
+				BlockItem item = new BlockItem(pair.value(), new Item.Properties());
+				Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, objectName), item);
 			}
 		);
 	}
 
 	public static void registerBlockEntityTypes(Class<?> clazz, String namespace) {
-		registerFields(Registries.BLOCK_ENTITY_TYPE, fixGenerics(BlockEntityType.class), clazz, namespace);
+		registerFields(BuiltInRegistries.BLOCK_ENTITY_TYPE, fixGenerics(BlockEntityType.class), clazz, namespace);
 	}
 
 	public static void registerEntityTypes(Class<?> clazz, String namespace) {
-		registerFields(Registries.ENTITY_TYPE, fixGenerics(EntityType.class), clazz, namespace);
+		registerFields(BuiltInRegistries.ENTITY_TYPE, fixGenerics(EntityType.class), clazz, namespace);
 	}
 
 	public static void registerSoundEvents(Class<?> clazz, String namespace) {
-		registerFields(Registries.SOUND_EVENT, SoundEvent.class, clazz, namespace);
+		registerFields(BuiltInRegistries.SOUND_EVENT, SoundEvent.class, clazz, namespace);
 	}
 
 	public static void registerParticleTypes(Class<?> clazz, String namespace) {
-		registerFields(Registries.PARTICLE_TYPE, fixGenerics(ParticleType.class), clazz, namespace);
+		registerFields(BuiltInRegistries.PARTICLE_TYPE, fixGenerics(ParticleType.class), clazz, namespace);
 	}
 
 	/**

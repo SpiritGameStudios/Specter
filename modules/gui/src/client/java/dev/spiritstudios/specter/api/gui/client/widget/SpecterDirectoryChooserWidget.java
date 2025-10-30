@@ -4,22 +4,20 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.text.Text;
-
-public class SpecterDirectoryChooserWidget extends ClickableWidget {
-	protected final Function<Optional<File>, Text> messageSupplier;
+public class SpecterDirectoryChooserWidget extends AbstractWidget {
+	protected final Function<Optional<File>, Component> messageSupplier;
 	protected final Consumer<Optional<File>> valueChangedListener;
 	protected final DirectoryChooserType type;
 	@Nullable
 	protected File value;
 
-	public SpecterDirectoryChooserWidget(int x, int y, int width, int height, @Nullable File value, Function<Optional<File>, Text> messageSupplier, Consumer<Optional<File>> valueChangedListener, DirectoryChooserType type) {
+	public SpecterDirectoryChooserWidget(int x, int y, int width, int height, @Nullable File value, Function<Optional<File>, Component> messageSupplier, Consumer<Optional<File>> valueChangedListener, DirectoryChooserType type) {
 		super(x, y, width, height, messageSupplier.apply(null));
 
 		this.messageSupplier = messageSupplier;
@@ -33,12 +31,12 @@ public class SpecterDirectoryChooserWidget extends ClickableWidget {
 	}
 
 	@Override
-	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+	protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 
 	}
 
 	@Override
-	protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+	protected void updateWidgetNarration(NarrationElementOutput builder) {
 
 	}
 
@@ -59,7 +57,7 @@ public class SpecterDirectoryChooserWidget extends ClickableWidget {
 		private int y;
 		private int width = 150;
 		private int height = 20;
-		private Function<Optional<File>, Text> messageSupplier = (value) -> Text.of("%s".formatted(value));
+		private Function<Optional<File>, Component> messageSupplier = (value) -> Component.nullToEmpty("%s".formatted(value));
 		private Consumer<Optional<File>> valueChangedListener = value -> {
 		};
 
@@ -84,7 +82,7 @@ public class SpecterDirectoryChooserWidget extends ClickableWidget {
 			return position(x, y).size(width, height);
 		}
 
-		public Builder message(Function<Optional<File>, Text> messageSupplier) {
+		public Builder message(Function<Optional<File>, Component> messageSupplier) {
 			this.messageSupplier = messageSupplier;
 			return this;
 		}

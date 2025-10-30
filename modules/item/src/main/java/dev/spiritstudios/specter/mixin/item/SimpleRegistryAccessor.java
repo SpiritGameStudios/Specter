@@ -1,11 +1,10 @@
 package dev.spiritstudios.specter.mixin.item;
 
+import net.minecraft.core.MappedRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.registry.SimpleRegistry;
-
-@Mixin(SimpleRegistry.class)
+@Mixin(MappedRegistry.class)
 public interface SimpleRegistryAccessor {
 	@Accessor
 	boolean getFrozen();

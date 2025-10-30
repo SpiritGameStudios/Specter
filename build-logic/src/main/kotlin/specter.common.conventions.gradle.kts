@@ -16,7 +16,13 @@ val libs = the<LibrariesForLibs>()
 
 dependencies {
 	minecraft(libs.minecraft)
-	mappings(variantOf(libs.yarn) { classifier("v2") })
+	@Suppress("UnstableApiUsage")
+	mappings(
+		loom.layered {
+			officialMojangMappings()
+			parchment(libs.parchment)
+		}
+	)
 	modImplementation(libs.fabric.loader)
 
 	modImplementation(libs.fabric.api)

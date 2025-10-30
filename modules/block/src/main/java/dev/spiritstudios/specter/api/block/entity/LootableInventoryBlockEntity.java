@@ -1,45 +1,44 @@
 package dev.spiritstudios.specter.api.block.entity;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.RandomizableContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SeededContainerLoot;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerLootComponent;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.LootableInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootTable;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-
 /**
- * Very similar to {@link net.minecraft.block.entity.LootableContainerBlockEntity}, but for blocks without a menu.
+ * Very similar to {@link net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity}, but for blocks without a menu.
  */
-public class LootableInventoryBlockEntity extends BlockEntity implements ImplementedInventory, LootableInventory {
-	protected final DefaultedList<ItemStack> inventory;
+public class LootableInventoryBlockEntity extends BlockEntity implements ImplementedInventory, RandomizableContainer {
+	protected final NonNullList<ItemStack> inventory;
 
 	@Nullable
-	protected RegistryKey<LootTable> lootTable;
+	protected ResourceKey<LootTable> lootTable;
 	protected long lootTableSeed = 0L;
 
 	public LootableInventoryBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int size) {
 		super(type, pos, state);
-		inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+		inventory = NonNullList.withSize(size, ItemStack.EMPTY);
 	}
 
 	@Nullable
-	public RegistryKey<LootTable> getLootTable() {
+	public ResourceKey<LootTable> getLootTable() {
 		return this.lootTable;
 	}
 
-	public void setLootTable(@Nullable RegistryKey<LootTable> lootTable) {
+	public void setLootTable(@Nullable ResourceKey<LootTable> lootTable) {
 		this.lootTable = lootTable;
 	}
 
@@ -53,56 +52,56 @@ public class LootableInventoryBlockEntity extends BlockEntity implements Impleme
 
 
 	public boolean isEmpty() {
-		this.generateLoot(null);
+		this.unpackLootTable(null);
 		return ImplementedInventory.super.isEmpty();
 	}
 
-	public ItemStack getStack(int slot) {
-		this.generateLoot(null);
-		return ImplementedInventory.super.getStack(slot);
+	public ItemStack getItem(int slot) {
+		this.unpackLootTable(null);
+		return ImplementedInventory.super.getItem(slot);
 	}
 
-	public ItemStack removeStack(int slot, int amount) {
-		this.generateLoot(null);
-		return ImplementedInventory.super.removeStack(slot, amount);
+	public ItemStack removeItem(int slot, int amount) {
+		this.unpackLootTable(null);
+		return ImplementedInventory.super.removeItem(slot, amount);
 	}
 
-	public ItemStack removeStack(int slot) {
-		this.generateLoot(null);
-		return ImplementedInventory.super.removeStack(slot);
+	public ItemStack removeItemNoUpdate(int slot) {
+		this.unpackLootTable(null);
+		return ImplementedInventory.super.removeItemNoUpdate(slot);
 	}
 
-	public void setStack(int slot, ItemStack itemStack) {
-		this.generateLoot(null);
-		ImplementedInventory.super.setStack(slot, itemStack);
+	public void setItem(int slot, ItemStack itemStack) {
+		this.unpackLootTable(null);
+		ImplementedInventory.super.setItem(slot, itemStack);
 	}
 
 
 	@Override
-	public DefaultedList<ItemStack> getItems() {
+	public NonNullList<ItemStack> getItems() {
 		return inventory;
 	}
 
 	@Override
-	protected void writeData(WriteView view) {
-		super.writeData(view);
+	protected void saveAdditional(ValueOutput view) {
+		super.saveAdditional(view);
 
-		if (!this.writeLootTable(view)) Inventories.writeData(view, this.inventory);
+		if (!this.trySaveLootTable(view)) ContainerHelper.saveAllItems(view, this.inventory);
 	}
 
 	@Override
-	protected void readData(ReadView view) {
-		super.readData(view);
+	protected void loadAdditional(ValueInput view) {
+		super.loadAdditional(view);
 
-		this.clear();
+		this.clearContent();
 
-		if (!this.readLootTable(view)) Inventories.readData(view, this.inventory);
+		if (!this.tryLoadLootTable(view)) ContainerHelper.loadAllItems(view, this.inventory);
 	}
 
 	@Override
-	protected void readComponents(ComponentsAccess components) {
-		super.readComponents(components);
-		ContainerLootComponent containerLootComponent = components.get(DataComponentTypes.CONTAINER_LOOT);
+	protected void applyImplicitComponents(DataComponentGetter components) {
+		super.applyImplicitComponents(components);
+		SeededContainerLoot containerLootComponent = components.get(DataComponents.CONTAINER_LOOT);
 		if (containerLootComponent != null) {
 			this.lootTable = containerLootComponent.lootTable();
 			this.lootTableSeed = containerLootComponent.seed();
@@ -110,17 +109,17 @@ public class LootableInventoryBlockEntity extends BlockEntity implements Impleme
 	}
 
 	@Override
-	protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-		super.addComponents(componentMapBuilder);
+	protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+		super.collectImplicitComponents(componentMapBuilder);
 		if (this.lootTable != null)
-			componentMapBuilder.add(DataComponentTypes.CONTAINER_LOOT, new ContainerLootComponent(this.lootTable, this.lootTableSeed));
+			componentMapBuilder.set(DataComponents.CONTAINER_LOOT, new SeededContainerLoot(this.lootTable, this.lootTableSeed));
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void removeFromCopiedStackData(WriteView view) {
-		super.removeFromCopiedStackData(view);
-		view.remove("LootTable");
-		view.remove("LootTableSeed");
+	public void removeComponentsFromTag(ValueOutput view) {
+		super.removeComponentsFromTag(view);
+		view.discard("LootTable");
+		view.discard("LootTableSeed");
 	}
 }

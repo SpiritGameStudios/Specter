@@ -4,7 +4,11 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
+import net.minecraft.core.Registry;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -13,13 +17,6 @@ import com.mojang.serialization.RecordBuilder;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-
 import dev.spiritstudios.specter.api.core.reflect.Ignore;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.core.util.SpecterPacketCodecs;
@@ -66,18 +63,18 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 
 	/**
 	 * Creates a new boolean value with the given default value.
-	 * The codec and packet codec are set to {@link Codec#BOOL} and {@link PacketCodecs#BOOLEAN} respectively.
+	 * The codec and packet codec are set to {@link Codec#BOOL} and {@link ByteBufCodecs#BOOL} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
 	protected static Value.Builder<Boolean> booleanValue(boolean defaultValue) {
-		return value(defaultValue, Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN);
+		return value(defaultValue, Codec.BOOL).packetCodec(ByteBufCodecs.BOOL);
 	}
 
 	/**
 	 * Creates a new integer value with the given default value and a default range of 0 to 100.
-	 * The codec and packet codec are set to {@link Codec#INT} and {@link PacketCodecs#INTEGER} respectively.
+	 * The codec and packet codec are set to {@link Codec#INT} and {@link ByteBufCodecs#INT} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
@@ -86,51 +83,51 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 		return new NumericValue.Builder<>(defaultValue, Codec.INT, Math::clamp)
 				.codecRange(SpecterCodecs::clampedRange)
 				.range(0, 100)
-				.packetCodec(PacketCodecs.INTEGER);
+				.packetCodec(ByteBufCodecs.INT);
 	}
 
 	/**
 	 * Creates a new float value with the given default value and a default range of 0 to 1.
-	 * The codec and packet codec are set to {@link Codec#FLOAT} and {@link PacketCodecs#FLOAT} respectively.
+	 * The codec and packet codec are set to {@link Codec#FLOAT} and {@link ByteBufCodecs#FLOAT} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
 	protected static NumericValue.Builder<Float> floatValue(float defaultValue) {
-		return new NumericValue.Builder<>(defaultValue, Codec.FLOAT, MathHelper::clamp)
+		return new NumericValue.Builder<>(defaultValue, Codec.FLOAT, Mth::clamp)
 				.codecRange(SpecterCodecs::clampedRange)
 				.range(0.0F, 1.0F)
-				.packetCodec(PacketCodecs.FLOAT);
+				.packetCodec(ByteBufCodecs.FLOAT);
 	}
 
 	/**
 	 * Creates a new double value with the given default value and a default range of 0 to 1.
-	 * The codec and packet codec are set to {@link Codec#DOUBLE} and {@link PacketCodecs#DOUBLE} respectively.
+	 * The codec and packet codec are set to {@link Codec#DOUBLE} and {@link ByteBufCodecs#DOUBLE} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
 	protected static NumericValue.Builder<Double> doubleValue(double defaultValue) {
-		return new NumericValue.Builder<>(defaultValue, Codec.DOUBLE, MathHelper::clamp)
+		return new NumericValue.Builder<>(defaultValue, Codec.DOUBLE, Mth::clamp)
 				.codecRange(SpecterCodecs::clampedRange)
 				.range(0.0, 1.0)
-				.packetCodec(PacketCodecs.DOUBLE);
+				.packetCodec(ByteBufCodecs.DOUBLE);
 	}
 
 	/**
 	 * Creates a new string value with the given default value.
-	 * The codec and packet codec are set to {@link Codec#STRING} and {@link PacketCodecs#STRING} respectively.
+	 * The codec and packet codec are set to {@link Codec#STRING} and {@link ByteBufCodecs#STRING_UTF8} respectively.
 	 *
 	 * @param defaultValue The default value.
 	 * @return A new value builder.
 	 */
 	protected static Value.Builder<String> stringValue(String defaultValue) {
-		return new Value.Builder<>(defaultValue, Codec.STRING).packetCodec(PacketCodecs.STRING);
+		return new Value.Builder<>(defaultValue, Codec.STRING).packetCodec(ByteBufCodecs.STRING_UTF8);
 	}
 
 	/**
 	 * Creates a new value for a registry entry with the given default value and registry.
-	 * This will be stored in the config as an {@link Identifier}.
+	 * This will be stored in the config as an {@link ResourceLocation}.
 	 *
 	 * @param defaultValue The default value.
 	 * @param registry     The registry used to create the codec.
@@ -138,7 +135,7 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 	 * @return A new value builder.
 	 */
 	protected static <T> Value.Builder<T> registryValue(T defaultValue, Registry<T> registry) {
-		return value(defaultValue, registry.getCodec());
+		return value(defaultValue, registry.byNameCodec());
 	}
 
 	/**
@@ -186,8 +183,8 @@ public abstract class Config<T extends Config<T>> implements Codec<T> {
 
 	@ApiStatus.Internal
 	@SuppressWarnings("unchecked")
-	public PacketCodec<ByteBuf, T> packetCodec() {
-		return PacketCodec.of(
+	public StreamCodec<ByteBuf, T> packetCodec() {
+		return StreamCodec.ofMember(
 				(value, buf) -> value.fields().forEach(pair -> {
 					if (!pair.value().sync()) return;
 					pair.value().packetEncode(buf);

@@ -11,11 +11,8 @@ import java.util.List;
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.loader.api.FabricLoader;
-
+import net.minecraft.resources.ResourceLocation;
 import dev.spiritstudios.specter.api.core.reflect.ReflectionHelper;
 import dev.spiritstudios.specter.api.serialization.format.DynamicFormat;
 import dev.spiritstudios.specter.api.serialization.format.JsonCFormat;
@@ -30,11 +27,11 @@ import dev.spiritstudios.specter.impl.core.Specter;
  */
 public class ConfigHolder<T extends Config<T>, F> {
 	private final T config;
-	private final Identifier id;
+	private final ResourceLocation id;
 	private final String path;
 	private final DynamicFormat<F> format;
 
-	protected ConfigHolder(DynamicFormat<F> language, Identifier id, String path, Class<T> clazz) {
+	protected ConfigHolder(DynamicFormat<F> language, ResourceLocation id, String path, Class<T> clazz) {
 		this.format = language;
 		this.id = id;
 		this.path = path;
@@ -66,7 +63,7 @@ public class ConfigHolder<T extends Config<T>, F> {
 	 * @param <T>   The type of the config.
 	 * @return A new config holder builder.
 	 */
-	public static <T extends Config<T>> Builder<T> builder(Identifier id, Class<T> clazz) {
+	public static <T extends Config<T>> Builder<T> builder(ResourceLocation id, Class<T> clazz) {
 		return new Builder<>(id, clazz);
 	}
 
@@ -169,7 +166,7 @@ public class ConfigHolder<T extends Config<T>, F> {
 	 *
 	 * @return The identifier of this holder.
 	 */
-	public Identifier id() {
+	public ResourceLocation id() {
 		return id;
 	}
 
@@ -198,13 +195,13 @@ public class ConfigHolder<T extends Config<T>, F> {
 	 * @param <T> The type of the config.
 	 */
 	public static class Builder<T extends Config<T>> {
-		private final Identifier id;
+		private final ResourceLocation id;
 		private final Class<T> clazz;
 
 		private DynamicFormat<?> format = JsonCFormat.INSTANCE;
 		private String path;
 
-		protected Builder(Identifier id, Class<T> clazz) {
+		protected Builder(ResourceLocation id, Class<T> clazz) {
 			this.id = id;
 			this.clazz = clazz;
 
